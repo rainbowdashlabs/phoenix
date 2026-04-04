@@ -28,23 +28,35 @@ import java.util.Base64;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 
 public class CryptoService {
+    private static final SecureRandom secureRandom = new SecureRandom();
     private final Configuration configuration;
-    private final KeyPairGenerator generator;
-    private final KeyFactory kf;
+    private final KeyPairGenerator rsaGenerator;
+    private final KeyGenerator aesGenerator;
+    private final KeyFactory rsaFactory;
+    private final SecretKeyFactory aesFactory;
 
     @Inject
     public CryptoService(Configuration configuration) throws NoSuchAlgorithmException {
         this.configuration = configuration;
-        generator = KeyPairGenerator.getInstance(key());
-        generator.initialize(keySize(), new SecureRandom());
-        kf = KeyFactory.getInstance(key());
+        rsaGenerator = KeyPairGenerator.getInstance(key());
+        rsaGenerator.initialize(keySize(), new SecureRandom());
+        aesGenerator = KeyGenerator.getInstance("AES");
+        aesGenerator.init(256);
+        rsaFactory = KeyFactory.getInstance("RSA");
+        aesFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
     }
 
     public KeyPair generateKeyPair() {
-        return generator.generateKeyPair();
+        return rsaGenerator.generateKeyPair();
     }
 
     public byte[] encrypt(String text, PublicKey key) {
@@ -69,7 +81,7 @@ public class CryptoService {
 
     private byte[] process(byte[] data, int opMode, Key key)
             throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException,
-                    InvalidKeyException {
+            InvalidKeyException {
         Cipher cipher = Cipher.getInstance(cipher());
         cipher.init(opMode, key);
         cipher.update(data);
@@ -92,20 +104,35 @@ public class CryptoService {
 
     public PrivateKey deserializePrivateKey(String key) throws InvalidKeySpecException {
         key = key.replace("\n", "")
-                .replace("-----BEGIN PRIVATE KEY-----", "")
-                .replace("-----END PRIVATE KEY-----", "")
-                .trim();
+                 .replace("-----BEGIN PRIVATE KEY-----", "")
+                 .replace("-----END PRIVATE KEY-----", "")
+                 .trim();
         byte[] decoded = Base64.getDecoder().decode(key);
-        return kf.generatePrivate(new PKCS8EncodedKeySpec(decoded));
+        return rsaFactory.generatePrivate(new PKCS8EncodedKeySpec(decoded));
     }
 
     public PublicKey deserializePublicKey(String key) throws InvalidKeySpecException {
         key = key.replace("\n", "")
-                .replace("-----BEGIN PUBLIC KEY-----", "")
-                .replace("-----END PUBLIC KEY-----", "")
-                .trim();
+                 .replace("-----BEGIN PUBLIC KEY-----", "")
+                 .replace("-----END PUBLIC KEY-----", "")
+                 .trim();
         byte[] decoded = Base64.getDecoder().decode(key);
-        return kf.generatePublic(new X509EncodedKeySpec(decoded));
+        return rsaFactory.generatePublic(new X509EncodedKeySpec(decoded));
+    }
+
+    private GCMParameterSpec gcmParameterSpec() {
+        byte[] iv = new byte[12];
+        secureRandom.nextBytes(iv);
+        return new GCMParameterSpec(128, iv);
+    }
+
+    private SecretKey randomAESKey() throws InvalidKeySpecException {
+        byte[] bytes = new byte[64];
+        secureRandom.nextBytes(bytes);
+        char[] key = Base64.getEncoder().withoutPadding().encodeToString(bytes).toCharArray();
+        byte[] salt = secureRandom.generateSeed(16);
+        PBEKeySpec pbeKeySpec = new PBEKeySpec(key, salt, 65536, 256);
+        return new SecretKeySpec(aesFactory.generateSecret(pbeKeySpec).getEncoded(), "AES");
     }
 
     private String cipher() {
