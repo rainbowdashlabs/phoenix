@@ -9,7 +9,6 @@ import com.google.inject.Inject;
 import dev.chojo.configuration.Configuration;
 import dev.chojo.crypto.exceptions.CryptoException;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
@@ -23,7 +22,6 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
@@ -31,7 +29,6 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.SecretKeySpec;
 
 public class CryptoService {
     private final Configuration configuration;
@@ -44,7 +41,6 @@ public class CryptoService {
         generator = KeyPairGenerator.getInstance(key());
         generator.initialize(keySize(), new SecureRandom());
         kf = KeyFactory.getInstance(key());
-
     }
 
     public KeyPair generateKeyPair() {
@@ -73,7 +69,7 @@ public class CryptoService {
 
     private byte[] process(byte[] data, int opMode, Key key)
             throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException,
-            InvalidKeyException {
+                    InvalidKeyException {
         Cipher cipher = Cipher.getInstance(cipher());
         cipher.init(opMode, key);
         cipher.update(data);
@@ -95,13 +91,19 @@ public class CryptoService {
     }
 
     public PrivateKey deserializePrivateKey(String key) throws InvalidKeySpecException {
-        key = key.replace("\n", "").replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "").trim();
+        key = key.replace("\n", "")
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
+                .trim();
         byte[] decoded = Base64.getDecoder().decode(key);
         return kf.generatePrivate(new PKCS8EncodedKeySpec(decoded));
     }
 
     public PublicKey deserializePublicKey(String key) throws InvalidKeySpecException {
-        key = key.replace("\n", "").replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "").trim();
+        key = key.replace("\n", "")
+                .replace("-----BEGIN PUBLIC KEY-----", "")
+                .replace("-----END PUBLIC KEY-----", "")
+                .trim();
         byte[] decoded = Base64.getDecoder().decode(key);
         return kf.generatePublic(new X509EncodedKeySpec(decoded));
     }

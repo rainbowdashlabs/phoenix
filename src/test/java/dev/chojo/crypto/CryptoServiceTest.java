@@ -77,6 +77,7 @@ class CryptoServiceTest {
         assertEquals(original.getFormat(), key.getFormat());
         assertArrayEquals(original.getEncoded(), key.getEncoded());
     }
+
     @Test
     void deserializePrivateKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
         Key original = cryptoService.generateKeyPair().getPrivate();
@@ -85,6 +86,5 @@ class CryptoServiceTest {
         assertEquals(original.getAlgorithm(), key.getAlgorithm());
         assertEquals(original.getFormat(), key.getFormat());
         assertArrayEquals(original.getEncoded(), key.getEncoded());
-
     }
 }
