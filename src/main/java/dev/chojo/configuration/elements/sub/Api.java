@@ -14,10 +14,13 @@ import dev.chojo.ocular.override.Prop;
 public class Api {
     @Overwrite(env = @Env, prop = @Prop)
     private String host = "0.0.0.0";
+
     @Overwrite(env = @Env, prop = @Prop)
     private int port = 8888;
+
     @Overwrite(env = @Env, prop = @Prop)
     private String url = "https://elpis.chojo.dev";
+
     @Overwrite(env = @Env, prop = @Prop)
     private int tokenValidHours = 720; // 30 Days
 

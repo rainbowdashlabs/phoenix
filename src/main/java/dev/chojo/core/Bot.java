@@ -1,3 +1,8 @@
+/*
+ *     SPDX-License-Identifier: AGPL-3.0-only
+ *
+ *     Copyright (C) RainbowDashLabs and Contributor
+ */
 package dev.chojo.core;
 
 import com.google.inject.AbstractModule;
@@ -21,12 +26,13 @@ public class Bot extends AbstractModule {
 
     private static final Logger log = LoggerFactory.getLogger(Bot.class);
 
-    @Inject
-    private Configuration configuration;
+    private final Configuration configuration;
 
-    public Bot() throws InterruptedException {
+    public Bot(Configuration configuration) {
+        this.configuration = configuration;
     }
 
+    @Inject
     public void start() throws InterruptedException {
         ShardManager manager = shardManager(configuration.main().general().token());
         jdaCommands(manager);
@@ -39,10 +45,10 @@ public class Bot extends AbstractModule {
 
     private ShardManager shardManager(String token) throws InterruptedException {
         ShardManager manager = DefaultShardManagerBuilder.createDefault(token)
-                                                       .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)
-                                                       .setStatus(OnlineStatus.DO_NOT_DISTURB)
-                                                       .setEventPool(Executors.newVirtualThreadPerTaskExecutor())
-                                                       .build();
+                .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)
+                .setStatus(OnlineStatus.DO_NOT_DISTURB)
+                .setEventPool(Executors.newVirtualThreadPerTaskExecutor())
+                .build();
         for (JDA shard : manager.getShards()) {
             shard.awaitReady();
         }

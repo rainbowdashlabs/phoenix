@@ -1,3 +1,8 @@
+/*
+ *     SPDX-License-Identifier: AGPL-3.0-only
+ *
+ *     Copyright (C) RainbowDashLabs and Contributor
+ */
 package dev.chojo;
 
 import com.google.inject.Guice;
@@ -6,8 +11,6 @@ import dev.chojo.core.Bot;
 import dev.chojo.guice.ElpisModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Objects;
 
 public class Bootstrapper {
 

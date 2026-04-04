@@ -42,10 +42,11 @@ dependencies {
 
     implementation(libs.jspecify)
 
+    testRuntimeOnly(libs.junit.platform)
     testImplementation(libs.sadu.testing)
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.bundles.junit)
-    testRuntimeOnly(libs.junit.platform)
+    testImplementation(libs.mockito)
 }
 
 tasks{
