@@ -1,3 +1,8 @@
+/*
+ *     SPDX-License-Identifier: AGPL-3.0-only
+ *
+ *     Copyright (C) RainbowDashLabs and Contributor
+ */
 package dev.chojo.configuration.elements.sub;
 
 import dev.chojo.ocular.override.Env;
@@ -9,16 +14,22 @@ import dev.chojo.ocular.override.Prop;
 public class Database {
     @Overwrite(env = @Env, prop = @Prop)
     private String host = "localhost";
+
     @Overwrite(env = @Env, prop = @Prop)
     private String port = "5432";
+
     @Overwrite(env = @Env, prop = @Prop)
     private String database = "postgres";
+
     @Overwrite(env = @Env, prop = @Prop)
     private String schema = "elpis_schema";
+
     @Overwrite(env = @Env, prop = @Prop)
     private String user = "postgres";
+
     @Overwrite(env = @Env, prop = @Prop)
     private String password = "postgres";
+
     @Overwrite(env = @Env, prop = @Prop)
     private int poolSize = 5;
 

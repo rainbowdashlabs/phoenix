@@ -10,8 +10,10 @@ plugins {
     alias(libs.plugins.idea)
 }
 
-application.mainClass = "dev.chojo.Bootstrapper"
-application.applicationDefaultJvmArgs = listOf("--add-reads", "dev.chojo.elpis=ALL-UNNAMED")
+application {
+    mainClass = "dev.chojo.Bootstrapper"
+    applicationDefaultJvmArgs = listOf("--add-reads", "dev.chojo.elpis=ALL-UNNAMED")
+}
 group = "dev.chojo"
 version = "1.0.0"
 
@@ -42,13 +44,14 @@ dependencies {
 
     implementation(libs.jspecify)
 
+    testRuntimeOnly(libs.junit.platform)
     testImplementation(libs.sadu.testing)
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.bundles.junit)
-    testRuntimeOnly(libs.junit.platform)
+    testImplementation(libs.mockito)
 }
 
-tasks{
+tasks {
     compileJava {
         options.isIncremental = true
         options.compilerArgs.addAll(listOf("--add-reads", "dev.chojo.elpis=ALL-UNNAMED"))
@@ -67,7 +70,10 @@ tasks{
                     val formattedDate = now.format(formatter)
 
                     version = when (System.getenv("GITHUB_REF_TYPE")) {
-                        "branch" -> "$version ${System.getenv("GITHUB_REF_NAME")}-${System.getenv("GITHUB_SHA").substring(0, 7)} @ $formattedDate"
+                        "branch" -> "$version ${System.getenv("GITHUB_REF_NAME")}-${
+                            System.getenv("GITHUB_SHA").substring(0, 7)
+                        } @ $formattedDate"
+
                         "tag" -> "$version ${System.getenv("GITHUB_REF_NAME").substring(1)} @ $formattedDate"
                         else -> "$version snapshot"
                     }
@@ -126,13 +132,15 @@ java {
 idea {
     project {
         settings {
-            var shared = listOf("-Dbot.cleanup=false",
+            var shared = listOf(
+                "-Dbot.cleanup=false",
                 "-Dbot.config=config.testing.yaml",
                 "-Dlog4j2.configurationFile=docker/config/log4j2.testing.xml",
                 "-Dbot.db.host=localhost,",
                 "-Dbot.api.url=http://localhost:5173",
                 "--sun-misc-unsafe-memory-access=allow",
-                "--enable-native-access=ALL-UNNAMED")
+                "--enable-native-access=ALL-UNNAMED"
+            )
             runConfigurations {
                 register<org.jetbrains.gradle.ext.Application>("App-Testing") {
                     mainClass = "dev.chojo.Bootstrapper"
@@ -141,7 +149,8 @@ idea {
                 }
                 register<org.jetbrains.gradle.ext.Application>("App-Testing - All SKUs") {
                     mainClass = "dev.chojo.Bootstrapper"
-                    jvmArgs = (shared + "-Dbot.grantallsku=true" + "-Dcjda.premium.skipEntitledCheck=true").joinToString(" ")
+                    jvmArgs =
+                        (shared + "-Dbot.grantallsku=true" + "-Dcjda.premium.skipEntitledCheck=true").joinToString(" ")
                     moduleName = "elpis.main"
                 }
             }
