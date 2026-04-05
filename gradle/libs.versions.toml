@@ -11,7 +11,7 @@ idea = { id = "org.jetbrains.gradle.plugin.idea-ext", version = "1.4.1" }
 
 [libraries]
 # Core
-jda = { group = "net.dv8tion", name = "JDA", version = "6.4.0" }
+jda = { group = "net.dv8tion", name = "JDA", version = "6.4.1" }
 jdacommands = { group = "io.github.kaktushose", name = "jda-commands", version = "5.0.0-SNAPSHOT" }
 
 # Database
