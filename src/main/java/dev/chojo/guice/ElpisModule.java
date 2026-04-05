@@ -13,6 +13,6 @@ public class ElpisModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(Configuration.class).toInstance(new Configuration());
-        bind(CryptoService.class).to(CryptoService.class);
+        bind(CryptoService.class);
     }
 }

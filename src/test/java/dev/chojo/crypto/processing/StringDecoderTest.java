@@ -19,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Random;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -47,8 +48,7 @@ class StringDecoderTest {
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
         EncryptedContent encrypted = new StringEncoder(rsa, aes).encode(generatedString);
-        System.out.printf("Encrypted: %s%n", encrypted);
         String decode = new StringDecoder(new Decoder(privateRSA)).decode(encrypted);
-        System.out.printf("Decrypted: %s%n", decode);
+        assertEquals(generatedString, decode);
     }
 }

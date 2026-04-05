@@ -28,6 +28,7 @@ public class Bot extends AbstractModule {
 
     private final Configuration configuration;
 
+    @Inject
     public Bot(Configuration configuration) {
         this.configuration = configuration;
     }
