@@ -15,6 +15,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -36,5 +38,27 @@ class DecoderTest {
         Decoder decoder = new Decoder(aes);
         byte[] decoded = decoder.process(encrypted);
         assertEquals("Hello", new String(decoded));
+    }
+
+    @Test
+    void testProcessFromString() throws InvalidKeySpecException {
+        var aes = cryptoService.randomAESKey();
+        Encoder encoder = new Encoder(aes);
+        String encrypted = encoder.processToString("Hello");
+
+        Decoder decoder = new Decoder(aes);
+        byte[] decoded = decoder.processFromString(encrypted);
+        assertEquals("Hello", new String(decoded));
+
+        String decodedString = decoder.processFromStringToString(encrypted);
+        assertEquals("Hello", decodedString);
+    }
+
+    @Test
+    void testProcessError() throws Exception {
+        var wrapper = mock(dev.chojo.crypto.processing.wrapper.AlgorithmWrapper.class);
+        when(wrapper.process(any(byte[].class), anyInt())).thenThrow(new RuntimeException("test error"));
+        Decoder decoder = new Decoder(wrapper);
+        assertThrows(RuntimeException.class, () -> decoder.process("data".getBytes()));
     }
 }

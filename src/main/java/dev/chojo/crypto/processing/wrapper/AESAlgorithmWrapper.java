@@ -30,12 +30,6 @@ public class AESAlgorithmWrapper extends AlgorithmWrapper {
     @Nullable
     private transient GCMParameterSpec spec;
 
-    public AESAlgorithmWrapper(SecretKey key, byte[] iv) {
-        this.key = key;
-        this.iv = iv;
-        this.cipher = "AES/GCM/NoPadding";
-    }
-
     public AESAlgorithmWrapper(SecretKey key, byte[] iv, String cipher) {
         this.key = key;
         this.iv = iv;

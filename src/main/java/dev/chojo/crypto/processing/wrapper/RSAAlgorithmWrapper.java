@@ -22,11 +22,6 @@ public class RSAAlgorithmWrapper extends AlgorithmWrapper {
 
     private final String cipher;
 
-    public RSAAlgorithmWrapper(Key key) {
-        this.key = key;
-        this.cipher = "RSA/ECB/PKCS1Padding";
-    }
-
     public RSAAlgorithmWrapper(Key key, String cipher) {
         this.key = key;
         this.cipher = cipher;
@@ -37,6 +32,14 @@ public class RSAAlgorithmWrapper extends AlgorithmWrapper {
             throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
                     InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
         return process(data, cipher, opMode, key, null);
+    }
+
+    public Key key() {
+        return key;
+    }
+
+    public String cipher() {
+        return cipher;
     }
 
     @Override
