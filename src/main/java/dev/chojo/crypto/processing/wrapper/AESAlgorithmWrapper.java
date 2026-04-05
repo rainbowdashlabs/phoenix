@@ -8,6 +8,12 @@ package dev.chojo.crypto.processing.wrapper;
 import dev.chojo.crypto.processing.model.AESProcessInput;
 import dev.chojo.crypto.processing.model.AESProcessResult;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Objects;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -15,11 +21,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.security.auth.DestroyFailedException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Objects;
 
 public class AESAlgorithmWrapper extends AlgorithmWrapper<AESProcessInput, AESProcessResult> {
     private static final SecureRandom secureRandom = new SecureRandom();
@@ -55,7 +56,7 @@ public class AESAlgorithmWrapper extends AlgorithmWrapper<AESProcessInput, AESPr
     @Override
     public AESProcessResult process(AESProcessInput input)
             throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
-            InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
+                    InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
         try (var lock = cipherLock()) {
             Cipher cipher = lock.cipher();
             if (opMode == Cipher.ENCRYPT_MODE) {

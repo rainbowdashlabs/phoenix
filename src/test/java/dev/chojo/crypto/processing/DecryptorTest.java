@@ -18,10 +18,11 @@ import dev.chojo.crypto.processing.wrapper.RSAAlgorithmWrapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import javax.crypto.Cipher;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+
+import javax.crypto.Cipher;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -42,9 +43,11 @@ class DecryptorTest {
     void testDecode() throws InvalidKeySpecException {
         KeyPair rsa = cryptoService.generateRSAKeyPair();
         String cipher = "RSA/ECB/PKCS1Padding";
-        Encryptor<BytesProcessInput, BytesProcessResult> encryptor = new Encryptor<>(new RSAAlgorithmWrapper(rsa.getPublic(), cipher, Cipher.ENCRYPT_MODE));
+        Encryptor<BytesProcessInput, BytesProcessResult> encryptor =
+                new Encryptor<>(new RSAAlgorithmWrapper(rsa.getPublic(), cipher, Cipher.ENCRYPT_MODE));
         byte[] encrypted = encryptor.process("Hello".getBytes()).bytes();
-        Decryptor<BytesProcessInput, BytesProcessResult> decryptor = new Decryptor<>(new RSAAlgorithmWrapper(rsa.getPrivate(), cipher, Cipher.DECRYPT_MODE));
+        Decryptor<BytesProcessInput, BytesProcessResult> decryptor =
+                new Decryptor<>(new RSAAlgorithmWrapper(rsa.getPrivate(), cipher, Cipher.DECRYPT_MODE));
         byte[] decoded = decryptor.process(encrypted).bytes();
         assertEquals("Hello", new String(decoded));
     }
@@ -92,7 +95,9 @@ class DecryptorTest {
         when(wrapper.process(any(BytesProcessInput.class))).thenReturn(null);
 
         Decryptor<BytesProcessInput, BytesProcessResult> decryptor = new Decryptor<>(wrapper);
-        assertThrows(dev.chojo.crypto.exceptions.CryptoException.class, () -> decryptor.process(new BytesProcessInput(new byte[0])));
+        assertThrows(
+                dev.chojo.crypto.exceptions.CryptoException.class,
+                () -> decryptor.process(new BytesProcessInput(new byte[0])));
     }
 
     @Test

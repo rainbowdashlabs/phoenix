@@ -5,8 +5,6 @@
  */
 package dev.chojo.crypto.processing;
 
-import dev.chojo.crypto.processing.model.AESProcessInput;
-import dev.chojo.crypto.processing.model.AESProcessResult;
 import dev.chojo.crypto.processing.model.BytesProcessInput;
 import dev.chojo.crypto.processing.model.ProcessInput;
 import dev.chojo.crypto.processing.model.ProcessResult;
@@ -28,7 +26,8 @@ public class Decryptor<I extends ProcessInput, R extends ProcessResult> extends 
     @SuppressWarnings("unchecked")
     public R process(byte[] data) {
         if (wrapper instanceof AESAlgorithmWrapper) {
-            throw new UnsupportedOperationException("AES decryption requires IV. Use process(AESProcessInput) instead.");
+            throw new UnsupportedOperationException(
+                    "AES decryption requires IV. Use process(AESProcessInput) instead.");
         }
         return process((I) new BytesProcessInput(data));
     }

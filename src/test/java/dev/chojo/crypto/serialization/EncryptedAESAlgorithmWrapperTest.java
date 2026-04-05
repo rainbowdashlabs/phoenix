@@ -9,22 +9,21 @@ import dev.chojo.configuration.Configuration;
 import dev.chojo.configuration.elements.Root;
 import dev.chojo.crypto.CryptoService;
 import dev.chojo.crypto.exceptions.CryptoException;
-import dev.chojo.crypto.processing.model.AESProcessInput;
-import dev.chojo.crypto.processing.model.AESProcessResult;
-import dev.chojo.crypto.processing.model.BytesProcessInput;
-import dev.chojo.crypto.processing.model.BytesProcessResult;
 import dev.chojo.crypto.processing.Decryptor;
 import dev.chojo.crypto.processing.Encryptor;
+import dev.chojo.crypto.processing.model.BytesProcessInput;
+import dev.chojo.crypto.processing.model.BytesProcessResult;
 import dev.chojo.crypto.processing.wrapper.AESAlgorithmWrapper;
 import dev.chojo.crypto.processing.wrapper.AlgorithmWrapper;
 import dev.chojo.crypto.processing.wrapper.RSAAlgorithmWrapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import javax.crypto.Cipher;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+
+import javax.crypto.Cipher;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,7 +43,8 @@ class EncryptedAESAlgorithmWrapperTest {
     @Test
     void encrypt() throws InvalidKeySpecException {
         KeyPair rsa = cryptoService.generateRSAKeyPair();
-        RSAAlgorithmWrapper rsaWrapper = new RSAAlgorithmWrapper(rsa.getPublic(), "RSA/ECB/PKCS1Padding", Cipher.ENCRYPT_MODE);
+        RSAAlgorithmWrapper rsaWrapper =
+                new RSAAlgorithmWrapper(rsa.getPublic(), "RSA/ECB/PKCS1Padding", Cipher.ENCRYPT_MODE);
         AESAlgorithmWrapper aesWrapper = cryptoService.randomAESKey();
         Encryptor<BytesProcessInput, BytesProcessResult> encryptor = new Encryptor<>(rsaWrapper);
         EncryptedAESAlgorithmWrapper wrapper = EncryptedAESAlgorithmWrapper.encrypt(aesWrapper, encryptor);

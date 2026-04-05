@@ -23,7 +23,8 @@ public class StringDecoder {
     /// In this case, it has to be the private key and not the public key.
     private final Decryptor<BytesProcessInput, BytesProcessResult> rsa;
 
-    private final Map<EncryptedAESAlgorithmWrapper, Decryptor<? extends ProcessInput, ? extends ProcessResult>> aesDecoder = new HashMap<>();
+    private final Map<EncryptedAESAlgorithmWrapper, Decryptor<? extends ProcessInput, ? extends ProcessResult>>
+            aesDecoder = new HashMap<>();
 
     public StringDecoder(Decryptor<BytesProcessInput, BytesProcessResult> rsa) {
         this.rsa = rsa;
@@ -36,14 +37,16 @@ public class StringDecoder {
 
         if (decryptor.wrapper() instanceof dev.chojo.crypto.processing.wrapper.AESAlgorithmWrapper) {
             @SuppressWarnings("unchecked")
-            Decryptor<AESProcessInput, AESProcessResult> aesDecryptor = (Decryptor<AESProcessInput, AESProcessResult>) decryptor;
-            return new String(aesDecryptor.process(new AESProcessInput(data, iv)).bytes());
+            Decryptor<AESProcessInput, AESProcessResult> aesDecryptor =
+                    (Decryptor<AESProcessInput, AESProcessResult>) decryptor;
+            return new String(
+                    aesDecryptor.process(new AESProcessInput(data, iv)).bytes());
         }
 
         return new String(decryptor.process(data).bytes());
     }
 
     private Decryptor<AESProcessInput, AESProcessResult> decodeKey(EncryptedAESAlgorithmWrapper key) {
-        return new Decryptor<AESProcessInput, AESProcessResult>(key.decrypt(rsa));
+        return new Decryptor<>(key.decrypt(rsa));
     }
 }

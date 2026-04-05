@@ -5,5 +5,4 @@
  */
 package dev.chojo.crypto.processing.model;
 
-public record BytesProcessInput(byte[] bytes) implements ProcessInput {
-}
+public record BytesProcessInput(byte[] bytes) implements ProcessInput {}

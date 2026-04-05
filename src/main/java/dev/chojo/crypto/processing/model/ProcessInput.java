@@ -5,5 +5,4 @@
  */
 package dev.chojo.crypto.processing.model;
 
-public interface ProcessInput {
-}
+public interface ProcessInput {}

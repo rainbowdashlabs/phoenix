@@ -10,13 +10,14 @@ import dev.chojo.configuration.Configuration;
 import dev.chojo.configuration.elements.sub.Crypto;
 import dev.chojo.crypto.processing.wrapper.AESAlgorithmWrapper;
 
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 
 public class CryptoService {
     private static final SecureRandom secureRandom = new SecureRandom();
@@ -68,4 +69,5 @@ public class CryptoService {
 
     int aesKeySize() {
         return crypto().symmetricKeySize();
-    }}
+    }
+}

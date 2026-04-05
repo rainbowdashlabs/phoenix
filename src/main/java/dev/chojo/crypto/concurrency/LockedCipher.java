@@ -5,8 +5,9 @@
  */
 package dev.chojo.crypto.concurrency;
 
-import javax.crypto.Cipher;
 import java.util.concurrent.locks.ReentrantLock;
+
+import javax.crypto.Cipher;
 
 public class LockedCipher implements AutoCloseable {
     private final Cipher cipher;

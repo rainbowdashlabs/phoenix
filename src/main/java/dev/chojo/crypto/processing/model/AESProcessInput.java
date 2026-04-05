@@ -7,5 +7,4 @@ package dev.chojo.crypto.processing.model;
 
 import org.jspecify.annotations.Nullable;
 
-public record AESProcessInput(byte[] bytes, byte @Nullable [] iv) implements ProcessInput {
-}
+public record AESProcessInput(byte[] bytes, byte @Nullable [] iv) implements ProcessInput {}
