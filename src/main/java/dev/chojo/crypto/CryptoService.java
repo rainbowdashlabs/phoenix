@@ -7,12 +7,9 @@ package dev.chojo.crypto;
 
 import com.google.inject.Inject;
 import dev.chojo.configuration.Configuration;
-import dev.chojo.crypto.exceptions.CryptoException;
+import dev.chojo.crypto.processing.wrapper.AESAlgorithmWrapper;
 
-import java.nio.charset.StandardCharsets;
-import java.security.GeneralSecurityException;
-import java.security.InvalidKeyException;
-import java.security.Key;
+import java.security.AsymmetricKey;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -25,14 +22,8 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -40,7 +31,6 @@ public class CryptoService {
     private static final SecureRandom secureRandom = new SecureRandom();
     private final Configuration configuration;
     private final KeyPairGenerator rsaGenerator;
-    private final KeyGenerator aesGenerator;
     private final KeyFactory rsaFactory;
     private final SecretKeyFactory aesFactory;
 
@@ -48,51 +38,16 @@ public class CryptoService {
     public CryptoService(Configuration configuration) throws NoSuchAlgorithmException {
         this.configuration = configuration;
         rsaGenerator = KeyPairGenerator.getInstance(key());
-        rsaGenerator.initialize(keySize(), new SecureRandom());
-        aesGenerator = KeyGenerator.getInstance("AES");
-        aesGenerator.init(256);
+        rsaGenerator.initialize(512, new SecureRandom());
         rsaFactory = KeyFactory.getInstance("RSA");
         aesFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
     }
 
-    public KeyPair generateKeyPair() {
+    public KeyPair generateRSAKeyPair() {
         return rsaGenerator.generateKeyPair();
     }
 
-    public byte[] encrypt(String text, PublicKey key) {
-        return encrypt(text.getBytes(StandardCharsets.UTF_8), key);
-    }
-
-    public byte[] encrypt(byte[] data, PublicKey key) {
-        try {
-            return process(data, Cipher.ENCRYPT_MODE, key);
-        } catch (GeneralSecurityException e) {
-            throw new CryptoException("Could not encrypt", e);
-        }
-    }
-
-    public byte[] decrypt(byte[] data, PrivateKey key) {
-        try {
-            return process(data, Cipher.DECRYPT_MODE, key);
-        } catch (GeneralSecurityException e) {
-            throw new CryptoException("Could not decrypt", e);
-        }
-    }
-
-    private byte[] process(byte[] data, int opMode, Key key)
-            throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException,
-            InvalidKeyException {
-        Cipher cipher = Cipher.getInstance(cipher());
-        cipher.init(opMode, key);
-        cipher.update(data);
-        return cipher.doFinal();
-    }
-
-    public String decryptString(byte[] data, PrivateKey key) {
-        return new String(decrypt(data, key), StandardCharsets.UTF_8);
-    }
-
-    public String serializeKey(Key key) {
+    public String serializeKey(AsymmetricKey key) {
         String encoded = Base64.getEncoder().encodeToString(key.getEncoded());
         if (key instanceof PublicKey) {
             encoded = "-----BEGIN PUBLIC KEY-----\n" + encoded + "\n-----END PUBLIC KEY-----";
@@ -120,17 +75,22 @@ public class CryptoService {
         return rsaFactory.generatePublic(new X509EncodedKeySpec(decoded));
     }
 
-    private GCMParameterSpec gcmParameterSpec() {
+    private byte[] iv() {
         byte[] iv = new byte[12];
         secureRandom.nextBytes(iv);
-        return new GCMParameterSpec(128, iv);
+        return iv;
     }
 
-    private SecretKey randomAESKey() throws InvalidKeySpecException {
+    public AESAlgorithmWrapper randomAESKey() throws InvalidKeySpecException {
         byte[] bytes = new byte[64];
         secureRandom.nextBytes(bytes);
         char[] key = Base64.getEncoder().withoutPadding().encodeToString(bytes).toCharArray();
         byte[] salt = secureRandom.generateSeed(16);
+        SecretKey secretKey = generateAESKey(key, salt);
+        return new AESAlgorithmWrapper(secretKey, iv());
+    }
+
+    public SecretKey generateAESKey(char[] key, byte[] salt) throws InvalidKeySpecException {
         PBEKeySpec pbeKeySpec = new PBEKeySpec(key, salt, 65536, 256);
         return new SecretKeySpec(aesFactory.generateSecret(pbeKeySpec).getEncoded(), "AES");
     }

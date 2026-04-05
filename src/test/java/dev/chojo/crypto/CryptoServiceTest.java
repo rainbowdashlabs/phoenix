@@ -7,10 +7,11 @@ package dev.chojo.crypto;
 
 import dev.chojo.configuration.Configuration;
 import dev.chojo.configuration.elements.Root;
+import dev.chojo.crypto.processing.wrapper.AESAlgorithmWrapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.security.Key;
+import java.security.AsymmetricKey;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -32,29 +33,14 @@ class CryptoServiceTest {
     }
 
     @Test
-    void generateKeyPair() {
-        KeyPair keyPair = cryptoService.generateKeyPair();
+    void generateRSAKeyPair() {
+        KeyPair keyPair = cryptoService.generateRSAKeyPair();
         assertNotNull(keyPair);
     }
 
     @Test
-    void encrypt() {
-        KeyPair keyPair = cryptoService.generateKeyPair();
-        byte[] testStrings = cryptoService.encrypt("Test String", keyPair.getPublic());
-        assertNotEquals("Test String".getBytes(), testStrings);
-    }
-
-    @Test
-    void decrypt() {
-        KeyPair keyPair = cryptoService.generateKeyPair();
-        byte[] bytes = cryptoService.encrypt("Test String", keyPair.getPublic());
-        String decrypted = cryptoService.decryptString(bytes, keyPair.getPrivate());
-        assertEquals("Test String", decrypted);
-    }
-
-    @Test
     void serializePublicKey() {
-        Key key = cryptoService.generateKeyPair().getPublic();
+        AsymmetricKey key = cryptoService.generateRSAKeyPair().getPublic();
         String serializedKey = cryptoService.serializeKey(key);
         System.out.println(serializedKey);
         assertNotNull(serializedKey);
@@ -62,7 +48,7 @@ class CryptoServiceTest {
 
     @Test
     void serializePrivateKey() {
-        Key key = cryptoService.generateKeyPair().getPublic();
+        AsymmetricKey key = cryptoService.generateRSAKeyPair().getPublic();
         String serializedKey = cryptoService.serializeKey(key);
         System.out.println(serializedKey);
         assertNotNull(serializedKey);
@@ -70,7 +56,7 @@ class CryptoServiceTest {
 
     @Test
     void deserializePublicKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
-        Key original = cryptoService.generateKeyPair().getPublic();
+        AsymmetricKey original = cryptoService.generateRSAKeyPair().getPublic();
         String serializedKey = cryptoService.serializeKey(original);
         PublicKey key = cryptoService.deserializePublicKey(serializedKey);
         assertEquals(original.getAlgorithm(), key.getAlgorithm());
@@ -80,11 +66,17 @@ class CryptoServiceTest {
 
     @Test
     void deserializePrivateKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
-        Key original = cryptoService.generateKeyPair().getPrivate();
+        AsymmetricKey original = cryptoService.generateRSAKeyPair().getPrivate();
         String serializedKey = cryptoService.serializeKey(original);
         PrivateKey key = cryptoService.deserializePrivateKey(serializedKey);
         assertEquals(original.getAlgorithm(), key.getAlgorithm());
         assertEquals(original.getFormat(), key.getFormat());
         assertArrayEquals(original.getEncoded(), key.getEncoded());
+    }
+
+    @Test
+    void randomAESKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
+        AESAlgorithmWrapper wrapper = cryptoService.randomAESKey();
+        assertNotNull(wrapper);
     }
 }
