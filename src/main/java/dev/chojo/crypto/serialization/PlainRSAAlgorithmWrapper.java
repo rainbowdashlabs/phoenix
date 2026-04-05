@@ -17,6 +17,8 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
+import javax.crypto.Cipher;
+
 public record PlainRSAAlgorithmWrapper(String key, String cipher) {
     public static PlainRSAAlgorithmWrapper wrap(RSAAlgorithmWrapper wrapper) {
         String encoded = Base64.getEncoder().encodeToString(wrapper.key().getEncoded());
@@ -29,7 +31,7 @@ public record PlainRSAAlgorithmWrapper(String key, String cipher) {
             throw new CryptoException(
                     "Unsupported key type: " + wrapper.key().getClass().getName(), null);
         }
-        return new PlainRSAAlgorithmWrapper(key, wrapper.cipher());
+        return new PlainRSAAlgorithmWrapper(key, wrapper.cipherName());
     }
 
     public RSAAlgorithmWrapper unwrap() {
@@ -43,7 +45,7 @@ public record PlainRSAAlgorithmWrapper(String key, String cipher) {
                         .trim();
                 byte[] decoded = decode(keyStr);
                 PublicKey publicKey = rsaFactory.generatePublic(new X509EncodedKeySpec(decoded));
-                return new RSAAlgorithmWrapper(publicKey, this.cipher);
+                return new RSAAlgorithmWrapper(publicKey, this.cipher, Cipher.ENCRYPT_MODE);
             } else if (this.key.contains("-----BEGIN PRIVATE KEY-----")) {
                 String keyStr = this.key
                         .replace("\n", "")
@@ -52,7 +54,7 @@ public record PlainRSAAlgorithmWrapper(String key, String cipher) {
                         .trim();
                 byte[] decoded = decode(keyStr);
                 PrivateKey privateKey = rsaFactory.generatePrivate(new PKCS8EncodedKeySpec(decoded));
-                return new RSAAlgorithmWrapper(privateKey, this.cipher);
+                return new RSAAlgorithmWrapper(privateKey, this.cipher, Cipher.DECRYPT_MODE);
             } else {
                 throw new CryptoException("Invalid RSA key format", null);
             }

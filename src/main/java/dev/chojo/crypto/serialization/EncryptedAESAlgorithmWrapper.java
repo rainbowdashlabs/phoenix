@@ -5,25 +5,25 @@
  */
 package dev.chojo.crypto.serialization;
 
-import dev.chojo.crypto.processing.Decoder;
-import dev.chojo.crypto.processing.Encoder;
+import dev.chojo.crypto.processing.Decryptor;
+import dev.chojo.crypto.processing.Encryptor;
+import dev.chojo.crypto.processing.model.BytesProcessInput;
+import dev.chojo.crypto.processing.model.BytesProcessResult;
 import dev.chojo.crypto.processing.wrapper.AESAlgorithmWrapper;
 
+import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
 
-public record EncryptedAESAlgorithmWrapper(String key, String iv, String cipher) {
-    public static EncryptedAESAlgorithmWrapper encrypt(AESAlgorithmWrapper wrapper, Encoder encoder) {
-        String key = encoder.processToString(wrapper.key().getEncoded());
-        String iv = encoder.processToString(wrapper.iv());
-        String cipher = encoder.processToString(wrapper.cipher());
-        return new EncryptedAESAlgorithmWrapper(key, iv, cipher);
+public record EncryptedAESAlgorithmWrapper(String key, String cipher) {
+    public static EncryptedAESAlgorithmWrapper encrypt(AESAlgorithmWrapper wrapper, Encryptor<BytesProcessInput, BytesProcessResult> encryptor) {
+        String key = Base64.getEncoder().encodeToString(encryptor.process(new BytesProcessInput(wrapper.key().getEncoded())).bytes());
+        return new EncryptedAESAlgorithmWrapper(key,  wrapper.cipherName());
     }
 
-    public AESAlgorithmWrapper decrypt(Decoder decoder) {
-        byte[] key = decoder.processFromString(this.key);
-        byte[] iv = decoder.processFromString(this.iv);
-        String cipher = decoder.processFromStringToString(this.cipher);
+    public AESAlgorithmWrapper decrypt(Decryptor<BytesProcessInput, BytesProcessResult> decryptor) {
+        byte[] key = decryptor.process(new BytesProcessInput(Base64.getDecoder().decode(this.key))).bytes();
         SecretKeySpec aes = new SecretKeySpec(key, 0, key.length, "AES");
-        return new AESAlgorithmWrapper(aes, iv, cipher);
+        return new AESAlgorithmWrapper(aes, cipher, Cipher.DECRYPT_MODE);
     }
 }

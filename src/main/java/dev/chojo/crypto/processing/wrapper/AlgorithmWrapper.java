@@ -5,34 +5,59 @@
  */
 package dev.chojo.crypto.processing.wrapper;
 
+import dev.chojo.crypto.concurrency.LockedCipher;
+import dev.chojo.crypto.processing.model.ProcessInput;
+import dev.chojo.crypto.processing.model.ProcessResult;
 import org.jspecify.annotations.Nullable;
 
-import java.io.Serializable;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.security.spec.AlgorithmParameterSpec;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-public abstract class AlgorithmWrapper implements Serializable {
-    public abstract byte[] process(byte[] data, int opMode)
+public abstract class AlgorithmWrapper<I extends ProcessInput, R extends ProcessResult> {
+    protected final String cipherName;
+    protected final int opMode;
+
+    @Nullable
+    private LockedCipher cipher;
+
+    protected AlgorithmWrapper(String cipherName, int opMode) {
+        this.cipherName = cipherName;
+        this.opMode = opMode;
+    }
+
+    public abstract R process(I data)
             throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
                     InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException;
 
-    protected byte[] process(byte[] data, String cipher, int opMode, Key key, @Nullable AlgorithmParameterSpec spec)
-            throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
-                    InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
-        Cipher c = Cipher.getInstance(cipher);
-        if (spec == null) {
-            c.init(opMode, key);
-        } else {
-            c.init(opMode, key, spec);
-        }
-        return c.doFinal(data);
+    protected synchronized LockedCipher cipherLock()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchAlgorithmException,
+                    InvalidKeyException {
+        if (cipher == null) cipher = new LockedCipher(createCipher());
+        cipher.lock();
+        return cipher;
+    }
+
+    protected Cipher createCipher()
+            throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException,
+                    InvalidKeyException {
+        return Cipher.getInstance(cipherName);
+    }
+
+    public String cipherName() {
+        return cipherName;
+    }
+
+    public int opMode() {
+        return opMode;
+    }
+
+    public int processedBytes() {
+        return 0;
     }
 }

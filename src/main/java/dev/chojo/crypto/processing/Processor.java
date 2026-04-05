@@ -6,40 +6,41 @@
 package dev.chojo.crypto.processing;
 
 import dev.chojo.crypto.exceptions.CryptoException;
+import dev.chojo.crypto.processing.model.ProcessInput;
+import dev.chojo.crypto.processing.model.ProcessResult;
 import dev.chojo.crypto.processing.wrapper.AlgorithmWrapper;
 
-import java.io.Serializable;
 import java.security.GeneralSecurityException;
 import java.util.Base64;
 
-public abstract class Processor implements Serializable {
-    protected final AlgorithmWrapper wrapper;
+public abstract class Processor<I extends ProcessInput, R extends ProcessResult> {
+    protected final AlgorithmWrapper<I, R> wrapper;
 
-    public Processor(AlgorithmWrapper wrapper) {
+    public Processor(AlgorithmWrapper<I, R> wrapper) {
         this.wrapper = wrapper;
     }
 
     public String processToString(byte[] data) {
-        return Base64.getEncoder().encodeToString(process(data));
+        return Base64.getEncoder().encodeToString(process(data).bytes());
     }
 
     public String processToString(String data) {
-        return Base64.getEncoder().encodeToString(process(data.getBytes()));
+        return Base64.getEncoder().encodeToString(process(data.getBytes()).bytes());
     }
 
     public byte[] processFromString(String data) {
-        return process(Base64.getDecoder().decode(data));
+        return process(Base64.getDecoder().decode(data)).bytes();
     }
 
     public String processFromStringToString(String data) {
-        return new String(process(Base64.getDecoder().decode(data)));
+        return new String(process(Base64.getDecoder().decode(data)).bytes());
     }
 
-    public abstract byte[] process(byte[] data);
+    public abstract R process(byte[] data);
 
-    protected byte[] process(byte[] data, int opMode) {
+    public R process(I input) {
         try {
-            byte[] result = wrapper.process(data, opMode);
+            R result = wrapper.process(input);
             if (result == null) {
                 throw new CryptoException("Wrapper returned null", null);
             }
@@ -49,7 +50,7 @@ public abstract class Processor implements Serializable {
         }
     }
 
-    public AlgorithmWrapper wrapper() {
+    public AlgorithmWrapper<I, R> wrapper() {
         return wrapper;
     }
 }

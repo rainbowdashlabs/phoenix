@@ -9,35 +9,35 @@ import dev.chojo.ocular.override.OverwritePrefix;
 
 @OverwritePrefix("bot.crypto")
 public class Crypto {
-    private String rsaKey = "RSA";
-    private int rsaKeySize = 2048;
-    private String rsaCipher = "RSA/ECB/PKCS1Padding";
+    private String asymmetricAlgorithm = "RSA";
+    private int asymmetricKeySize = 2048;
+    private String asymmetricCipher = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
 
-    private String aesCipher = "AES/GCM/NoPadding";
-    private int aesKeySize = 256;
-    private int aesIterations = 65536;
+    private String symmetricAlgorithm = "AES";
+    private String symmetricCipher = "AES/GCM/NoPadding";
+    private int symmetricKeySize = 256;
 
-    public String rsaKey() {
-        return rsaKey;
+    public String asymmetricAlgorithm() {
+        return asymmetricAlgorithm;
     }
 
-    public int rsaKeySize() {
-        return rsaKeySize;
+    public int asymmetricKeySize() {
+        return asymmetricKeySize;
     }
 
-    public String rsaCipher() {
-        return rsaCipher;
+    public String asymmetricCipher() {
+        return asymmetricCipher;
     }
 
-    public String aesCipher() {
-        return aesCipher;
+    public String symmetricCipher() {
+        return symmetricCipher;
     }
 
-    public int aesKeySize() {
-        return aesKeySize;
+    public int symmetricKeySize() {
+        return symmetricKeySize;
     }
 
-    public int aesIterations() {
-        return aesIterations;
+    public String symmetricAlgorithm() {
+        return symmetricAlgorithm;
     }
 }

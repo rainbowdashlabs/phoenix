@@ -9,21 +9,34 @@ import dev.chojo.configuration.Configuration;
 import dev.chojo.configuration.elements.Root;
 import dev.chojo.crypto.CryptoService;
 import dev.chojo.crypto.EncryptedContent;
+import dev.chojo.crypto.policy.KeyRotationPolicy;
+import dev.chojo.crypto.processing.model.AESProcessInput;
+import dev.chojo.crypto.processing.model.AESProcessResult;
+import dev.chojo.crypto.processing.model.BytesProcessInput;
+import dev.chojo.crypto.processing.model.BytesProcessResult;
 import dev.chojo.crypto.processing.wrapper.AESAlgorithmWrapper;
+import dev.chojo.crypto.processing.wrapper.AlgorithmWrapper;
 import dev.chojo.crypto.processing.wrapper.RSAAlgorithmWrapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Random;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class StringDecoderTest {
+class StringDecryptorTest {
     static CryptoService cryptoService;
 
     @BeforeAll
@@ -37,19 +50,19 @@ class StringDecoderTest {
     void testDecode() throws InvalidKeySpecException {
         KeyPair keyPair = cryptoService.generateRSAKeyPair();
         String rsaCipher = "RSA/ECB/PKCS1Padding";
-        RSAAlgorithmWrapper publicRSA = new RSAAlgorithmWrapper(keyPair.getPublic(), rsaCipher);
-        RSAAlgorithmWrapper privateRSA = new RSAAlgorithmWrapper(keyPair.getPrivate(), rsaCipher);
+        RSAAlgorithmWrapper publicRSA = new RSAAlgorithmWrapper(keyPair.getPublic(), rsaCipher, javax.crypto.Cipher.ENCRYPT_MODE);
+        RSAAlgorithmWrapper privateRSA = new RSAAlgorithmWrapper(keyPair.getPrivate(), rsaCipher, javax.crypto.Cipher.DECRYPT_MODE);
         AESAlgorithmWrapper aesAlgorithmWrapper = cryptoService.randomAESKey();
-        Encoder rsa = new Encoder(publicRSA);
-        Encoder aes = new Encoder(aesAlgorithmWrapper);
+        Encryptor<BytesProcessInput, BytesProcessResult> rsa = new Encryptor<>(publicRSA);
         String generatedString = new Random()
                 .ints('0', 'z' + 1)
                 .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
                 .limit(4000)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
-        EncryptedContent encrypted = new StringEncoder(rsa, aes).encode(generatedString);
-        String decode = new StringDecoder(new Decoder(privateRSA)).decode(encrypted);
+        KeyRotationPolicy keyRotationPolicy = new KeyRotationPolicy(10000, () -> new Encryptor<>(cryptoService.randomAESKey()));
+        EncryptedContent encrypted = new StringEncoder(rsa, keyRotationPolicy).encode(generatedString);
+        String decode = new StringDecoder(new Decryptor<>(privateRSA)).decode(encrypted);
         assertEquals(generatedString, decode);
     }
 }
