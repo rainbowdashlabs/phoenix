@@ -1,24 +1,32 @@
+/*
+ *     SPDX-License-Identifier: AGPL-3.0-only
+ *
+ *     Copyright (C) RainbowDashLabs and Contributor
+ */
 package dev.chojo.crypto.processing.wrapper;
 
 import org.jspecify.annotations.Nullable;
+
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 
 public class AESAlgorithmWrapper extends AlgorithmWrapper {
     /**
      * The AES key.
      */
     private final SecretKey key;
+
     private final byte[] iv;
     private final String cipher;
+
     @Nullable
     private transient GCMParameterSpec spec;
 
@@ -41,7 +49,9 @@ public class AESAlgorithmWrapper extends AlgorithmWrapper {
     }
 
     @Override
-    public byte[] process(byte[] data, int opMode) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
+    public byte[] process(byte[] data, int opMode)
+            throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
+                    InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
         return process(data, cipher, opMode, key, gcmParameterSpec());
     }
 

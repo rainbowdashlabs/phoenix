@@ -1,3 +1,8 @@
+/*
+ *     SPDX-License-Identifier: AGPL-3.0-only
+ *
+ *     Copyright (C) RainbowDashLabs and Contributor
+ */
 package dev.chojo.crypto.processing;
 
 import dev.chojo.configuration.Configuration;
@@ -35,14 +40,13 @@ class StringEncoderTest {
         AESAlgorithmWrapper aesAlgorithmWrapper = cryptoService.randomAESKey();
         Encoder rsa = new Encoder(rsaAlgorithmWrapper);
         Encoder aes = new Encoder(aesAlgorithmWrapper);
-        String generatedString = new Random().ints('0', 'z' + 1)
-                                       .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
-                                       .limit(4000)
-                                       .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                                       .toString();
+        String generatedString = new Random()
+                .ints('0', 'z' + 1)
+                .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
+                .limit(4000)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
         EncryptedContent encrypted = new StringEncoder(rsa, aes).encode(generatedString);
         System.out.printf("Encrypted: %s%n", encrypted);
     }
-
-
 }

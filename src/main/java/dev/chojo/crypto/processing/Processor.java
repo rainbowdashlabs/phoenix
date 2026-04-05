@@ -1,3 +1,8 @@
+/*
+ *     SPDX-License-Identifier: AGPL-3.0-only
+ *
+ *     Copyright (C) RainbowDashLabs and Contributor
+ */
 package dev.chojo.crypto.processing;
 
 import dev.chojo.crypto.exceptions.CryptoException;
@@ -17,6 +22,7 @@ public abstract class Processor implements Serializable {
     public String processToString(byte[] data) {
         return Base64.getEncoder().encodeToString(process(data));
     }
+
     public String processToString(String data) {
         return Base64.getEncoder().encodeToString(process(data.getBytes()));
     }
@@ -24,6 +30,7 @@ public abstract class Processor implements Serializable {
     public byte[] processFromString(String data) {
         return process(Base64.getDecoder().decode(data));
     }
+
     public String processFromStringToString(String data) {
         return new String(process(Base64.getDecoder().decode(data)));
     }

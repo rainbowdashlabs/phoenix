@@ -59,18 +59,18 @@ public class CryptoService {
 
     public PrivateKey deserializePrivateKey(String key) throws InvalidKeySpecException {
         key = key.replace("\n", "")
-                 .replace("-----BEGIN PRIVATE KEY-----", "")
-                 .replace("-----END PRIVATE KEY-----", "")
-                 .trim();
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
+                .trim();
         byte[] decoded = Base64.getDecoder().decode(key);
         return rsaFactory.generatePrivate(new PKCS8EncodedKeySpec(decoded));
     }
 
     public PublicKey deserializePublicKey(String key) throws InvalidKeySpecException {
         key = key.replace("\n", "")
-                 .replace("-----BEGIN PUBLIC KEY-----", "")
-                 .replace("-----END PUBLIC KEY-----", "")
-                 .trim();
+                .replace("-----BEGIN PUBLIC KEY-----", "")
+                .replace("-----END PUBLIC KEY-----", "")
+                .trim();
         byte[] decoded = Base64.getDecoder().decode(key);
         return rsaFactory.generatePublic(new X509EncodedKeySpec(decoded));
     }

@@ -1,10 +1,13 @@
+/*
+ *     SPDX-License-Identifier: AGPL-3.0-only
+ *
+ *     Copyright (C) RainbowDashLabs and Contributor
+ */
 package dev.chojo.crypto.processing;
 
 import dev.chojo.crypto.EncryptedContent;
 import dev.chojo.crypto.processing.wrapper.AESAlgorithmWrapper;
 import dev.chojo.crypto.serialization.EncryptedAESAlgorithmWrapper;
-
-import static dev.chojo.util.Serialization.serializeObject;
 
 public class StringEncoder {
     /**

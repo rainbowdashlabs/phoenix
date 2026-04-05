@@ -1,14 +1,16 @@
+/*
+ *     SPDX-License-Identifier: AGPL-3.0-only
+ *
+ *     Copyright (C) RainbowDashLabs and Contributor
+ */
 package dev.chojo.crypto.processing.wrapper;
 
 import dev.chojo.configuration.Configuration;
 import dev.chojo.configuration.elements.Root;
 import dev.chojo.crypto.CryptoService;
-import dev.chojo.util.Serialization;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
@@ -33,5 +35,4 @@ class AESAlgorithmWrapperTest {
         AESAlgorithmWrapper wrapper = Serialization.deserializeObject(bytes);
         assertEquals(aesAlgorithmWrapper, wrapper);
     }
-
 }
