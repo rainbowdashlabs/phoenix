@@ -37,8 +37,8 @@ public class CryptoService {
     @Inject
     public CryptoService(Configuration configuration) throws NoSuchAlgorithmException {
         this.configuration = configuration;
-        rsaGenerator = KeyPairGenerator.getInstance(key());
-        rsaGenerator.initialize(512, new SecureRandom());
+        rsaGenerator = KeyPairGenerator.getInstance(rsaKey());
+        rsaGenerator.initialize(rsaKeySize(), secureRandom);
         rsaFactory = KeyFactory.getInstance("RSA");
         aesFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
     }
@@ -75,7 +75,7 @@ public class CryptoService {
         return rsaFactory.generatePublic(new X509EncodedKeySpec(decoded));
     }
 
-    private byte[] iv() {
+    byte[] iv() {
         byte[] iv = new byte[12];
         secureRandom.nextBytes(iv);
         return iv;
@@ -87,23 +87,35 @@ public class CryptoService {
         char[] key = Base64.getEncoder().withoutPadding().encodeToString(bytes).toCharArray();
         byte[] salt = secureRandom.generateSeed(16);
         SecretKey secretKey = generateAESKey(key, salt);
-        return new AESAlgorithmWrapper(secretKey, iv());
+        return new AESAlgorithmWrapper(secretKey, iv(), aesCipher());
     }
 
     public SecretKey generateAESKey(char[] key, byte[] salt) throws InvalidKeySpecException {
-        PBEKeySpec pbeKeySpec = new PBEKeySpec(key, salt, 65536, 256);
+        PBEKeySpec pbeKeySpec = new PBEKeySpec(key, salt, aesIterations(), aesKeySize());
         return new SecretKeySpec(aesFactory.generateSecret(pbeKeySpec).getEncoded(), "AES");
     }
 
-    private String cipher() {
-        return configuration.main().general().cipher();
+    String rsaCipher() {
+        return configuration.main().crypto().rsaCipher();
     }
 
-    private String key() {
-        return configuration.main().general().key();
+    String rsaKey() {
+        return configuration.main().crypto().rsaKey();
     }
 
-    private int keySize() {
-        return configuration.main().general().keySize();
+    int rsaKeySize() {
+        return configuration.main().crypto().rsaKeySize();
+    }
+
+    String aesCipher() {
+        return configuration.main().crypto().aesCipher();
+    }
+
+    int aesKeySize() {
+        return configuration.main().crypto().aesKeySize();
+    }
+
+    int aesIterations() {
+        return configuration.main().crypto().aesIterations();
     }
 }

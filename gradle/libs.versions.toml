@@ -8,6 +8,7 @@ javalin = "7.1.0"
 [plugins]
 spotless = { id = "com.diffplug.spotless", version = "8.4.0" }
 idea = { id = "org.jetbrains.gradle.plugin.idea-ext", version = "1.4.1" }
+pitest = { id = "info.solidsoft.pitest", version = "1.19.0"}
 
 [libraries]
 # Core

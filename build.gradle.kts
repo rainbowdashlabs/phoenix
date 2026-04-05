@@ -8,6 +8,8 @@ plugins {
     application
     alias(libs.plugins.spotless)
     alias(libs.plugins.idea)
+    alias(libs.plugins.pitest)
+    jacoco
 }
 
 application {
@@ -196,4 +198,14 @@ spotless {
         encoding("UTF-8")
         target("frontend/src/locales/*.json")
     }
+}
+
+pitest {
+    //adds dependency to org.pitest:pitest-junit5-plugin and sets "testPlugin" to "junit5"
+    junit5PluginVersion = "1.2.3"    //or 0.15 for PIT <1.9.0
+    threads = 4
+    mutators.set(setOf("STRONGER"))
+    mutationThreshold = 80
+    targetClasses.set(setOf("dev.chojo.crypto.**"))
+    targetTests.set(setOf("dev.chojo.crypto.**"))
 }

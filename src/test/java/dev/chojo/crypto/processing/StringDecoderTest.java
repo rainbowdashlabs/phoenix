@@ -36,8 +36,9 @@ class StringDecoderTest {
     @Test
     void testDecode() throws InvalidKeySpecException {
         KeyPair keyPair = cryptoService.generateRSAKeyPair();
-        RSAAlgorithmWrapper publicRSA = new RSAAlgorithmWrapper(keyPair.getPublic());
-        RSAAlgorithmWrapper privateRSA = new RSAAlgorithmWrapper(keyPair.getPrivate());
+        String rsaCipher = "RSA/ECB/PKCS1Padding";
+        RSAAlgorithmWrapper publicRSA = new RSAAlgorithmWrapper(keyPair.getPublic(), rsaCipher);
+        RSAAlgorithmWrapper privateRSA = new RSAAlgorithmWrapper(keyPair.getPrivate(), rsaCipher);
         AESAlgorithmWrapper aesAlgorithmWrapper = cryptoService.randomAESKey();
         Encoder rsa = new Encoder(publicRSA);
         Encoder aes = new Encoder(aesAlgorithmWrapper);

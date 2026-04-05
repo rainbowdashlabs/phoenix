@@ -36,7 +36,7 @@ class StringEncoderTest {
     @Test
     void testEncode() throws InvalidKeySpecException {
         KeyPair keyPair = cryptoService.generateRSAKeyPair();
-        RSAAlgorithmWrapper rsaAlgorithmWrapper = new RSAAlgorithmWrapper(keyPair.getPublic());
+        RSAAlgorithmWrapper rsaAlgorithmWrapper = new RSAAlgorithmWrapper(keyPair.getPublic(), "RSA/ECB/PKCS1Padding");
         AESAlgorithmWrapper aesAlgorithmWrapper = cryptoService.randomAESKey();
         Encoder rsa = new Encoder(rsaAlgorithmWrapper);
         Encoder aes = new Encoder(aesAlgorithmWrapper);

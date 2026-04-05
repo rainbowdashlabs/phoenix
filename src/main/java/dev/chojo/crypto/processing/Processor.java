@@ -39,7 +39,11 @@ public abstract class Processor implements Serializable {
 
     protected byte[] process(byte[] data, int opMode) {
         try {
-            return wrapper.process(data, opMode);
+            byte[] result = wrapper.process(data, opMode);
+            if (result == null) {
+                throw new CryptoException("Wrapper returned null", null);
+            }
+            return result;
         } catch (GeneralSecurityException e) {
             throw new CryptoException("Could not process", e);
         }
