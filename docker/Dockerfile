@@ -9,7 +9,7 @@ RUN nix-shell --run "npm ci"
 COPY frontend/ .
 RUN nix-shell --run "npm run build"
 
-FROM gradle:jdk21-alpine AS build
+FROM gradle:jdk25-alpine AS build
 
 ARG GITHUB_ACTIONS=false
 ARG GITHUB_REF_TYPE=null
@@ -33,11 +33,11 @@ ENV DOCKER=true
 WORKDIR /app
 
 #COPY --from=frontend /build/dist/ public
-COPY --from=build /home/gradle/build/install/elpis/* .
+COPY --from=build /home/gradle/build/install/elpis/ .
 
 RUN mkdir config
 RUN echo "{}" > config/config.json
 
 WORKDIR /app/bin
 
-ENTRYPOINT ["elpis.bat"]
+ENTRYPOINT ["sh","elpis"]
