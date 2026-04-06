@@ -5,75 +5,94 @@
  */
 package dev.chojo.crypto.processing.wrapper;
 
-import org.jspecify.annotations.Nullable;
+import dev.chojo.crypto.processing.model.AESProcessInput;
+import dev.chojo.crypto.processing.model.AESProcessResult;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
+import java.security.SecureRandom;
+import java.util.Objects;
 
 import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
+import javax.security.auth.DestroyFailedException;
 
-public class AESAlgorithmWrapper extends AlgorithmWrapper {
-    ///
+public class AESAlgorithmWrapper extends AlgorithmWrapper<AESProcessInput, AESProcessResult> {
+    private static final SecureRandom secureRandom = new SecureRandom();
     /// The AES key.
-    ///
     private final SecretKey key;
 
-    private final byte[] iv;
-    private final String cipher;
+    private int processedBytes = 0;
 
-    @Nullable
-    private transient GCMParameterSpec spec;
-
-    public AESAlgorithmWrapper(SecretKey key, byte[] iv, String cipher) {
-        this.key = key;
-        this.iv = iv;
-        this.cipher = cipher;
+    public AESAlgorithmWrapper(SecretKey key, String cipher) {
+        this(key, cipher, 0);
     }
 
-    public GCMParameterSpec gcmParameterSpec() {
-        if (spec != null) return spec;
-        spec = new GCMParameterSpec(128, iv);
-        return spec;
+    public AESAlgorithmWrapper(SecretKey key, String cipher, int opMode) {
+        super(cipher, opMode);
+        this.key = key;
     }
 
     @Override
-    public byte[] process(byte[] data, int opMode)
+    public int processedBytes() {
+        return processedBytes;
+    }
+
+    private GCMParameterSpec newNonce() {
+        var iv = new byte[12];
+        secureRandom.nextBytes(iv);
+        return nonce(iv);
+    }
+
+    private GCMParameterSpec nonce(byte[] iv) {
+        return new GCMParameterSpec(128, iv);
+    }
+
+    @Override
+    public AESProcessResult process(AESProcessInput input)
             throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
                     InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
-        return process(data, cipher, opMode, key, gcmParameterSpec());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-
-        AESAlgorithmWrapper that = (AESAlgorithmWrapper) o;
-        return key.equals(that.key) && Arrays.equals(iv, that.iv) && cipher.equals(that.cipher);
+        try (var lock = cipherLock()) {
+            Cipher cipher = lock.cipher();
+            if (opMode == Cipher.ENCRYPT_MODE) {
+                GCMParameterSpec nonce = newNonce();
+                cipher.init(opMode, key, nonce);
+                processedBytes += input.bytes().length;
+                byte[] encrypted = cipher.doFinal(input.bytes());
+                return new AESProcessResult(encrypted, nonce.getIV());
+            } else {
+                byte[] usedIv = input.iv();
+                Objects.requireNonNull(usedIv, "IV must be provided for decryption");
+                cipher.init(opMode, key, nonce(usedIv));
+                byte[] decrypted = cipher.doFinal(input.bytes());
+                return new AESProcessResult(decrypted, null);
+            }
+        }
     }
 
     public SecretKey key() {
         return key;
     }
 
-    public byte[] iv() {
-        return iv;
-    }
-
-    public String cipher() {
-        return cipher;
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        AESAlgorithmWrapper that = (AESAlgorithmWrapper) o;
+        return Objects.equals(key, that.key) && Objects.equals(cipherName, that.cipherName);
     }
 
     @Override
     public int hashCode() {
-        int result = key.hashCode();
-        result = 31 * result + Arrays.hashCode(iv);
-        result = 31 * result + cipher.hashCode();
-        return result;
+        return Objects.hash(key, cipherName);
+    }
+
+    @Override
+    public void destroy() throws DestroyFailedException {
+        key.destroy();
     }
 }

@@ -5,8 +5,15 @@
  */
 package dev.chojo.crypto.exceptions;
 
+import org.jspecify.annotations.Nullable;
+
+/// Exception thrown when a cryptographic operation fails.
 public class CryptoException extends RuntimeException {
-    public CryptoException(String message, Exception cause) {
+    /// Creates a new crypto exception with the specified message and cause.
+    ///
+    /// @param message the detail message
+    /// @param cause   the cause of the exception
+    public CryptoException(String message, @Nullable Exception cause) {
         super(message, cause);
     }
 }

@@ -13,9 +13,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class EncryptedContentTest {
     @Test
     void testEncryptedContent() {
-        EncryptedAESAlgorithmWrapper key = new EncryptedAESAlgorithmWrapper("key", "iv", "cipher");
-        EncryptedContent content = new EncryptedContent("content", key);
+        EncryptedAESAlgorithmWrapper key = new EncryptedAESAlgorithmWrapper("key", "cipher");
+        EncryptedContent content = new EncryptedContent("content", key, "iv");
         assertEquals("content", content.content());
         assertEquals(key, content.key());
+        assertEquals("iv", content.iv());
     }
 }
