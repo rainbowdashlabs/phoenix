@@ -18,18 +18,31 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StringDecoder {
-    /// The Private RSA decryptor that was used to encrypt the AES key.
+/// Decrypts strings using a combination of RSA and AES.
+///
+/// This class handles the decryption of content using AES, and the decryption of the AES key
+/// using RSA.
+public class StringDecrypter {
+    ///
+    /// The Private RSA encoder that was used to encrypt the AES key.
     /// In this case, it has to be the private key and not the public key.
+    ///
     private final Decryptor<BytesProcessInput, BytesProcessResult> rsa;
 
     private final Map<EncryptedAESAlgorithmWrapper, Decryptor<? extends ProcessInput, ? extends ProcessResult>>
             aesDecoder = new HashMap<>();
 
-    public StringDecoder(Decryptor<BytesProcessInput, BytesProcessResult> rsa) {
+    /// Creates a new string decrypter with the given RSA decryptor.
+    ///
+    /// @param rsa the RSA decryptor for decrypting the AES keys
+    public StringDecrypter(Decryptor<BytesProcessInput, BytesProcessResult> rsa) {
         this.rsa = rsa;
     }
 
+    /// Decodes the given encrypted content.
+    ///
+    /// @param content the content to decode
+    /// @return the decoded string
     public String decode(EncryptedContent content) {
         var decryptor = aesDecoder.computeIfAbsent(content.key(), this::decodeKey);
         byte[] data = Base64.getDecoder().decode(content.content());

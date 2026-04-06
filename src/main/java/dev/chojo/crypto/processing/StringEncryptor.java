@@ -16,11 +16,15 @@ import dev.chojo.crypto.processing.wrapper.AESAlgorithmWrapper;
 import dev.chojo.crypto.serialization.EncryptedAESAlgorithmWrapper;
 import org.jspecify.annotations.Nullable;
 
-import javax.security.auth.DestroyFailedException;
 import java.util.Base64;
 
-public class StringEncoder {
+import javax.security.auth.DestroyFailedException;
 
+/// Encrypts strings using a combination of RSA and AES.
+///
+/// This class handles the encryption of content using AES, and the encryption of the AES key
+/// using RSA. It also supports key rotation based on a [KeyRotationPolicy].
+public class StringEncryptor {
     /// The AES encoder that was used to encrypt the content.
     @Nullable
     private Encryptor<? extends ProcessInput, ? extends ProcessResult> aes;
@@ -32,12 +36,20 @@ public class StringEncoder {
     /// The policy that determines when to rotate the AES key.
     private final KeyRotationPolicy keyRotationPolicy;
 
-    public StringEncoder(Encryptor<BytesProcessInput, BytesProcessResult> rsa, KeyRotationPolicy keyRotationPolicy) {
+    /// Creates a new string encryptor with the given RSA encryptor and key rotation policy.
+    ///
+    /// @param rsa               the RSA encryptor for encrypting the AES keys
+    /// @param keyRotationPolicy the policy for AES key rotation
+    public StringEncryptor(Encryptor<BytesProcessInput, BytesProcessResult> rsa, KeyRotationPolicy keyRotationPolicy) {
         this.rsa = rsa;
         this.keyRotationPolicy = keyRotationPolicy;
-        // TODO: Rotate the key every x bytes
+        // TODO: Rotate the key every x bytes.
     }
 
+    /// Encodes the given content.
+    ///
+    /// @param content the content to encode
+    /// @return the encrypted content
     public EncryptedContent encode(String content) {
         ProcessResult result = aes().process(content.getBytes());
         String encrypted = Base64.getEncoder().encodeToString(result.bytes());
@@ -53,7 +65,7 @@ public class StringEncoder {
             try {
                 if (aes != null) aes.wrapper().destroy();
             } catch (DestroyFailedException e) {
-                // ignore. if it fails, we can't do anything about it
+                // Ignore. If it fails, we can't do anything about it.
             }
             aes = keyRotationPolicy.rotationSupplier().get();
             key = EncryptedAESAlgorithmWrapper.encrypt((AESAlgorithmWrapper) aes.wrapper, rsa);

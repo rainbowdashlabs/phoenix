@@ -47,10 +47,10 @@ class CryptoServiceTest {
 
     @Test
     void testConfigMethods() {
-        assertEquals("RSA/ECB/OAEPWithSHA-256AndMGF1Padding", cryptoService.rsaCipher());
+        assertEquals("RSA/ECB/OAEPWithSHA-256AndMGF1Padding", cryptoService.asymmetricCipher());
         assertEquals("RSA", cryptoService.asymmetricAlgorithm());
         assertEquals(2048, cryptoService.asymmetricKeySize());
-        assertEquals("AES/GCM/NoPadding", cryptoService.aesCipher());
-        assertEquals(256, cryptoService.aesKeySize());
+        assertEquals("AES/GCM/NoPadding", cryptoService.symmetricCipher());
+        assertEquals(256, cryptoService.symmetricKeySize());
     }
 }

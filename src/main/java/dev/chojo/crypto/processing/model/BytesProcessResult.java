@@ -5,4 +5,7 @@
  */
 package dev.chojo.crypto.processing.model;
 
+/// Represents the result of a byte-based cryptographic process.
+///
+/// @param bytes the processed bytes
 public record BytesProcessResult(byte[] bytes) implements ProcessResult {}

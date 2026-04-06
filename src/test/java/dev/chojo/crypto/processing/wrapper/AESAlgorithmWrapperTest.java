@@ -58,7 +58,7 @@ class AESAlgorithmWrapperTest {
             throws InvalidKeySpecException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
                     InvalidAlgorithmParameterException {
         AESAlgorithmWrapper decryptWrapper = new AESAlgorithmWrapper(
-                cryptoService.randomAESKey().key(), cryptoService.aesCipher(), Cipher.DECRYPT_MODE);
+                cryptoService.randomAESKey().key(), cryptoService.symmetricCipher(), Cipher.DECRYPT_MODE);
         Decryptor<AESProcessInput, AESProcessResult> decryptor = new Decryptor<>(decryptWrapper);
 
         AESProcessInput input = new AESProcessInput(new byte[16], null);
@@ -70,7 +70,7 @@ class AESAlgorithmWrapperTest {
             throws InvalidKeySpecException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
                     InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
         AESAlgorithmWrapper encryptWrapper = new AESAlgorithmWrapper(
-                cryptoService.randomAESKey().key(), cryptoService.aesCipher(), Cipher.ENCRYPT_MODE);
+                cryptoService.randomAESKey().key(), cryptoService.symmetricCipher(), Cipher.ENCRYPT_MODE);
         Encryptor<AESProcessInput, AESProcessResult> encryptor = new Encryptor<>(encryptWrapper);
 
         assertEquals(0, encryptWrapper.processedBytes());
@@ -129,7 +129,7 @@ class AESAlgorithmWrapperTest {
             throws InvalidKeySpecException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
                     InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
         AESAlgorithmWrapper encryptWrapper = new AESAlgorithmWrapper(
-                cryptoService.randomAESKey().key(), cryptoService.aesCipher(), Cipher.ENCRYPT_MODE);
+                cryptoService.randomAESKey().key(), cryptoService.symmetricCipher(), Cipher.ENCRYPT_MODE);
         Encryptor<AESProcessInput, AESProcessResult> encryptor = new Encryptor<>(encryptWrapper);
 
         String message = "Hello, World!";
@@ -144,7 +144,7 @@ class AESAlgorithmWrapperTest {
         assertNotNull(result2.iv());
 
         AESAlgorithmWrapper decryptWrapper =
-                new AESAlgorithmWrapper(encryptWrapper.key(), cryptoService.aesCipher(), Cipher.DECRYPT_MODE);
+                new AESAlgorithmWrapper(encryptWrapper.key(), cryptoService.symmetricCipher(), Cipher.DECRYPT_MODE);
         Decryptor<AESProcessInput, AESProcessResult> decryptor = new Decryptor<>(decryptWrapper);
 
         AESProcessResult decrypted1 = decryptor.process(new AESProcessInput(result1.bytes(), result1.iv()));

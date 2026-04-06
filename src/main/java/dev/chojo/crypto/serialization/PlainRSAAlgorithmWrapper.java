@@ -19,7 +19,16 @@ import java.util.Base64;
 
 import javax.crypto.Cipher;
 
+/// A record representing a plain RSA algorithm wrapper for serialization.
+///
+/// @param key    the PEM encoded RSA key
+/// @param cipher the RSA cipher name
 public record PlainRSAAlgorithmWrapper(String key, String cipher) {
+    /// Wraps an [RSAAlgorithmWrapper] into a [PlainRSAAlgorithmWrapper].
+    ///
+    /// @param wrapper the RSA algorithm wrapper to wrap
+    /// @return the wrapped RSA algorithm wrapper
+    /// @throws CryptoException if the key type is unsupported
     public static PlainRSAAlgorithmWrapper wrap(RSAAlgorithmWrapper wrapper) {
         String encoded = Base64.getEncoder().encodeToString(wrapper.key().getEncoded());
         String key;
@@ -34,6 +43,10 @@ public record PlainRSAAlgorithmWrapper(String key, String cipher) {
         return new PlainRSAAlgorithmWrapper(key, wrapper.cipherName());
     }
 
+    /// Unwraps the [PlainRSAAlgorithmWrapper] back into an [RSAAlgorithmWrapper].
+    ///
+    /// @return the unwrapped RSA algorithm wrapper
+    /// @throws CryptoException if the RSA key format is invalid or decryption fails
     public RSAAlgorithmWrapper unwrap() {
         try {
             KeyFactory rsaFactory = KeyFactory.getInstance("RSA");

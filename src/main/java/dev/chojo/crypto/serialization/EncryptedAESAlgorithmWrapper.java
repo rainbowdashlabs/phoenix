@@ -16,7 +16,16 @@ import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+/// A record representing an encrypted AES algorithm wrapper for serialization.
+///
+/// @param key    the base64 encoded encrypted AES key
+/// @param cipher the AES cipher name
 public record EncryptedAESAlgorithmWrapper(String key, String cipher) {
+    /// Encrypts an [AESAlgorithmWrapper] into an [EncryptedAESAlgorithmWrapper].
+    ///
+    /// @param wrapper   the AES algorithm wrapper to encrypt
+    /// @param encryptor the encryptor to use for encrypting the AES key
+    /// @return the encrypted AES algorithm wrapper
     public static EncryptedAESAlgorithmWrapper encrypt(
             AESAlgorithmWrapper wrapper, Encryptor<BytesProcessInput, BytesProcessResult> encryptor) {
         String key = Base64.getEncoder()
@@ -26,6 +35,10 @@ public record EncryptedAESAlgorithmWrapper(String key, String cipher) {
         return new EncryptedAESAlgorithmWrapper(key, wrapper.cipherName());
     }
 
+    /// Decrypts the [EncryptedAESAlgorithmWrapper] back into an [AESAlgorithmWrapper].
+    ///
+    /// @param decryptor the decryptor to use for decrypting the AES key
+    /// @return the decrypted AES algorithm wrapper
     public AESAlgorithmWrapper decrypt(Decryptor<BytesProcessInput, BytesProcessResult> decryptor) {
         byte[] key = decryptor
                 .process(new BytesProcessInput(Base64.getDecoder().decode(this.key)))

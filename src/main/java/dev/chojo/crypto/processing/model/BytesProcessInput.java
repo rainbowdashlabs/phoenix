@@ -5,4 +5,7 @@
  */
 package dev.chojo.crypto.processing.model;
 
+/// Represents a simple byte-based input for a cryptographic process.
+///
+/// @param bytes the bytes to process
 public record BytesProcessInput(byte[] bytes) implements ProcessInput {}

@@ -8,6 +8,11 @@ package dev.chojo.crypto;
 import dev.chojo.crypto.serialization.EncryptedAESAlgorithmWrapper;
 import org.jspecify.annotations.Nullable;
 
+/// A record representing encrypted content along with its key and optional IV.
+///
+/// @param content the base64 encoded encrypted content
+/// @param key     the encrypted AES algorithm wrapper
+/// @param iv      the optional initialization vector
 public record EncryptedContent(
         String content,
         EncryptedAESAlgorithmWrapper key,

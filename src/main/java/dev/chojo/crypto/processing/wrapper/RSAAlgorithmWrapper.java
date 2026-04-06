@@ -64,6 +64,6 @@ public class RSAAlgorithmWrapper extends AlgorithmWrapper<BytesProcessInput, Byt
 
     @Override
     public void destroy() throws DestroyFailedException {
-        // ignore
+        // Ignore.
     }
 }

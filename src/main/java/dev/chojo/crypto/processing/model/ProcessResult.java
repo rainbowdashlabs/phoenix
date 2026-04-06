@@ -5,6 +5,10 @@
  */
 package dev.chojo.crypto.processing.model;
 
+/// Represents the result of a cryptographic process.
 public interface ProcessResult {
+    /// Returns the processed bytes.
+    ///
+    /// @return the processed bytes
     byte[] bytes();
 }

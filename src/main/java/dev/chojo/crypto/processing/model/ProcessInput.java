@@ -5,4 +5,5 @@
  */
 package dev.chojo.crypto.processing.model;
 
+/// Represents a generic input for a cryptographic process.
 public interface ProcessInput {}

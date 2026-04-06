@@ -46,7 +46,7 @@ class StringEncryptorTest {
 
         KeyRotationPolicy keyRotationPolicy =
                 new KeyRotationPolicy(10000, () -> new Encryptor<>(cryptoService.randomAESKey()));
-        EncryptedContent encrypted = new StringEncoder(rsa, keyRotationPolicy).encode(generatedString);
+        EncryptedContent encrypted = new StringEncryptor(rsa, keyRotationPolicy).encode(generatedString);
         assertNotNull(encrypted.content());
         assertNotNull(encrypted.key());
         assertNotNull(encrypted.iv());
@@ -66,7 +66,7 @@ class StringEncryptorTest {
         Encryptor<BytesProcessInput, BytesProcessResult> rsaEnc = new Encryptor<>(rsaAlgorithmWrapper);
         KeyRotationPolicy policy = new KeyRotationPolicy(1000, () -> (Encryptor) rsaEnc);
 
-        StringEncoder encoder = new StringEncoder(rsa, policy);
+        StringEncryptor encoder = new StringEncryptor(rsa, policy);
         // This will likely throw ClassCastException at line 54 of StringEncoder.java
         assertThrows(ClassCastException.class, () -> encoder.encode("test"));
     }
