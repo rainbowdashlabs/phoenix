@@ -18,6 +18,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.security.auth.DestroyFailedException;
 
 public abstract class AlgorithmWrapper<I extends ProcessInput, R extends ProcessResult> {
     protected final String cipherName;
@@ -60,4 +61,6 @@ public abstract class AlgorithmWrapper<I extends ProcessInput, R extends Process
     public int processedBytes() {
         return 0;
     }
+
+    public abstract void destroy() throws DestroyFailedException;
 }

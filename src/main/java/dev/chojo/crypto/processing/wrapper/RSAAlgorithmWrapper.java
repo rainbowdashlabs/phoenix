@@ -17,6 +17,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.security.auth.DestroyFailedException;
 
 public class RSAAlgorithmWrapper extends AlgorithmWrapper<BytesProcessInput, BytesProcessResult> {
     /// The AES key.
@@ -59,5 +60,10 @@ public class RSAAlgorithmWrapper extends AlgorithmWrapper<BytesProcessInput, Byt
     @Override
     public int hashCode() {
         return java.util.Objects.hash(key, cipherName);
+    }
+
+    @Override
+    public void destroy() throws DestroyFailedException {
+        // ignore
     }
 }

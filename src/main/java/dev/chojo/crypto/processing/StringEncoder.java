@@ -16,6 +16,7 @@ import dev.chojo.crypto.processing.wrapper.AESAlgorithmWrapper;
 import dev.chojo.crypto.serialization.EncryptedAESAlgorithmWrapper;
 import org.jspecify.annotations.Nullable;
 
+import javax.security.auth.DestroyFailedException;
 import java.util.Base64;
 
 public class StringEncoder {
@@ -49,6 +50,11 @@ public class StringEncoder {
 
     private Encryptor<? extends ProcessInput, ? extends ProcessResult> aes() {
         if (aes == null || aes.wrapper().processedBytes() > keyRotationPolicy.rotationBytes()) {
+            try {
+                if (aes != null) aes.wrapper().destroy();
+            } catch (DestroyFailedException e) {
+                // ignore. if it fails, we can't do anything about it
+            }
             aes = keyRotationPolicy.rotationSupplier().get();
             key = EncryptedAESAlgorithmWrapper.encrypt((AESAlgorithmWrapper) aes.wrapper, rsa);
         }

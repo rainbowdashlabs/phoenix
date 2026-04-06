@@ -91,6 +91,7 @@ public class AESAlgorithmWrapper extends AlgorithmWrapper<AESProcessInput, AESPr
         return Objects.hash(key, cipherName);
     }
 
+    @Override
     public void destroy() throws DestroyFailedException {
         key.destroy();
     }
