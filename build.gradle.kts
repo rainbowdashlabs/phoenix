@@ -48,6 +48,8 @@ dependencies {
 
     testRuntimeOnly(libs.junit.platform)
     testImplementation(libs.sadu.testing)
+    testImplementation(libs.postgres)
+    testImplementation(libs.bundles.testcontainers)
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.bundles.junit)
     testImplementation(libs.mockito)

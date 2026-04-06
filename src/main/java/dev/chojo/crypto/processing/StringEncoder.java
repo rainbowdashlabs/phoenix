@@ -10,13 +10,13 @@ import dev.chojo.crypto.processing.wrapper.AESAlgorithmWrapper;
 import dev.chojo.crypto.serialization.EncryptedAESAlgorithmWrapper;
 
 public class StringEncoder {
-    /**
-     * The AES encoder that was used to encrypt the content.
-     */
+    ///
+    /// The AES encoder that was used to encrypt the content.
+    ///
     private final Encoder aes;
-    /**
-     * The RSA encrypted AES key that was used to encrypt the content.
-     */
+    ///
+    /// The RSA encrypted AES key that was used to encrypt the content.
+    ///
     private final EncryptedAESAlgorithmWrapper key;
 
     public StringEncoder(Encoder rsa, Encoder aes) {

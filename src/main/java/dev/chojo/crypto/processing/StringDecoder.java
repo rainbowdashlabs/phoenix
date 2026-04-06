@@ -12,10 +12,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StringDecoder {
-    /**
-     * The Private RSA encoder that was used to encrypt the AES key.
-     * In this case, it has to be the private key and not the public key.
-     */
+    ///
+    /// The Private RSA encoder that was used to encrypt the AES key.
+    /// In this case, it has to be the private key and not the public key.
+    ///
     private final Decoder rsa;
 
     private final Map<EncryptedAESAlgorithmWrapper, Decoder> aesDecoder = new HashMap<>();

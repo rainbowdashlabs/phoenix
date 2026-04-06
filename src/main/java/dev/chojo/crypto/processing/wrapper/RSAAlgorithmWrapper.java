@@ -15,9 +15,9 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 public class RSAAlgorithmWrapper extends AlgorithmWrapper {
-    /**
-     * The AES key.
-     */
+    ///
+    /// The AES key.
+    ///
     private final Key key;
 
     private final String cipher;

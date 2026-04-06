@@ -13,3 +13,5 @@ services:
       POSTGRES_DB: postgres
     volumes:
       - ./postgres:/var/lib/postgresql/18/docker
+    ports:
+      - "5432:5432"
