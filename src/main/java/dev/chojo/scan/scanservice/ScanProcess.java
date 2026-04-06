@@ -21,6 +21,11 @@ import java.util.function.Function;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+/**
+ * Represents an ongoing scan process for a guild.
+ * <p>
+ * This class coordinates the scanning of all channels within a guild and manages the overall progress.
+ */
 public class ScanProcess {
     private static final Logger log = getLogger(ScanProcess.class);
     public final Guild guild;
@@ -33,6 +38,12 @@ public class ScanProcess {
     // TODO: probably get from central place
     private ScheduledExecutorService runner;
 
+    /**
+     * Creates a new ScanProcess for the specified guild.
+     *
+     * @param guild    the guild to scan
+     * @param channels the list of channels to scan
+     */
     public ScanProcess(Guild guild, List<Channel> channels) {
         this.guild = guild;
         this.channels = channels;
@@ -40,6 +51,9 @@ public class ScanProcess {
         this.maxChannelMessages = e -> 10000;
     }
 
+    /**
+     * Initializes the scan process by creating the necessary {@link Scan} objects and starting the runner.
+     */
     public void init() {
         scans = channels.stream()
                 .map(c -> Scan.create(this, c, null))
@@ -49,6 +63,9 @@ public class ScanProcess {
         runner.execute(this::scanTick);
     }
 
+    /**
+     * Periodically executes a scan tick.
+     */
     private void scanTick() {
         var start = Instant.now();
         try {
@@ -61,6 +78,9 @@ public class ScanProcess {
         runner.schedule(this::scanTick, next, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * Performs a single scanning operation.
+     */
     private void scan() {
         scans.stream().filter(c -> !c.done()).findFirst().ifPresent(Scan::scan);
         currWorker = Thread.currentThread();
@@ -68,26 +88,56 @@ public class ScanProcess {
         save();
     }
 
+    /**
+     * Checks if the entire scan process is finished.
+     *
+     * @return true if all channels are scanned, false otherwise
+     */
     public boolean done() {
         return scans.stream().allMatch(Scan::done);
     }
 
+    /**
+     * Gets the total number of messages to scan.
+     *
+     * @return the maximum number of messages
+     */
     public int maxMessages() {
         return scans.stream().mapToInt(Scan::maxMessages).sum();
     }
 
+    /**
+     * Gets the total number of messages scanned so far.
+     *
+     * @return the number of scanned messages
+     */
     public int scanned() {
         return scans.stream().mapToInt(Scan::scanned).sum();
     }
 
+    /**
+     * Gets the list of channels being scanned.
+     *
+     * @return the list of channels
+     */
     public List<Channel> channels() {
         return channels;
     }
 
+    /**
+     * Gets the start time of the scan process.
+     *
+     * @return the start instant
+     */
     public Instant start() {
         return start;
     }
 
+    /**
+     * Creates a {@link ScanProgress} object representing the current state of the process.
+     *
+     * @return the current progress
+     */
     public ScanProgress progress() {
         return new ScanProgress(
                 ScanTarget.GUILD,
@@ -98,11 +148,20 @@ public class ScanProcess {
                 scans.stream().map(Scan::progress).toList());
     }
 
+    /**
+     * Saves the current progress of the scan.
+     */
     public void save() {
         // TODO
         // guild.scan().saveProgress(progress(), start, done() ? Instant.now() : null);
     }
 
+    /**
+     * Gets the maximum number of messages to scan for a specific channel.
+     *
+     * @param channel the channel to check
+     * @return the maximum number of messages
+     */
     public int maxChannelMessages(Channel channel) {
         if (channel instanceof ThreadChannel thread) {
             return maxChannelMessages.apply(thread.getParentMessageChannel());
@@ -110,6 +169,11 @@ public class ScanProcess {
         return maxChannelMessages.apply(channel);
     }
 
+    /**
+     * Gets the guild being scanned.
+     *
+     * @return the guild
+     */
     public Guild guild() {
         return guild;
     }

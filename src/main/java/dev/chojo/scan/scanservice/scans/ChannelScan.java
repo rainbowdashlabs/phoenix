@@ -25,6 +25,11 @@ import static net.dv8tion.jda.api.Permission.MESSAGE_HISTORY;
 import static net.dv8tion.jda.api.Permission.VIEW_CHANNEL;
 import static org.slf4j.LoggerFactory.getLogger;
 
+/**
+ * Represents a scan of a Discord message channel.
+ * <p>
+ * This class handles the retrieval and processing of messages in a single channel.
+ */
 public class ChannelScan implements Scan {
     private static final Logger log = getLogger(ChannelScan.class);
     private final ScanProcess process;
@@ -43,11 +48,26 @@ public class ChannelScan implements Scan {
         maxMessages = process.maxChannelMessages(channel);
     }
 
+    /**
+     * Creates a new ChannelScan.
+     *
+     * @param process the overall scan process
+     * @param channel the channel to scan
+     * @param scanned an optional atomic integer to track the scanned messages
+     * @return the created channel scan
+     */
     public static ChannelScan create(
             ScanProcess process, GuildMessageChannel channel, @Nullable AtomicInteger scanned) {
         return new ChannelScan(process, channel, scanned == null ? new AtomicInteger(0) : scanned);
     }
 
+    /**
+     * Creates a new ChannelScan.
+     *
+     * @param process the overall scan process
+     * @param channel the channel to scan
+     * @return the created channel scan
+     */
     public static ChannelScan create(ScanProcess process, GuildMessageChannel channel) {
         return new ChannelScan(process, channel, new AtomicInteger(0));
     }
@@ -81,6 +101,11 @@ public class ChannelScan implements Scan {
         }
     }
 
+    /**
+     * Processes a single message.
+     *
+     * @param message the message to process
+     */
     private void check(Message message) {
         currentTimestamp = snowflakeToTimestamp(message.getIdLong());
         countScan();
@@ -114,6 +139,9 @@ public class ChannelScan implements Scan {
         // TODO implement saving of messages
     }
 
+    /**
+     * Increments the count of scanned messages.
+     */
     public void countScan() {
         scanned.incrementAndGet();
     }
@@ -149,10 +177,20 @@ public class ChannelScan implements Scan {
                 List.of());
     }
 
+    /**
+     * Gets the ID of the channel being scanned.
+     *
+     * @return the channel ID
+     */
     public long channelId() {
         return channel.getIdLong();
     }
 
+    /**
+     * Gets the timestamp of the last scanned message.
+     *
+     * @return the timestamp as a long
+     */
     public long currentTimestamp() {
         return currentTimestamp;
     }

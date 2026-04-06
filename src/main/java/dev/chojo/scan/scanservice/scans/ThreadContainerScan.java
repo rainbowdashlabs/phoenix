@@ -20,6 +20,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static dev.chojo.util.SnowflakeUtil.snowflakeToTimestamp;
 
+/**
+ * Represents a scan of a channel that can contain threads, such as a forum or a media channel.
+ * <p>
+ * This class also handles the threads of a regular text channel if it is used as a sub-scan.
+ */
 public class ThreadContainerScan implements Scan {
     private ScanProcess scanProcess;
     private final IThreadContainer postContainer;
@@ -36,6 +41,15 @@ public class ThreadContainerScan implements Scan {
         this.parent = parent;
     }
 
+    /**
+     * Creates a new ThreadContainerScan.
+     *
+     * @param scanProcess   the overall scan process
+     * @param postContainer the container of the threads
+     * @param parent        the parent channel scan, if any
+     * @param scanned       an optional atomic integer to track the scanned messages
+     * @return the created thread container scan
+     */
     public static ThreadContainerScan create(
             ScanProcess scanProcess,
             IThreadContainer postContainer,

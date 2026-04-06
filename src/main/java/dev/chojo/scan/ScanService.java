@@ -22,15 +22,29 @@ import java.util.concurrent.TimeUnit;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+/**
+ * Service for managing guild scan processes.
+ * <p>
+ * This service is responsible for starting and monitoring {@link ScanProcess ScanProcesses} for different guilds.
+ * It uses a background watcher to periodically check the status of active scans and save them when finished.
+ */
 public class ScanService {
     private static final Logger log = getLogger(ScanService.class);
     private final Map<Long, ScanProcess> scanProcesses = new HashMap<>();
     private final ScheduledExecutorService watcher = Executors.newSingleThreadScheduledExecutor();
 
+    /**
+     * Creates a new ScanService and starts the background watcher.
+     */
     public ScanService() {
         watcher.schedule(this::tick, 2, TimeUnit.SECONDS);
     }
 
+    /**
+     * Starts a scan for the given guild if no scan is currently active for it.
+     *
+     * @param guild the guild to scan
+     */
     public void scan(Guild guild) {
         if (scanProcesses.containsKey(guild.getIdLong())) return;
         // TODO: Retrieve backup channels.
@@ -42,6 +56,11 @@ public class ScanService {
         log.info("Started scan for {}", guild);
     }
 
+    /**
+     * Periodically checks all active scan processes.
+     * <p>
+     * If a process is finished, it is removed from the active scans and its results are saved.
+     */
     private void tick() {
         for (ScanProcess process : List.copyOf(scanProcesses.values())) {
             if (process.done()) {
@@ -52,6 +71,12 @@ public class ScanService {
         }
     }
 
+    /**
+     * Retrieves the active scan process for a guild.
+     *
+     * @param guild the guild to get the scan process for
+     * @return an optional containing the scan process if active, empty otherwise
+     */
     public Optional<ScanProcess> getScanProcess(Guild guild) {
         return Optional.ofNullable(scanProcesses.get(guild.getIdLong()));
     }

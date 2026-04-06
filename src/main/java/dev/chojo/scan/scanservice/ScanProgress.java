@@ -17,10 +17,12 @@ import java.util.List;
  * Scan progress is a nested object that might contain more scan progress objects that represent child entities of a progress.
  * A child might be the channels of a category, threads of a text channel, or threads of a forum channel.
  *
- * @param target  the type of the target channel
- * @param id      id of the channel. 0 if the result contains the threads of a text channel.
- * @param scanned amount of scanned messages. This is the sum of all sub processes.
- * @param childs  a list of child scan progress objects. These might be channels of a category, threads of a text channel, or threads of a forum channel.
+ * @param target      the type of the target channel
+ * @param id          id of the channel. 0 if the result contains the threads of a text channel.
+ * @param name        the name of the scanned target
+ * @param scanned     amount of scanned messages. This is the sum of all sub processes.
+ * @param maxMessages the maximum number of messages to scan
+ * @param childs      a list of child scan progress objects. These might be channels of a category, threads of a text channel, or threads of a forum channel.
  */
 @JsonPropertyOrder({"target", "id", "scanned", "maxMessages", "childs"})
 public record ScanProgress(
