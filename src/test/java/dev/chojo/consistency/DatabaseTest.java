@@ -1,3 +1,8 @@
+/*
+ *     SPDX-License-Identifier: AGPL-3.0-only
+ *
+ *     Copyright (C) RainbowDashLabs and Contributor
+ */
 package dev.chojo.consistency;
 
 import com.zaxxer.hikari.HikariDataSource;
@@ -25,15 +30,15 @@ public class DatabaseTest {
     void verifyDeployment() throws IOException, SQLException {
         try (var container = createContainer("postgres", "postgres")) {
             HikariDataSource dataSource = DataSourceCreator.create(PostgreSql.get())
-                                                           .configure(conf -> conf.port(container.getFirstMappedPort()))
-                                                           .create()
-                                                           .usingUsername("postgres")
-                                                           .usingPassword("postgres")
-                                                           .build();
+                    .configure(conf -> conf.port(container.getFirstMappedPort()))
+                    .create()
+                    .usingUsername("postgres")
+                    .usingPassword("postgres")
+                    .build();
             try (dataSource) {
                 SqlUpdater.builder(dataSource, PostgreSql.get())
-                          .setSchemas("repbot_schema")
-                          .execute();
+                        .setSchemas("repbot_schema")
+                        .execute();
             }
         }
     }
@@ -47,5 +52,4 @@ public class DatabaseTest {
         self.start();
         return self;
     }
-
 }
