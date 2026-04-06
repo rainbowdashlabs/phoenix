@@ -24,6 +24,8 @@ module dev.chojo.elpis {
     requires java.desktop;
     requires java.sql;
     requires dev.chojo.ocular;
+    requires com.fasterxml.jackson.databind;
+    requires org.apache.commons.collections4;
 
     exports dev.chojo.configuration;
     exports dev.chojo.core;
