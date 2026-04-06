@@ -62,31 +62,31 @@ public class CryptoService {
         return new AESAlgorithmWrapper(secretKey, symmetricCipher(), opMode);
     }
 
-    private String asymmetricCipher() {
-        return configuration.main().crypto().asymmetricCipher();
+    public String asymmetricCipher() {
+        return crypto().asymmetricCipher();
     }
 
-    private String asymmetricAlgorithm() {
-        return configuration.main().crypto().asymmetricAlgorithm();
+    public String asymmetricAlgorithm() {
+        return crypto().asymmetricAlgorithm();
     }
 
-    private int asymmetricKeySize() {
-        return configuration.main().crypto().asymmetricKeySize();
+    public int asymmetricKeySize() {
+        return crypto().asymmetricKeySize();
     }
 
-    private String symmetricCipher() {
-        return configuration.main().crypto().symmetricCipher();
+    public String symmetricCipher() {
+        return crypto().symmetricCipher();
     }
 
     private String symmetricAlgorithm() {
-        return configuration.main().crypto().symmetricAlgorithm();
+        return crypto().symmetricAlgorithm();
     }
 
-    private Crypto crypto() {
+    public Crypto crypto() {
         return configuration.main().crypto();
     }
 
-    private int symmetricKeySize() {
+    public int symmetricKeySize() {
         return crypto().symmetricKeySize();
     }
 }
