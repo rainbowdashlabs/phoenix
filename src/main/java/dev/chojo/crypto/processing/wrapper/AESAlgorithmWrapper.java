@@ -19,9 +19,9 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 
 public class AESAlgorithmWrapper extends AlgorithmWrapper {
-    /**
-     * The AES key.
-     */
+    ///
+    /// The AES key.
+    ///
     private final SecretKey key;
 
     private final byte[] iv;

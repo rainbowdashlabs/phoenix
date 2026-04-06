@@ -4,11 +4,12 @@ sadu = "2.3.8"
 jackson = "3.1.1"
 junit = "6.0.3"
 javalin = "7.1.0"
+testcontainers = "2.0.4"
 
 [plugins]
 spotless = { id = "com.diffplug.spotless", version = "8.4.0" }
 idea = { id = "org.jetbrains.gradle.plugin.idea-ext", version = "1.4.1" }
-pitest = { id = "info.solidsoft.pitest", version = "1.19.0"}
+pitest = { id = "info.solidsoft.pitest", version = "1.19.0" }
 
 [libraries]
 # Core
@@ -38,17 +39,22 @@ javalin-openapi-openapi = { group = "io.javalin.community.openapi", name = "java
 
 # Configuration
 ocular = { group = "dev.chojo", name = "ocular", version = "2.1.4" }
-jackson-yaml = {group = "tools.jackson.dataformat",  name="jackson-dataformat-yaml", version.ref= "jackson"}
-jackson-toml = {group = "tools.jackson.dataformat",  name="jackson-dataformat-toml", version.ref= "jackson"}
-jackson-core = {group = "tools.jackson.core",  name="jackson-core", version.ref= "jackson"}
-jackson-databind = {group = "tools.jackson.core",  name="jackson-databind", version.ref= "jackson"}
+jackson-yaml = { group = "tools.jackson.dataformat", name = "jackson-dataformat-yaml", version.ref = "jackson" }
+jackson-toml = { group = "tools.jackson.dataformat", name = "jackson-dataformat-toml", version.ref = "jackson" }
+jackson-core = { group = "tools.jackson.core", name = "jackson-core", version.ref = "jackson" }
+jackson-databind = { group = "tools.jackson.core", name = "jackson-databind", version.ref = "jackson" }
 
 # Testing
 junit-bom = { group = "org.junit", name = "junit-bom", version.ref = "junit" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit" }
 junit-params = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junit" }
 junit-platform = { group = "org.junit.platform", name = "junit-platform-launcher", version.ref = "junit" }
-mockito = {group= "org.mockito", name = "mockito-core", version = "5.+"}
+mockito = { group = "org.mockito", name = "mockito-core", version = "5.+" }
+
+# Database testing
+testcontainers-postgres = { group = "org.testcontainers", name = "testcontainers-postgresql", version.ref = "testcontainers" }
+testcontainers-core = { group = "org.testcontainers", name = "testcontainers", version.ref = "testcontainers" }
+testcontainers-junit = { group = "org.testcontainers", name = "testcontainers-junit-jupiter", version.ref = "testcontainers" }
 
 
 # Annotations
@@ -82,4 +88,9 @@ config = [
     "jackson-databind",
     "jackson-yaml",
     "jackson-toml"
+]
+testcontainers = [
+    "testcontainers-core",
+    "testcontainers-junit",
+    "testcontainers-postgres"
 ]
