@@ -10,8 +10,6 @@ import dev.chojo.crypto.processing.model.AESProcessInput;
 import dev.chojo.crypto.processing.model.AESProcessResult;
 import dev.chojo.crypto.processing.model.BytesProcessInput;
 import dev.chojo.crypto.processing.model.BytesProcessResult;
-import dev.chojo.crypto.processing.model.ProcessInput;
-import dev.chojo.crypto.processing.model.ProcessResult;
 import dev.chojo.crypto.serialization.EncryptedAESAlgorithmWrapper;
 
 import java.util.Base64;
@@ -23,14 +21,12 @@ import java.util.Map;
 /// This class handles the decryption of content using AES, and the decryption of the AES key
 /// using RSA.
 public class StringDecrypter {
-    ///
     /// The Private RSA encoder that was used to encrypt the AES key.
     /// In this case, it has to be the private key and not the public key.
-    ///
     private final Decryptor<BytesProcessInput, BytesProcessResult> rsa;
 
-    private final Map<EncryptedAESAlgorithmWrapper, Decryptor<? extends ProcessInput, ? extends ProcessResult>>
-            aesDecoder = new HashMap<>();
+    private final Map<EncryptedAESAlgorithmWrapper, Decryptor<AESProcessInput, AESProcessResult>> aesDecoder =
+            new HashMap<>();
 
     /// Creates a new string decrypter with the given RSA decryptor.
     ///
@@ -48,15 +44,7 @@ public class StringDecrypter {
         byte[] data = Base64.getDecoder().decode(content.content());
         byte[] iv = content.iv() != null ? Base64.getDecoder().decode(content.iv()) : null;
 
-        if (decryptor.wrapper() instanceof dev.chojo.crypto.processing.wrapper.AESAlgorithmWrapper) {
-            @SuppressWarnings("unchecked")
-            Decryptor<AESProcessInput, AESProcessResult> aesDecryptor =
-                    (Decryptor<AESProcessInput, AESProcessResult>) decryptor;
-            return new String(
-                    aesDecryptor.process(new AESProcessInput(data, iv)).bytes());
-        }
-
-        return new String(decryptor.process(data).bytes());
+        return new String(decryptor.process(new AESProcessInput(data, iv)).bytes());
     }
 
     private Decryptor<AESProcessInput, AESProcessResult> decodeKey(EncryptedAESAlgorithmWrapper key) {
