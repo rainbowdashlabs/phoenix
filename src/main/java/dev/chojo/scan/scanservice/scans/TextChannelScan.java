@@ -30,9 +30,7 @@ public class TextChannelScan implements Scan {
         var scanned = new AtomicInteger(0);
         ChannelScan channelScan = ChannelScan.create(scanProcess, channel, scanned);
         return new TextChannelScan(
-                channel,
-                ThreadContainerScan.create(scanProcess, channel, channelScan, scanned),
-                channelScan);
+                channel, ThreadContainerScan.create(scanProcess, channel, channelScan, scanned), channelScan);
     }
 
     @Override

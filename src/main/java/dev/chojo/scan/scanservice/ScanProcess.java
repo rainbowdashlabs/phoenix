@@ -42,10 +42,10 @@ public class ScanProcess {
 
     public void init() {
         scans = channels.stream()
-                        .map(c -> Scan.create(this, c, null))
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .toList();
+                .map(c -> Scan.create(this, c, null))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
         runner.execute(this::scanTick);
     }
 
