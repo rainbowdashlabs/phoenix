@@ -3,21 +3,27 @@
  *
  *     Copyright (C) RainbowDashLabs and Contributor
  */
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import dev.chojo.guice.ElpisModule;
+import dev.chojo.configuration.Configuration;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
-public class GuiceExtension implements ParameterResolver {
+public class GuiceExtension extends AbstractModule implements ParameterResolver {
     private final Injector injector;
 
     public GuiceExtension() {
-        injector = Guice.createInjector(new ElpisModule());
+        injector = Guice.createInjector(this);
+    }
+
+    @Override
+    protected void configure() {
+        bind(Configuration.class).toInstance(new Configuration());
     }
 
     @Override

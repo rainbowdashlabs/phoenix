@@ -6,6 +6,8 @@
 package dev.chojo.data.snapshot.message.content;
 
 import dev.chojo.data.snapshot.UserProfile;
+import dev.chojo.data.snapshot.message.context.GuildRestorationContext;
+import dev.chojo.data.snapshot.message.context.MessageRestorationContext;
 import net.dv8tion.jda.api.components.MessageTopLevelComponentUnion;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -32,7 +34,7 @@ class MessageContentSnapshotTest {
         User author = mock(User.class);
         when(author.getIdLong()).thenReturn(12345L);
         when(message.getAuthor()).thenReturn(author);
-        when(message.getContentRaw()).thenReturn("Test Content");
+        when(message.getContentRaw()).thenReturn(""); // V2 components don't allow content
         when(message.getType()).thenReturn(MessageType.DEFAULT);
         when(message.isPinned()).thenReturn(false);
         when(message.getEmbeds()).thenReturn(Collections.emptyList());
@@ -55,11 +57,15 @@ class MessageContentSnapshotTest {
         assertFalse(snapshot.components().isEmpty());
 
         // Deserialize back to MessageCreateData
-        Function<Long, UserProfile> profileResolver = id -> null;
-        MessageCreateData createData = snapshot.create(profileResolver);
+        Function<Long, UserProfile> profileResolver =
+                id -> new UserProfile(id, "TestUser", "https://example.com/avatar.png");
+        GuildRestorationContext guildRestorationContext =
+                new GuildRestorationContext(id -> id, id -> id, (name, id) -> null, profileResolver);
+        MessageRestorationContext context = new MessageRestorationContext(guildRestorationContext, 67890L, 111L, 222L);
+        MessageCreateData createData = snapshot.create(context);
 
         assertNotNull(createData);
-        assertEquals("Test Content", createData.getContent());
+        assertEquals("", createData.getContent());
 
         // JDA's MessageCreateData doesn't easily expose components for direct comparison in a simple way
         // without further inspection of its internal DataObject, but the fact that it built successfully
