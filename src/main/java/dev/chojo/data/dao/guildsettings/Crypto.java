@@ -1,0 +1,80 @@
+/*
+ *     SPDX-License-Identifier: AGPL-3.0-only
+ *
+ *     Copyright (C) RainbowDashLabs and Contributor
+ */
+package dev.chojo.data.dao.guildsettings;
+
+import dev.chojo.crypto.processing.wrapper.RSAAlgorithmWrapper;
+import dev.chojo.crypto.serialization.PlainRSAAlgorithmWrapper;
+import dev.chojo.data.base.GuildHolder;
+import dev.chojo.data.dao.GuildSettings;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Objects;
+
+import static de.chojo.sadu.queries.api.call.Call.call;
+import static de.chojo.sadu.queries.api.query.Query.query;
+
+public class Crypto implements GuildHolder {
+    private final GuildSettings guildSettings;
+
+    @Nullable
+    private RSAAlgorithmWrapper wrapper;
+
+    private boolean initialized = false;
+
+    public Crypto(GuildSettings guildSettings) {
+        this.guildSettings = guildSettings;
+    }
+
+    public synchronized void setPublicKey(PlainRSAAlgorithmWrapper wrapper) {
+        Objects.requireNonNull(wrapper, "Wrapper cannot be null");
+        if (this.wrapper != null) throw new IllegalStateException("Wrapper already set");
+        query("""
+                INSERT
+                INTO
+                    guild_crypto(guild_id, public_key, cipher)
+                VALUES
+                    (?, ?, ?)
+                ON CONFLICT(guild_id) DO UPDATE SET
+                    public_key = excluded.public_key""").single(call().bind(guildId()).bind(wrapper.key()).bind(wrapper.cipher()));
+        this.wrapper = wrapper.unwrap();
+        this.initialized = true;
+    }
+
+    public synchronized void clearPublicKey() {
+        this.wrapper = null;
+        this.initialized = false;
+    }
+
+    public @Nullable RSAAlgorithmWrapper publicKey() {
+        if (wrapper == null && !initialized) {
+            query("""
+                    SELECT
+                        guild_id,
+                        public_key,
+                        cipher
+                    FROM
+                        guild_crypto
+                    WHERE guild_id = ?""")
+                    .single(call().bind(guildId()))
+                    .map(row -> new PlainRSAAlgorithmWrapper(row.getString("public_key"), row.getString("cipher")))
+                    .first()
+                    .map(PlainRSAAlgorithmWrapper::unwrap)
+                    .ifPresent(wrapper -> this.wrapper = wrapper);
+            initialized = true;
+        }
+        return wrapper;
+    }
+
+    public boolean hasPublicKey() {
+        if (!initialized) publicKey();
+        return this.wrapper != null;
+    }
+
+    @Override
+    public GuildHolder guildHolder() {
+        return guildSettings;
+    }
+}

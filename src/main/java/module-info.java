@@ -28,11 +28,15 @@ module dev.chojo.elpis {
     requires org.apache.commons.collections4;
     requires jdk.jshell;
     requires org.eclipse.jetty.util;
+    requires com.google.common;
 
     exports dev.chojo.configuration;
     exports dev.chojo.core;
     exports dev.chojo.data;
     exports dev.chojo.data.snapshot;
+    exports dev.chojo.data.snapshot.message.content;
+    exports dev.chojo.data.snapshot.message.context;
+    exports dev.chojo.data.repository;
     exports dev.chojo.scan;
     exports dev.chojo.scan.scanservice;
     exports dev.chojo.scan.scanservice.scans;

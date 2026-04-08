@@ -36,7 +36,7 @@ class StringEncryptorTest {
     }
 
     @Test
-    void testEncode() throws InvalidKeySpecException {
+    void testEncrypt() throws InvalidKeySpecException {
         KeyPair keyPair = cryptoService.generateRSAKeyPair();
         RSAAlgorithmWrapper rsaAlgorithmWrapper =
                 new RSAAlgorithmWrapper(keyPair.getPublic(), "RSA/ECB/PKCS1Padding", javax.crypto.Cipher.ENCRYPT_MODE);
@@ -46,14 +46,14 @@ class StringEncryptorTest {
 
         KeyRotationPolicy keyRotationPolicy =
                 new KeyRotationPolicy(10000, () -> new Encryptor<>(cryptoService.randomAESKey()));
-        EncryptedContent encrypted = new StringEncryptor(rsa, keyRotationPolicy).encode(generatedString);
+        EncryptedContent encrypted = new StringEncryptor(rsa, keyRotationPolicy).encrypt(generatedString);
         assertNotNull(encrypted.content());
         assertNotNull(encrypted.key());
         assertNotNull(encrypted.iv());
     }
 
     @Test
-    void testEncodeWithoutIV() throws Exception {
+    void testEncryptWithoutIV() throws Exception {
         KeyPair keyPair = cryptoService.generateRSAKeyPair();
         RSAAlgorithmWrapper rsaAlgorithmWrapper =
                 new RSAAlgorithmWrapper(keyPair.getPublic(), "RSA/ECB/PKCS1Padding", javax.crypto.Cipher.ENCRYPT_MODE);
@@ -68,6 +68,6 @@ class StringEncryptorTest {
 
         StringEncryptor encoder = new StringEncryptor(rsa, policy);
         // This will likely throw ClassCastException at line 54 of StringEncoder.java
-        assertThrows(ClassCastException.class, () -> encoder.encode("test"));
+        assertThrows(ClassCastException.class, () -> encoder.encrypt("test"));
     }
 }

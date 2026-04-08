@@ -46,7 +46,7 @@ public class CryptoService {
         return rsaGenerator.generateKeyPair();
     }
 
-    /// Generates a random AES key in encrypt mode.
+    /// Generates a random AES key in encryption mode.
     ///
     /// @return the generated AES algorithm wrapper
     public AESAlgorithmWrapper randomAESKey() {

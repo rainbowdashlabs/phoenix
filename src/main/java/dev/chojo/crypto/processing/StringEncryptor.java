@@ -50,7 +50,7 @@ public class StringEncryptor {
     ///
     /// @param content the content to encode
     /// @return the encrypted content
-    public EncryptedContent encode(String content) {
+    public EncryptedContent encrypt(String content) {
         ProcessResult result = aes().process(content.getBytes());
         String encrypted = Base64.getEncoder().encodeToString(result.bytes());
         String iv = null;

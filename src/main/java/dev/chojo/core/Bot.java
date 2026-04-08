@@ -5,8 +5,10 @@
  */
 package dev.chojo.core;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Provides;
 import dev.chojo.configuration.Configuration;
 import dev.chojo.service.MessageStoreService;
 import io.github.kaktushose.jdac.JDACBuilder;
@@ -20,20 +22,31 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Executors;
 
-public class Bot {
+public class Bot extends AbstractModule {
 
     private static final Logger log = LoggerFactory.getLogger(Bot.class);
     private final Configuration configuration;
 
+    @Nullable
+    private ShardManager shardManager;
+
     @Inject
-    public Bot(Configuration configuration) {
+    public Bot(Configuration configuration, MessageStoreService messageStoreService) {
         this.configuration = configuration;
+    }
+
+    @Provides
+    public ShardManager shardManager() {
+        Objects.requireNonNull(shardManager, "ShardManager not initialized!");
+        return shardManager;
     }
 
     public void start(Injector injector) throws InterruptedException {
@@ -47,16 +60,16 @@ public class Bot {
     }
 
     private ShardManager shardManager(String token) throws InterruptedException {
-        ShardManager manager = DefaultShardManagerBuilder.createDefault(token)
+        shardManager = DefaultShardManagerBuilder.createDefault(token)
                 .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setEventPool(Executors.newVirtualThreadPerTaskExecutor())
-                .addEventListeners(new MessageStoreService())
+                .addEventListeners()
                 .build();
-        for (JDA shard : manager.getShards()) {
+        for (JDA shard : shardManager.getShards()) {
             shard.awaitReady();
         }
-        return manager;
+        return shardManager;
     }
 
     private void jdaCommands(ShardManager manager, Injector injector) {

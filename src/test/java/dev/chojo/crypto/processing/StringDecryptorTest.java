@@ -54,7 +54,7 @@ class StringDecryptorTest {
                 .toString();
         KeyRotationPolicy keyRotationPolicy =
                 new KeyRotationPolicy(10000, () -> new Encryptor<>(cryptoService.randomAESKey()));
-        EncryptedContent encrypted = new StringEncryptor(rsa, keyRotationPolicy).encode(generatedString);
+        EncryptedContent encrypted = new StringEncryptor(rsa, keyRotationPolicy).encrypt(generatedString);
         String decode = new StringDecrypter(new Decryptor<>(privateRSA)).decode(encrypted);
         assertEquals(generatedString, decode);
     }
