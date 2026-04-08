@@ -54,5 +54,23 @@ public class MessageRepository {
                         .bind("message", content.content())
                         .bind("nonce", content.iv()))
                 .insert();
+        // TODO: This works, but there might be a more efficient way, instead of inserting the user every time.
+        query("""
+                INSERT
+                INTO
+                    guild_user(guild_id, id, username, profile_picture)
+                VALUES
+                    (?, ?, ?, ?)
+                ON CONFLICT(guild_id, id)
+                    DO UPDATE
+                    SET
+                        username        = excluded.username,
+                        profile_picture = excluded.profile_picture;
+                """)
+                .single(call().bind(encryptedMessage.guildId())
+                        .bind(encryptedMessage.author().id())
+                        .bind(encryptedMessage.author().username())
+                        .bind(encryptedMessage.author().profilePicture()))
+                .insert();
     }
 }

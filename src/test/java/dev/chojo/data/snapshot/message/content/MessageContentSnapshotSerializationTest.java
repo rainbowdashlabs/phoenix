@@ -87,8 +87,8 @@ class MessageContentSnapshotSerializationTest {
     void testPollMetaSerialization() throws JsonProcessingException {
         PollAnswer answer = new PollAnswer(":thumbsup:", "Yes", 5);
         PollMeta pollMeta = new PollMeta("Question?", List.of(answer), 123456789L);
-        MessageContentSnapshot snapshot = new MessageContentSnapshot(
-                123L, "content", null, null, Collections.emptyList(), false, pollMeta);
+        MessageContentSnapshot snapshot =
+                new MessageContentSnapshot(123L, "content", null, null, Collections.emptyList(), false, pollMeta);
 
         String json = objectMapper.writeValueAsString(snapshot);
         assertTrue(json.contains("\"type\":\"POLL_META\""));
@@ -107,8 +107,8 @@ class MessageContentSnapshotSerializationTest {
 
     @Test
     void testNullMetaSerialization() throws JsonProcessingException {
-        MessageContentSnapshot snapshot = new MessageContentSnapshot(
-                123L, "content", null, null, Collections.emptyList(), false, null);
+        MessageContentSnapshot snapshot =
+                new MessageContentSnapshot(123L, "content", null, null, Collections.emptyList(), false, null);
 
         String json = objectMapper.writeValueAsString(snapshot);
         MessageContentSnapshot deserialized = objectMapper.readValue(json, MessageContentSnapshot.class);
