@@ -58,7 +58,7 @@ dependencies {
 tasks {
     compileJava {
         options.isIncremental = true
-        options.compilerArgs.addAll(listOf("--add-reads", "dev.chojo.elpis=ALL-UNNAMED"))
+        options.compilerArgs.addAll(listOf("--add-reads", "dev.chojo.elpis=ALL-UNNAMED", "-parameters"))
     }
 
     processResources {
@@ -139,7 +139,7 @@ idea {
             var shared = listOf(
                 "-Dbot.cleanup=false",
                 "-Dbot.config=config.testing.yaml",
-                "-Dlog4j2.configurationFile=docker/config/log4j2.testing.xml",
+                //"-Dlog4j2.configurationFile=docker/config/log4j2.testing.xml",
                 "-Dbot.db.host=localhost,",
                 "-Dbot.api.url=http://localhost:5173",
                 "--sun-misc-unsafe-memory-access=allow",

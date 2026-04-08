@@ -3,7 +3,7 @@
  *
  *     Copyright (C) RainbowDashLabs and Contributor
  */
-package dev.chojo.data.snapshot.message.poll;
+package dev.chojo.data.snapshot.message.content.meta.poll;
 
 import net.dv8tion.jda.api.entities.messages.MessagePoll;
 import org.jspecify.annotations.Nullable;

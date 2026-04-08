@@ -6,11 +6,18 @@
 package dev.chojo.core;
 
 import com.google.inject.Guice;
+<<<<<<< HEAD
 import com.google.inject.Provides;
 import dev.chojo.configuration.Configuration;
 import dev.chojo.crypto.CryptoService;
 import dev.chojo.data.SaduModule;
 import io.github.kaktushose.jdac.JDACBuilder;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import dev.chojo.commands.message.Replicate;
+import dev.chojo.configuration.Configuration;
+import dev.chojo.guice.ElpisModule;
+import dev.chojo.service.MessageStore;
 import io.github.kaktushose.jdac.JDACommands;
 import io.github.kaktushose.jdac.annotations.interactions.CommandScope;
 import io.github.kaktushose.jdac.definitions.interactions.command.CommandDefinition;
@@ -67,6 +74,7 @@ public class Bot extends SaduModule {
                 .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setEventPool(Executors.newVirtualThreadPerTaskExecutor())
+                .addEventListeners(new MessageStore())
                 .build();
         for (JDA shard : manager.getShards()) {
             shard.awaitReady();

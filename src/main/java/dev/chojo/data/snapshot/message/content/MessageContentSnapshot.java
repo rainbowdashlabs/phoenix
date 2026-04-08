@@ -5,10 +5,10 @@
  */
 package dev.chojo.data.snapshot.message.content;
 
-import dev.chojo.data.snapshot.UserProfile;
 import dev.chojo.data.snapshot.message.Reply;
+import dev.chojo.data.snapshot.message.contect.MessageRestorationContext;
 import dev.chojo.data.snapshot.message.content.meta.Meta;
-import dev.chojo.data.snapshot.message.poll.PollMeta;
+import dev.chojo.data.snapshot.message.content.meta.poll.PollMeta;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.tree.MessageComponentTree;
 import net.dv8tion.jda.api.components.utils.ComponentDeserializer;
@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.interactions.InteractionType;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import net.dv8tion.jda.internal.entities.EntityBuilder;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Base64;
@@ -29,10 +28,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 
 import static net.dv8tion.jda.api.entities.MessageType.AUTO_MODERATION_ACTION;
 import static net.dv8tion.jda.api.entities.MessageType.CALL;
+import static net.dv8tion.jda.api.entities.MessageType.CHANNEL_FOLLOW_ADD;
 import static net.dv8tion.jda.api.entities.MessageType.CHANNEL_ICON_CHANGE;
 import static net.dv8tion.jda.api.entities.MessageType.CHANNEL_NAME_CHANGE;
 import static net.dv8tion.jda.api.entities.MessageType.CHANNEL_PINNED_ADD;
@@ -107,7 +106,9 @@ public record MessageContentSnapshot(
             GUILD_DISCOVERY_DISQUALIFIED,
             GUILD_DISCOVERY_REQUALIFIED,
             GUILD_DISCOVERY_GRACE_PERIOD_INITIAL_WARNING,
-            GUILD_DISCOVERY_GRACE_PERIOD_FINAL_WARNING);
+            GUILD_DISCOVERY_GRACE_PERIOD_FINAL_WARNING,
+            // We can not backup the target channel from the channel follow add event
+            CHANNEL_FOLLOW_ADD);
 
     /**
      * Creates a new MessageContentSnapshot from a {@link Message}.
@@ -180,7 +181,7 @@ public record MessageContentSnapshot(
                 new MessageContentSnapshot(message.getIdLong(), rawContent, components, attachmentURLs, pinned, meta));
     }
 
-    public MessageCreateData create(Function<Long, UserProfile> profileResolver) {
+    public MessageCreateData create(MessageRestorationContext context) {
         MessageCreateBuilder builder = new MessageCreateBuilder();
         builder.setContent(rawContent);
         if (components != null) {
@@ -194,6 +195,10 @@ public record MessageContentSnapshot(
             MessageComponentTree messageComponentTree = MessageComponentTree.of(iComponentUnions);
             MessageComponentTree disabled = messageComponentTree.asDisabled();
             builder.addComponents(disabled);
+        }
+
+        if (meta != null) {
+            meta.apply(builder, context);
         }
         return builder.build();
     }

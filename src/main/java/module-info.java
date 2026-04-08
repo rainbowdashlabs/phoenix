@@ -26,6 +26,7 @@ module dev.chojo.elpis {
     requires dev.chojo.ocular;
     requires com.fasterxml.jackson.databind;
     requires org.apache.commons.collections4;
+    requires jdk.jshell;
 
     exports dev.chojo.configuration;
     exports dev.chojo.core;

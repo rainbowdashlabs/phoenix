@@ -5,4 +5,9 @@
  */
 package dev.chojo.data.snapshot.message.content.meta;
 
-public interface Meta {}
+import dev.chojo.data.snapshot.message.contect.MessageRestorationContext;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+
+public interface Meta {
+    void apply(MessageCreateBuilder builder, MessageRestorationContext context);
+}
