@@ -5,6 +5,7 @@
  */
 package dev.chojo.scan.scanservice.scans;
 
+import dev.chojo.data.snapshot.MessageSnapshot;
 import dev.chojo.scan.scanservice.ScanProcess;
 import dev.chojo.scan.scanservice.ScanProgress;
 import dev.chojo.scan.scanservice.ScanTarget;
@@ -108,7 +109,7 @@ public class ChannelScan implements Scan {
         currentTimestamp = snowflakeToTimestamp(message.getIdLong());
         countScan();
 
-        // TODO implement saving of messages
+        MessageSnapshot.create(message).ifPresent(process::store);
     }
 
     /**

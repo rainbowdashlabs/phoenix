@@ -8,7 +8,7 @@ package dev.chojo.core;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import dev.chojo.configuration.Configuration;
-import dev.chojo.service.MessageStore;
+import dev.chojo.service.MessageStoreService;
 import io.github.kaktushose.jdac.JDACBuilder;
 import io.github.kaktushose.jdac.JDACommands;
 import io.github.kaktushose.jdac.annotations.interactions.CommandScope;
@@ -51,7 +51,7 @@ public class Bot {
                 .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setEventPool(Executors.newVirtualThreadPerTaskExecutor())
-                .addEventListeners(new MessageStore())
+                .addEventListeners(new MessageStoreService())
                 .build();
         for (JDA shard : manager.getShards()) {
             shard.awaitReady();

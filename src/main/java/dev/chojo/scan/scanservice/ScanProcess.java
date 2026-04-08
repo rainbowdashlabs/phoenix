@@ -5,6 +5,7 @@
  */
 package dev.chojo.scan.scanservice;
 
+import dev.chojo.data.snapshot.MessageSnapshot;
 import dev.chojo.scan.scanservice.scans.Scan;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.Channel;
@@ -31,6 +32,7 @@ public class ScanProcess {
     public final Guild guild;
     private final List<Channel> channels;
     private final Function<Channel, Integer> maxChannelMessages;
+    private final Function<Channel, Integer> oldestKnownMessage;
     private List<? extends Scan> scans;
     private Thread currWorker;
     private Instant start = Instant.now();
@@ -49,6 +51,8 @@ public class ScanProcess {
         this.channels = channels;
         // TODO: Get from server settings
         this.maxChannelMessages = e -> 10000;
+        // TODO receive from database
+        this.oldestKnownMessage = e -> 0;
     }
 
     /**
@@ -56,11 +60,15 @@ public class ScanProcess {
      */
     public void init() {
         scans = channels.stream()
-                .map(c -> Scan.create(this, c, null))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toList();
+                        .map(c -> Scan.create(this, c, null))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .toList();
         runner.execute(this::scanTick);
+    }
+
+    public void store(MessageSnapshot e) {
+        // TODO: Plug this into the MessageStore
     }
 
     /**
@@ -167,6 +175,16 @@ public class ScanProcess {
             return maxChannelMessages.apply(thread.getParentMessageChannel());
         }
         return maxChannelMessages.apply(channel);
+    }
+
+    /**
+     * Receive a timestamp of the last saved message in this channel.
+     *
+     * @param channel the channel to check
+     * @return the timestamp of the last saved message or 0 if no message has been saved yet
+     */
+    public long earliestKnownMessage(Channel channel) {
+        return oldestKnownMessage.apply(channel);
     }
 
     /**
