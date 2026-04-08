@@ -5,11 +5,15 @@
  */
 package dev.chojo.core;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
-import com.google.inject.Inject;
+import com.google.inject.Provides;
 import dev.chojo.configuration.Configuration;
+import dev.chojo.crypto.CryptoService;
+import dev.chojo.data.SaduModule;
+import io.github.kaktushose.jdac.JDACBuilder;
 import io.github.kaktushose.jdac.JDACommands;
+import io.github.kaktushose.jdac.annotations.interactions.CommandScope;
+import io.github.kaktushose.jdac.definitions.interactions.command.CommandDefinition;
 import io.github.kaktushose.jdac.guice.GuiceExtensionData;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -20,20 +24,24 @@ import net.dv8tion.jda.api.sharding.ShardManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.concurrent.Executors;
 
-public class Bot extends AbstractModule {
+public class Bot extends SaduModule {
 
     private static final Logger log = LoggerFactory.getLogger(Bot.class);
 
     private final Configuration configuration;
+    private final CryptoService cryptoService;
 
-    @Inject
-    public Bot(Configuration configuration) {
+    public Bot(Configuration configuration) throws SQLException, IOException, NoSuchAlgorithmException {
+        super(configuration);
         this.configuration = configuration;
+        cryptoService = new CryptoService(configuration);
     }
 
-    @Inject
     public void start() throws InterruptedException {
         ShardManager manager = shardManager(configuration.main().general().token());
         jdaCommands(manager);
@@ -42,6 +50,16 @@ public class Bot extends AbstractModule {
         Runtime.getRuntime().addShutdownHook(new Thread(manager::shutdown));
 
         manager.setPresence(OnlineStatus.ONLINE, Activity.customStatus("Vibing"));
+    }
+
+    @Provides
+    public Configuration configuration() {
+        return configuration;
+    }
+
+    @Provides
+    public CryptoService cryptoService() {
+        return cryptoService;
     }
 
     private ShardManager shardManager(String token) throws InterruptedException {

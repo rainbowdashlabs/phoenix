@@ -5,7 +5,7 @@
  */
 package dev.chojo.data;
 
-import com.google.inject.Inject;
+import com.google.inject.AbstractModule;
 import de.chojo.sadu.datasource.DataSourceCreator;
 import de.chojo.sadu.mapper.RowMapperRegistry;
 import de.chojo.sadu.postgresql.databases.PostgreSql;
@@ -25,21 +25,17 @@ import javax.sql.DataSource;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class SaduConfig {
-    private static final Logger log = getLogger(SaduConfig.class);
+public class SaduModule extends AbstractModule {
+    private static final Logger log = getLogger(SaduModule.class);
     private final Configuration configuration;
 
     @Nullable
     private DataSource dataSource;
 
-    @Inject
-    public SaduConfig(Configuration configuration) {
+    public SaduModule(Configuration configuration) throws SQLException, IOException {
         this.configuration = configuration;
-    }
-
-    public void init() throws SQLException, IOException {
         connect();
-        configure();
+        configureQuery();
         update();
     }
 
@@ -72,7 +68,7 @@ public class SaduConfig {
                 .build();
     }
 
-    private void configure() {
+    private void configureQuery() {
         QueryConfiguration config = QueryConfiguration.builder(dataSource)
                 .setExceptionHandler(err -> log.error("An error occurred during a database request", err))
                 .setThrowExceptions(false)
