@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS elpis_schema.guild_message_key (
         CONSTRAINT guild_message_key_guild_id_fk
             REFERENCES elpis_schema.guild
             ON DELETE CASCADE,
-    id            BIGINT DEFAULT nextval('elpis_schema.guild_message_key_column_name_seq'::REGCLASS) NOT NULL,
+    id            BIGSERIAL NOT NULL,
     encrypted_key TEXT                                                                               NOT NULL,
     cipher        TEXT                                                                               NOT NULL,
     CONSTRAINT guild_message_key_pk
