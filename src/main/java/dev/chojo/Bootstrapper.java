@@ -7,6 +7,7 @@ package dev.chojo;
 
 import dev.chojo.configuration.Configuration;
 import dev.chojo.core.Bot;
+import dev.chojo.data.SaduModule;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -15,6 +16,8 @@ import java.sql.SQLException;
 public class Bootstrapper {
 
     void main() throws InterruptedException, SQLException, IOException, NoSuchAlgorithmException {
-        new Bot(new Configuration()).start();
+        Configuration configuration = new Configuration();
+        new SaduModule(configuration);
+        new Bot(configuration).start();
     }
 }

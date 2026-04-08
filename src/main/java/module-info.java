@@ -31,6 +31,8 @@ module dev.chojo.elpis {
     exports dev.chojo.configuration;
     exports dev.chojo.core;
     exports dev.chojo.data;
+    exports dev.chojo.scan;
+    exports dev.chojo.crypto;
 
     opens dev.chojo.core;
     opens dev.chojo.configuration;

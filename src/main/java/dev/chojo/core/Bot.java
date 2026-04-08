@@ -6,18 +6,11 @@
 package dev.chojo.core;
 
 import com.google.inject.Guice;
-<<<<<<< HEAD
 import com.google.inject.Provides;
 import dev.chojo.configuration.Configuration;
 import dev.chojo.crypto.CryptoService;
-import dev.chojo.data.SaduModule;
-import io.github.kaktushose.jdac.JDACBuilder;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import dev.chojo.commands.message.Replicate;
-import dev.chojo.configuration.Configuration;
-import dev.chojo.guice.ElpisModule;
 import dev.chojo.service.MessageStore;
+import io.github.kaktushose.jdac.JDACBuilder;
 import io.github.kaktushose.jdac.JDACommands;
 import io.github.kaktushose.jdac.annotations.interactions.CommandScope;
 import io.github.kaktushose.jdac.definitions.interactions.command.CommandDefinition;
@@ -31,20 +24,18 @@ import net.dv8tion.jda.api.sharding.ShardManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
+import java.util.Set;
 import java.util.concurrent.Executors;
 
-public class Bot extends SaduModule {
+public class Bot {
 
     private static final Logger log = LoggerFactory.getLogger(Bot.class);
 
     private final Configuration configuration;
     private final CryptoService cryptoService;
 
-    public Bot(Configuration configuration) throws SQLException, IOException, NoSuchAlgorithmException {
-        super(configuration);
+    public Bot(Configuration configuration) throws NoSuchAlgorithmException {
         this.configuration = configuration;
         cryptoService = new CryptoService(configuration);
     }
@@ -71,11 +62,11 @@ public class Bot extends SaduModule {
 
     private ShardManager shardManager(String token) throws InterruptedException {
         ShardManager manager = DefaultShardManagerBuilder.createDefault(token)
-                .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)
-                .setStatus(OnlineStatus.DO_NOT_DISTURB)
-                .setEventPool(Executors.newVirtualThreadPerTaskExecutor())
-                .addEventListeners(new MessageStore())
-                .build();
+                                                         .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)
+                                                         .setStatus(OnlineStatus.DO_NOT_DISTURB)
+                                                         .setEventPool(Executors.newVirtualThreadPerTaskExecutor())
+                                                         .addEventListeners(new MessageStore())
+                                                         .build();
         for (JDA shard : manager.getShards()) {
             shard.awaitReady();
         }
@@ -84,15 +75,15 @@ public class Bot extends SaduModule {
 
     private void jdaCommands(ShardManager manager) {
         JDACBuilder builder = JDACommands.builder(manager)
-                .packages("dev.chojo")
-                .extensionData(new GuiceExtensionData(Guice.createInjector(this)));
+                                         .packages("dev.chojo")
+                                         .extensionData(new GuiceExtensionData(Guice.createInjector(this)));
 
         // @Nora set dev mode here, either from configuration or env, idk what you like
-        boolean devMode = false;
-        if (devMode) {
+        if (configuration.main().general().testmode()) {
             // workaround dev mode until #309 is implemented.
             // !!! Doesn't work if commands have @CommandConfig annotation
             builder.globalCommandConfig(CommandDefinition.CommandConfig.of(config -> config.scope(CommandScope.GUILD)));
+            builder.guildScopeProvider(commandData -> Set.of(configuration.main().general().botguild()));
         }
         builder.start();
     }
