@@ -50,7 +50,8 @@ public class ScanProcess {
      * @param guild    the guild to scan
      * @param channels the list of channels to scan
      */
-    public ScanProcess(Guild guild, List<Channel> channels, ScanService scanService, MessageStoreService messageService) {
+    public ScanProcess(
+            Guild guild, List<Channel> channels, ScanService scanService, MessageStoreService messageService) {
         this.guild = guild;
         this.channels = channels;
         // TODO: Get from server settings
@@ -66,10 +67,10 @@ public class ScanProcess {
      */
     public void init() {
         scans = channels.stream()
-                        .map(c -> Scan.create(this, c, null))
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .toList();
+                .map(c -> Scan.create(this, c, null))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
         runner.execute(this::scanTick);
     }
 

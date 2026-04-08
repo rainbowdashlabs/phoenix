@@ -7,7 +7,6 @@ package dev.chojo.service;
 
 import dev.chojo.data.snapshot.MessageSnapshot;
 import net.dv8tion.jda.api.entities.channel.Channel;
-import org.eclipse.jetty.util.BlockingArrayQueue;
 import org.slf4j.Logger;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -70,5 +69,4 @@ public class MessageStoreService {
     public long oldestKnownMessage(Channel channel) {
         return 0;
     }
-
 }

@@ -67,7 +67,6 @@ public class ScanService {
         return 10000;
     }
 
-
     /**
      * Periodically checks all active scan processes.
      * <p>
