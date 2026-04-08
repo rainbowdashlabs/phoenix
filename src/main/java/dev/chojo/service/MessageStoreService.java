@@ -6,6 +6,7 @@
 package dev.chojo.service;
 
 import dev.chojo.data.snapshot.MessageSnapshot;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import org.eclipse.jetty.util.BlockingArrayQueue;
 import org.slf4j.Logger;
 
@@ -65,4 +66,9 @@ public class MessageStoreService {
     public void storeImmediately(MessageSnapshot message) {
         cache.offer(message);
     }
+
+    public long oldestKnownMessage(Channel channel) {
+        return 0;
+    }
+
 }

@@ -5,7 +5,9 @@
  */
 package dev.chojo.scan;
 
+import com.google.inject.Inject;
 import dev.chojo.scan.scanservice.ScanProcess;
+import dev.chojo.service.MessageStoreService;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import org.slf4j.Logger;
@@ -32,12 +34,15 @@ public class ScanService {
     private static final Logger log = getLogger(ScanService.class);
     private final Map<Long, ScanProcess> scanProcesses = new HashMap<>();
     private final ScheduledExecutorService watcher = Executors.newSingleThreadScheduledExecutor();
+    private final MessageStoreService messageStoreService;
 
     /**
      * Creates a new ScanService and starts the background watcher.
      */
-    public ScanService() {
+    @Inject
+    public ScanService(MessageStoreService messageStoreService) {
         watcher.schedule(this::tick, 2, TimeUnit.SECONDS);
+        this.messageStoreService = messageStoreService;
     }
 
     /**
@@ -49,12 +54,19 @@ public class ScanService {
         if (scanProcesses.containsKey(guild.getIdLong())) return;
         // TODO: Retrieve backup channels.
         List<Channel> channels = new ArrayList<>();
-        channels.addAll(Collections.emptyList()); // Add categories
-        ScanProcess scanProcess = new ScanProcess(guild, channels);
+        channels.addAll(Collections.emptyList());
+        // Add categories
+        // TODO: Add proper channel message limit
+        ScanProcess scanProcess = new ScanProcess(guild, channels, this, messageStoreService);
         scanProcess.init();
         scanProcesses.put(guild.getIdLong(), scanProcess);
         log.info("Started scan for {}", guild);
     }
+
+    public int maxChannelMessages(Channel channel) {
+        return 10000;
+    }
+
 
     /**
      * Periodically checks all active scan processes.

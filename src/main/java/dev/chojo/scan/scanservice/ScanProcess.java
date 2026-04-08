@@ -6,7 +6,9 @@
 package dev.chojo.scan.scanservice;
 
 import dev.chojo.data.snapshot.MessageSnapshot;
+import dev.chojo.scan.ScanService;
 import dev.chojo.scan.scanservice.scans.Scan;
+import dev.chojo.service.MessageStoreService;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -32,7 +34,9 @@ public class ScanProcess {
     public final Guild guild;
     private final List<Channel> channels;
     private final Function<Channel, Integer> maxChannelMessages;
-    private final Function<Channel, Integer> oldestKnownMessage;
+    private final ScanService scanService;
+    private final Function<Channel, Long> oldestKnownMessage;
+    private final MessageStoreService messageService;
     private List<? extends Scan> scans;
     private Thread currWorker;
     private Instant start = Instant.now();
@@ -46,13 +50,15 @@ public class ScanProcess {
      * @param guild    the guild to scan
      * @param channels the list of channels to scan
      */
-    public ScanProcess(Guild guild, List<Channel> channels) {
+    public ScanProcess(Guild guild, List<Channel> channels, ScanService scanService, MessageStoreService messageService) {
         this.guild = guild;
         this.channels = channels;
         // TODO: Get from server settings
-        this.maxChannelMessages = e -> 10000;
+        this.maxChannelMessages = scanService::maxChannelMessages;
+        this.scanService = scanService;
         // TODO receive from database
-        this.oldestKnownMessage = e -> 0;
+        this.oldestKnownMessage = messageService::oldestKnownMessage;
+        this.messageService = messageService;
     }
 
     /**
@@ -68,7 +74,7 @@ public class ScanProcess {
     }
 
     public void store(MessageSnapshot e) {
-        // TODO: Plug this into the MessageStore
+        messageService.store(e);
     }
 
     /**
@@ -172,9 +178,9 @@ public class ScanProcess {
      */
     public int maxChannelMessages(Channel channel) {
         if (channel instanceof ThreadChannel thread) {
-            return maxChannelMessages.apply(thread.getParentMessageChannel());
+            return scanService.maxChannelMessages(thread.getParentMessageChannel());
         }
-        return maxChannelMessages.apply(channel);
+        return scanService.maxChannelMessages(channel);
     }
 
     /**
@@ -184,7 +190,7 @@ public class ScanProcess {
      * @return the timestamp of the last saved message or 0 if no message has been saved yet
      */
     public long earliestKnownMessage(Channel channel) {
-        return oldestKnownMessage.apply(channel);
+        return messageService.oldestKnownMessage(channel);
     }
 
     /**

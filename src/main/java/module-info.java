@@ -32,7 +32,10 @@ module dev.chojo.elpis {
     exports dev.chojo.configuration;
     exports dev.chojo.core;
     exports dev.chojo.data;
+    exports dev.chojo.data.snapshot;
     exports dev.chojo.scan;
+    exports dev.chojo.scan.scanservice;
+    exports dev.chojo.scan.scanservice.scans;
     exports dev.chojo.crypto;
     exports dev.chojo.crypto.policy;
     exports dev.chojo.crypto.serialization;
@@ -41,6 +44,7 @@ module dev.chojo.elpis {
     exports dev.chojo.crypto.exceptions;
     exports dev.chojo.crypto.processing.model;
     exports dev.chojo.commands.message;
+    exports dev.chojo.service;
 
     opens dev.chojo.core;
     opens dev.chojo.configuration;

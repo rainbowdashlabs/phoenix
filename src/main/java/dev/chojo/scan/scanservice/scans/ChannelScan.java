@@ -37,6 +37,7 @@ public class ChannelScan implements Scan {
     private final int maxMessages;
     private final AtomicInteger scanned;
     private long currentTimestamp;
+    private final long oldestKnownMessage;
     private boolean done;
 
     private ChannelScan(ScanProcess process, GuildMessageChannel channel, AtomicInteger scanned) {
@@ -45,6 +46,7 @@ public class ChannelScan implements Scan {
         history = channel.getHistory();
         this.scanned = scanned;
         maxMessages = process.maxChannelMessages(channel);
+        oldestKnownMessage = process.earliestKnownMessage(channel);
     }
 
     /**
@@ -77,6 +79,9 @@ public class ChannelScan implements Scan {
             done = true;
             return;
         }
+
+        if (oldestKnownMessage > currentTimestamp) return;
+
         List<Message> messages;
         try {
             messages = history.retrievePast(100).timeout(30, TimeUnit.SECONDS).complete();
