@@ -24,10 +24,27 @@ module dev.chojo.elpis {
     requires java.desktop;
     requires java.sql;
     requires dev.chojo.ocular;
+    requires com.fasterxml.jackson.databind;
+    requires org.apache.commons.collections4;
+    requires jdk.jshell;
+    requires org.eclipse.jetty.util;
 
     exports dev.chojo.configuration;
     exports dev.chojo.core;
     exports dev.chojo.data;
+    exports dev.chojo.data.snapshot;
+    exports dev.chojo.scan;
+    exports dev.chojo.scan.scanservice;
+    exports dev.chojo.scan.scanservice.scans;
+    exports dev.chojo.crypto;
+    exports dev.chojo.crypto.policy;
+    exports dev.chojo.crypto.serialization;
+    exports dev.chojo.crypto.processing;
+    exports dev.chojo.crypto.processing.wrapper;
+    exports dev.chojo.crypto.exceptions;
+    exports dev.chojo.crypto.processing.model;
+    exports dev.chojo.commands.message;
+    exports dev.chojo.service;
 
     opens dev.chojo.core;
     opens dev.chojo.configuration;

@@ -5,11 +5,14 @@
  */
 package dev.chojo.core;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import dev.chojo.configuration.Configuration;
+import dev.chojo.service.MessageStoreService;
+import io.github.kaktushose.jdac.JDACBuilder;
 import io.github.kaktushose.jdac.JDACommands;
+import io.github.kaktushose.jdac.annotations.interactions.CommandScope;
+import io.github.kaktushose.jdac.definitions.interactions.command.CommandDefinition;
 import io.github.kaktushose.jdac.guice.GuiceExtensionData;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -20,12 +23,12 @@ import net.dv8tion.jda.api.sharding.ShardManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Set;
 import java.util.concurrent.Executors;
 
-public class Bot extends AbstractModule {
+public class Bot {
 
     private static final Logger log = LoggerFactory.getLogger(Bot.class);
-
     private final Configuration configuration;
 
     @Inject
@@ -33,10 +36,9 @@ public class Bot extends AbstractModule {
         this.configuration = configuration;
     }
 
-    @Inject
-    public void start() throws InterruptedException {
+    public void start(Injector injector) throws InterruptedException {
         ShardManager manager = shardManager(configuration.main().general().token());
-        jdaCommands(manager);
+        jdaCommands(manager, injector);
 
         Thread.setDefaultUncaughtExceptionHandler((_, e) -> log.error("An uncaught exception has occurred!", e));
         Runtime.getRuntime().addShutdownHook(new Thread(manager::shutdown));
@@ -49,6 +51,7 @@ public class Bot extends AbstractModule {
                 .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setEventPool(Executors.newVirtualThreadPerTaskExecutor())
+                .addEventListeners(new MessageStoreService())
                 .build();
         for (JDA shard : manager.getShards()) {
             shard.awaitReady();
@@ -56,10 +59,18 @@ public class Bot extends AbstractModule {
         return manager;
     }
 
-    private void jdaCommands(ShardManager manager) {
-        JDACommands.builder(manager)
-                .packages("dev.chojo")
-                .extensionData(new GuiceExtensionData(Guice.createInjector(this)))
-                .start();
+    private void jdaCommands(ShardManager manager, Injector injector) {
+        JDACBuilder builder =
+                JDACommands.builder(manager).packages("dev.chojo").extensionData(new GuiceExtensionData(injector));
+
+        // @Nora set dev mode here, either from configuration or env, idk what you like
+        if (configuration.main().general().testmode()) {
+            // workaround dev mode until #309 is implemented.
+            // !!! Doesn't work if commands have @CommandConfig annotation
+            builder.globalCommandConfig(CommandDefinition.CommandConfig.of(config -> config.scope(CommandScope.GUILD)));
+            builder.guildScopeProvider(
+                    _ -> Set.of(configuration.main().general().botguild()));
+        }
+        builder.start();
     }
 }

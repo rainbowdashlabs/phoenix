@@ -1,5 +1,6 @@
 import org.jetbrains.gradle.ext.runConfigurations
 import org.jetbrains.gradle.ext.settings
+import org.jetbrains.gradle.ext.ShortenCommandLine
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -58,7 +59,7 @@ dependencies {
 tasks {
     compileJava {
         options.isIncremental = true
-        options.compilerArgs.addAll(listOf("--add-reads", "dev.chojo.elpis=ALL-UNNAMED"))
+        options.compilerArgs.addAll(listOf("--add-reads", "dev.chojo.elpis=ALL-UNNAMED", "-parameters"))
     }
 
     processResources {
@@ -137,25 +138,37 @@ idea {
     project {
         settings {
             var shared = listOf(
-                "-Dbot.cleanup=false",
                 "-Dbot.config=config.testing.yaml",
-                "-Dlog4j2.configurationFile=docker/config/log4j2.testing.xml",
-                "-Dbot.db.host=localhost,",
+                //"-Dlog4j2.configurationFile=docker/config/log4j2.testing.xml",
+                "-Dbot.db.host=localhost",
                 "-Dbot.api.url=http://localhost:5173",
                 "--sun-misc-unsafe-memory-access=allow",
                 "--enable-native-access=ALL-UNNAMED"
             )
             runConfigurations {
+                register<org.jetbrains.gradle.ext.Gradle>("Run App") {
+                    projectPath = project.path
+                    taskNames = listOf("run")
+                    jvmArgs = shared.joinToString(" ")
+                }
+                register<org.jetbrains.gradle.ext.Gradle>("Run App - All SKUs") {
+                    projectPath = project.path
+                    taskNames = listOf("run")
+                    jvmArgs =
+                        (shared + "-Dbot.grantallsku=true" + "-Dcjda.premium.skipEntitledCheck=true").joinToString(" ")
+                }
                 register<org.jetbrains.gradle.ext.Application>("App-Testing") {
                     mainClass = "dev.chojo.Bootstrapper"
                     jvmArgs = shared.joinToString(" ")
                     moduleName = "elpis.main"
+                    shortenCommandLine = ShortenCommandLine.MANIFEST
                 }
                 register<org.jetbrains.gradle.ext.Application>("App-Testing - All SKUs") {
                     mainClass = "dev.chojo.Bootstrapper"
                     jvmArgs =
                         (shared + "-Dbot.grantallsku=true" + "-Dcjda.premium.skipEntitledCheck=true").joinToString(" ")
                     moduleName = "elpis.main"
+                    shortenCommandLine = ShortenCommandLine.MANIFEST
                 }
             }
         }

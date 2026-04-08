@@ -15,7 +15,21 @@ public class General {
     @Overwrite(env = @Env("TOKEN"), prop = @Prop("token"))
     private String token;
 
+    @Overwrite(env = @Env, prop = @Prop)
+    private boolean testmode = false;
+
+    @Overwrite(env = @Env, prop = @Prop)
+    private long botguild = 0L;
+
     public String token() {
         return token;
+    }
+
+    public boolean testmode() {
+        return testmode;
+    }
+
+    public long botguild() {
+        return botguild;
     }
 }
