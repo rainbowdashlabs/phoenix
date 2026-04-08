@@ -5,19 +5,23 @@
  */
 package dev.chojo;
 
-import dev.chojo.configuration.Configuration;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import dev.chojo.core.Bot;
-import dev.chojo.data.SaduModule;
+import dev.chojo.data.SaduConfig;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 
 public class Bootstrapper {
 
-    void main() throws InterruptedException, SQLException, IOException, NoSuchAlgorithmException {
-        Configuration configuration = new Configuration();
-        new SaduModule(configuration);
-        new Bot(configuration).start();
+    void main() throws InterruptedException, SQLException, IOException {
+        Injector injector = Guice.createInjector();
+
+        SaduConfig sadu = injector.getInstance(SaduConfig.class);
+        sadu.init();
+
+        Bot instance = injector.getInstance(Bot.class);
+        instance.start(injector);
     }
 }
