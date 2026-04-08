@@ -6,7 +6,6 @@
 package dev.chojo.guice;
 
 import com.google.inject.AbstractModule;
-import dev.chojo.Bootstrapper;
 import dev.chojo.configuration.Configuration;
 import dev.chojo.crypto.CryptoService;
 import dev.chojo.data.SaduConfig;

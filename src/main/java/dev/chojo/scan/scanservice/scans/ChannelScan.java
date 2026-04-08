@@ -8,21 +8,13 @@ package dev.chojo.scan.scanservice.scans;
 import dev.chojo.scan.scanservice.ScanProcess;
 import dev.chojo.scan.scanservice.ScanProgress;
 import dev.chojo.scan.scanservice.ScanTarget;
-import dev.chojo.scan.snapshots.meta.Meta;
-import dev.chojo.scan.snapshots.meta.Reply;
-import dev.chojo.scan.snapshots.meta.poll.PollMeta;
-import net.dv8tion.jda.api.components.tree.MessageComponentTree;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
-import net.dv8tion.jda.api.interactions.InteractionType;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -115,95 +107,6 @@ public class ChannelScan implements Scan {
     private void check(Message message) {
         currentTimestamp = snowflakeToTimestamp(message.getIdLong());
         countScan();
-
-        // Check if a thread was started from this message
-        // Serialize the message with extras
-        message.getStartedThread();
-        long userId = message.getAuthor().getIdLong();
-        String rawContent = message.getContentRaw();
-        MessageComponentTree componentTree = message.getComponentTree();
-        // TODO Probably find a way to serialize components? Or just dont care?
-        List<String> attachmentURLs = message.getAttachments().stream()
-                                             .map(Message.Attachment::getUrl)
-                                             .toList();
-        Meta meta = null;
-        switch (message.getType()) {
-            // If it is an answer
-            case INLINE_REPLY -> {
-                long messageIdLong = message.getMessageReference().getMessageIdLong();
-                meta = new Reply(messageIdLong);
-            }
-            // Poll result
-            case POLL_RESULT -> {
-                meta = PollMeta.create(message.getPoll());
-            }
-            //
-            case DEFAULT -> {
-                // No meta needed
-            }
-            case RECIPIENT_ADD, RECIPIENT_REMOVE, CALL, CHANNEL_NAME_CHANGE, CHANNEL_ICON_CHANGE,
-                 CHANNEL_PINNED_ADD -> {
-                // Private group channel stuff
-                return;
-            }
-            case GUILD_MEMBER_JOIN, GUILD_MEMBER_BOOST, GUILD_BOOST_TIER_1, GUILD_BOOST_TIER_2, GUILD_BOOST_TIER_3 -> {
-
-            }
-            case CHANNEL_FOLLOW_ADD -> {
-                // TODO Create a list of channels that were followed, but probably as part of the channel backup
-            }
-            case GUILD_DISCOVERY_DISQUALIFIED, GUILD_DISCOVERY_REQUALIFIED,
-                 GUILD_DISCOVERY_GRACE_PERIOD_INITIAL_WARNING, GUILD_DISCOVERY_GRACE_PERIOD_FINAL_WARNING -> {
-                // Not relevant
-                return;
-            }
-            case THREAD_CREATED -> {
-                // Save from which message the thread was created.
-            }
-            case THREAD_STARTER_MESSAGE -> {
-            }
-            case SLASH_COMMAND, CONTEXT_COMMAND -> {
-                User executingUser = message.getInteractionMetadata().getUser();
-                // A regular slash command
-                if (message.getInteractionMetadata().getType() == InteractionType.COMMAND) {
-
-                }
-                // If this is a context command on a message
-                if (message.getMessageReference() != null) {
-
-                }
-                // If this is a context command on a user
-                if (message.getInteractionMetadata().getTargetUser() != null) {
-
-                }
-
-            }
-            case GUILD_INVITE_REMINDER, AUTO_MODERATION_ACTION -> {
-                // ignore
-                return;
-            }
-            case ROLE_SUBSCRIPTION_PURCHASE, INTERACTION_PREMIUM_UPSELL -> {
-                // ignore
-                return;
-            }
-            case STAGE_START, STAGE_END, STAGE_SPEAKER, STAGE_TOPIC -> {
-                // no metadata needed
-            }
-            case GUILD_APPLICATION_PREMIUM_SUBSCRIPTION, PURCHASE_NOTIFICATION -> {
-                // ignore
-                return;
-            }
-            case GUILD_INCIDENT_ALERT_MODE_ENABLED, GUILD_INCIDENT_ALERT_MODE_DISABLED, GUILD_INCIDENT_REPORT_RAID,
-                 GUILD_INCIDENT_REPORT_FALSE_ALARM -> {
-                // ignore
-                return;
-            }
-            case UNKNOWN -> {
-                // ignore
-                return;
-            }
-        }
-        boolean pinned = message.isPinned();
 
         // TODO implement saving of messages
     }
