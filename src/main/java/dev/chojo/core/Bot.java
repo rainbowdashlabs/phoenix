@@ -75,9 +75,17 @@ public class Bot extends SaduModule {
     }
 
     private void jdaCommands(ShardManager manager) {
-        JDACommands.builder(manager)
+        JDACBuilder builder = JDACommands.builder(manager)
                 .packages("dev.chojo")
-                .extensionData(new GuiceExtensionData(Guice.createInjector(this)))
-                .start();
+                .extensionData(new GuiceExtensionData(Guice.createInjector(this)));
+
+        // @Nora set dev mode here, either from configuration or env, idk what you like
+        boolean devMode = false;
+        if (devMode) {
+            // workaround dev mode until #309 is implemented.
+            // !!! Doesn't work if commands have @CommandConfig annotation
+            builder.globalCommandConfig(CommandDefinition.CommandConfig.of(config -> config.scope(CommandScope.GUILD)));
+        }
+        builder.start();
     }
 }
