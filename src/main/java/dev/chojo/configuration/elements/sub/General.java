@@ -14,8 +14,10 @@ import dev.chojo.ocular.override.Prop;
 public class General {
     @Overwrite(env = @Env("TOKEN"), prop = @Prop("token"))
     private String token;
+
     @Overwrite(env = @Env, prop = @Prop)
     private boolean testmode = false;
+
     @Overwrite(env = @Env, prop = @Prop)
     private long botguild = 0L;
 

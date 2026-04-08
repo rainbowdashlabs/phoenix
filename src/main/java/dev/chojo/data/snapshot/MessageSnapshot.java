@@ -5,8 +5,8 @@
  */
 package dev.chojo.data.snapshot;
 
-import dev.chojo.data.snapshot.message.contect.MessageRestorationContext;
 import dev.chojo.data.snapshot.message.content.MessageContentSnapshot;
+import dev.chojo.data.snapshot.message.context.MessageRestorationContext;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 

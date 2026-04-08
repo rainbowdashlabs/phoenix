@@ -10,6 +10,10 @@ public class Links {
         return "https://discord.com/channels/%s/%s/%s".formatted(guildId, channelId, messageId);
     }
 
+    public static String channel(long guildId, long channelId) {
+        return "https://discord.com/channels/%s/%s".formatted(guildId, channelId);
+    }
+
     public static String user(long userId) {
         return "https://discord.com/users/%s".formatted(userId);
     }

@@ -48,11 +48,11 @@ public class Bot {
 
     private ShardManager shardManager(String token) throws InterruptedException {
         ShardManager manager = DefaultShardManagerBuilder.createDefault(token)
-                                                         .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)
-                                                         .setStatus(OnlineStatus.DO_NOT_DISTURB)
-                                                         .setEventPool(Executors.newVirtualThreadPerTaskExecutor())
-                                                         .addEventListeners(new MessageStore())
-                                                         .build();
+                .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)
+                .setStatus(OnlineStatus.DO_NOT_DISTURB)
+                .setEventPool(Executors.newVirtualThreadPerTaskExecutor())
+                .addEventListeners(new MessageStore())
+                .build();
         for (JDA shard : manager.getShards()) {
             shard.awaitReady();
         }
@@ -60,16 +60,16 @@ public class Bot {
     }
 
     private void jdaCommands(ShardManager manager, Injector injector) {
-        JDACBuilder builder = JDACommands.builder(manager)
-                                         .packages("dev.chojo")
-                                         .extensionData(new GuiceExtensionData(injector));
+        JDACBuilder builder =
+                JDACommands.builder(manager).packages("dev.chojo").extensionData(new GuiceExtensionData(injector));
 
         // @Nora set dev mode here, either from configuration or env, idk what you like
         if (configuration.main().general().testmode()) {
             // workaround dev mode until #309 is implemented.
             // !!! Doesn't work if commands have @CommandConfig annotation
             builder.globalCommandConfig(CommandDefinition.CommandConfig.of(config -> config.scope(CommandScope.GUILD)));
-            builder.guildScopeProvider(_ -> Set.of(configuration.main().general().botguild()));
+            builder.guildScopeProvider(
+                    _ -> Set.of(configuration.main().general().botguild()));
         }
         builder.start();
     }

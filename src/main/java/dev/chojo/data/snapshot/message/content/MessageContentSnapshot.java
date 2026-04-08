@@ -6,20 +6,24 @@
 package dev.chojo.data.snapshot.message.content;
 
 import dev.chojo.data.snapshot.UserProfile;
-import dev.chojo.data.snapshot.message.Reply;
-import dev.chojo.data.snapshot.message.contect.MessageRestorationContext;
 import dev.chojo.data.snapshot.message.content.meta.Meta;
+import dev.chojo.data.snapshot.message.content.meta.PollEnd;
+import dev.chojo.data.snapshot.message.content.meta.Reference;
+import dev.chojo.data.snapshot.message.content.meta.ThreadCreated;
+import dev.chojo.data.snapshot.message.content.meta.ThreadStarterMessage;
 import dev.chojo.data.snapshot.message.content.meta.poll.PollMeta;
+import dev.chojo.data.snapshot.message.context.MessageRestorationContext;
 import dev.chojo.util.Links;
 import dev.chojo.util.SnowflakeUtil;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.tree.MessageComponentTree;
 import net.dv8tion.jda.api.components.utils.ComponentDeserializer;
 import net.dv8tion.jda.api.components.utils.ComponentSerializer;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.MessageType;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.InteractionType;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -28,9 +32,9 @@ import org.jspecify.annotations.Nullable;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static net.dv8tion.jda.api.entities.MessageType.AUTO_MODERATION_ACTION;
 import static net.dv8tion.jda.api.entities.MessageType.CALL;
@@ -38,6 +42,7 @@ import static net.dv8tion.jda.api.entities.MessageType.CHANNEL_FOLLOW_ADD;
 import static net.dv8tion.jda.api.entities.MessageType.CHANNEL_ICON_CHANGE;
 import static net.dv8tion.jda.api.entities.MessageType.CHANNEL_NAME_CHANGE;
 import static net.dv8tion.jda.api.entities.MessageType.CHANNEL_PINNED_ADD;
+import static net.dv8tion.jda.api.entities.MessageType.CONTEXT_COMMAND;
 import static net.dv8tion.jda.api.entities.MessageType.GUILD_APPLICATION_PREMIUM_SUBSCRIPTION;
 import static net.dv8tion.jda.api.entities.MessageType.GUILD_BOOST_TIER_1;
 import static net.dv8tion.jda.api.entities.MessageType.GUILD_BOOST_TIER_2;
@@ -58,6 +63,7 @@ import static net.dv8tion.jda.api.entities.MessageType.PURCHASE_NOTIFICATION;
 import static net.dv8tion.jda.api.entities.MessageType.RECIPIENT_ADD;
 import static net.dv8tion.jda.api.entities.MessageType.RECIPIENT_REMOVE;
 import static net.dv8tion.jda.api.entities.MessageType.ROLE_SUBSCRIPTION_PURCHASE;
+import static net.dv8tion.jda.api.entities.MessageType.SLASH_COMMAND;
 import static net.dv8tion.jda.api.entities.MessageType.STAGE_END;
 import static net.dv8tion.jda.api.entities.MessageType.STAGE_SPEAKER;
 import static net.dv8tion.jda.api.entities.MessageType.STAGE_START;
@@ -67,7 +73,8 @@ public record MessageContentSnapshot(
         long userId,
         String rawContent,
         @Nullable List<String> components,
-        List<String> attachmentURLs,
+        @Nullable List<String> embeds,
+        List<Attachment> attachmentURLs,
         boolean pinned,
         @Nullable Meta meta) {
     private static final ComponentSerializer serializer = new ComponentSerializer();
@@ -111,7 +118,10 @@ public record MessageContentSnapshot(
             GUILD_DISCOVERY_GRACE_PERIOD_INITIAL_WARNING,
             GUILD_DISCOVERY_GRACE_PERIOD_FINAL_WARNING,
             // We can not backup the target channel from the channel follow add event
-            CHANNEL_FOLLOW_ADD);
+            CHANNEL_FOLLOW_ADD,
+            // Command-generated messages probably provide little value. We will ignore this.
+            SLASH_COMMAND,
+            CONTEXT_COMMAND);
 
     /**
      * Creates a new MessageContentSnapshot from a {@link Message}.
@@ -130,62 +140,59 @@ public record MessageContentSnapshot(
         message.getStartedThread();
         long userId = message.getAuthor().getIdLong();
         String rawContent = message.getContentRaw();
-        List<Map<String, Object>> embeds =
-                message.getEmbeds().stream().map(m -> m.toData().toMap()).toList();
-        List<String> attachmentURLs = message.getAttachments().stream()
-                                             .map(Message.Attachment::getUrl)
-                                             .toList();
+        List<String> embeds = message.getEmbeds().stream()
+                .map(m -> m.toData().toJson())
+                .map(e -> Base64.getEncoder().encodeToString(e))
+                .toList();
+        List<Attachment> attachmentURLs =
+                message.getAttachments().stream().map(Attachment::create).toList();
         List<String> components = null;
         if (message.isUsingComponentsV2()) {
             // TODO Probably find a way to serialize components? Or just dont care?
             // We do not care about v1 components
             components = message.getComponents().stream()
-                                .map(serializer::serialize)
-                                .map(DataObject::toJson)
-                                .map(e -> Base64.getEncoder().encodeToString(e))
-                                .toList();
+                    .map(serializer::serialize)
+                    .map(DataObject::toJson)
+                    .map(e -> Base64.getEncoder().encodeToString(e))
+                    .toList();
         }
         Meta meta = null;
         switch (message.getType()) {
             // If it is an answer
             case INLINE_REPLY -> {
-                meta = new Reply(message.getMessageReference().getMessageIdLong());
+                meta = new Reference(message.getMessageReference().getMessageIdLong());
             }
             // Poll result
             case POLL_RESULT -> {
-                meta = PollMeta.create(message.getPoll());
+                // An ended poll does not contain the finalized votes. However, it references the original poll message.
+                meta = new PollEnd(message.getMessageReference().getMessageIdLong());
             }
             //
             case DEFAULT -> {
-                // No meta needed
-            }
-
-            case CHANNEL_FOLLOW_ADD -> {
-                // TODO Create a list of channels that were followed, but probably as part of the channel backup
+                // A poll that has been finalized. A poll is a normal message that contains a poll, but no content.
+                // We only save finalized polls.
+                if (message.getPoll() != null && message.getPoll().isFinalizedVotes()) {
+                    message.getPoll().getTimeExpiresAt().toEpochSecond();
+                    meta = PollMeta.create(message.getPoll());
+                }
+                // Even if a thread was created from that message, we will later use it when loading the thread starter
+                // message from the original thread.
+                // That way we also do not need to recreate an thread start embed. We can just start the thread.
             }
             case THREAD_CREATED -> {
-                // Save from which message the thread was created.
+                ThreadChannel startedThread = message.getStartedThread();
+                String name = startedThread.getName();
+                long idLong = startedThread.getIdLong();
+                rawContent = "";
+                meta = new ThreadCreated(name, idLong);
             }
             case THREAD_STARTER_MESSAGE -> {
-            }
-            case SLASH_COMMAND, CONTEXT_COMMAND -> {
-                User executingUser = message.getInteractionMetadata().getUser();
-                // A regular slash command
-                if (message.getInteractionMetadata().getType() == InteractionType.COMMAND) {
-                }
-
-                // If this is a context command on a message
-                if (message.getMessageReference() != null) {
-                }
-
-                // If this is a context command on a user
-                if (message.getInteractionMetadata().getTargetUser() != null) {
-                }
+                meta = new ThreadStarterMessage(message.getReferencedMessage().getIdLong());
             }
         }
         boolean pinned = message.isPinned();
-        return Optional.of(
-                new MessageContentSnapshot(message.getIdLong(), rawContent, components, attachmentURLs, pinned, meta));
+        return Optional.of(new MessageContentSnapshot(
+                message.getIdLong(), rawContent, components, embeds, attachmentURLs, pinned, meta));
     }
 
     public MessageCreateData create(MessageRestorationContext context) {
@@ -193,24 +200,45 @@ public record MessageContentSnapshot(
         builder.setContent(rawContent);
         if (components != null) {
             List<DataObject> components = this.components.stream()
-                                                         .map(e -> Base64.getDecoder().decode(e))
-                                                         .map(DataObject::fromJson)
-                                                         .toList();
+                    .map(e -> Base64.getDecoder().decode(e))
+                    .map(DataObject::fromJson)
+                    .toList();
             List<MessageTopLevelComponent> iComponentUnions = deserializer.deserializeAll(components).stream()
-                                                                          .map(MessageTopLevelComponent.class::cast)
-                                                                          .toList();
+                    .map(MessageTopLevelComponent.class::cast)
+                    .toList();
             MessageComponentTree messageComponentTree = MessageComponentTree.of(iComponentUnions);
             MessageComponentTree disabled = messageComponentTree.asDisabled();
-            builder.addComponents(disabled);
+            builder.useComponentsV2().addComponents(disabled);
+        } else if (embeds != null) {
+            List<MessageEmbed> deserialized = embeds.stream()
+                    .map(e -> Base64.getDecoder().decode(e))
+                    .map(DataObject::fromJson)
+                    .map(EmbedBuilder::fromData)
+                    .map(EmbedBuilder::build)
+                    .toList();
+            builder.addEmbeds(deserialized);
         }
+
+        if (!attachmentURLs.isEmpty()) {
+            builder.addContent(
+                    "\n" + attachmentURLs.stream().map(Attachment::link).collect(Collectors.joining(" ")));
+        }
+
+        // End of message content
 
         if (meta != null) {
             meta.apply(builder, context);
         }
 
         UserProfile userProfile = context.userProfile(userId);
+        if (!builder.isUsingComponentsV2()) {
+            builder.addContent("\n-# <t:%s> by [%s](<%s>)"
+                    .formatted(
+                            SnowflakeUtil.snowflakeToTimestamp(context.messageId()),
+                            userProfile.username(),
+                            Links.user(userId)));
+        }
 
-        builder.addContent("\n<t:%s> by [%s](%s)".formatted(SnowflakeUtil.snowflakeToTimestamp(context.messageId()), userProfile.username(), Links.user(userId)));
         return builder.build();
     }
 }

@@ -9,7 +9,12 @@ import static net.dv8tion.jda.api.utils.TimeUtil.DISCORD_EPOCH;
 import static net.dv8tion.jda.api.utils.TimeUtil.TIMESTAMP_OFFSET;
 
 public class SnowflakeUtil {
+    /**
+     * Snowflake to epoch timestamp in seconds.
+     * @param snowflake discord snowflake
+     * @return epoch timestamp in seconds
+     */
     public static long snowflakeToTimestamp(long snowflake) {
-        return (snowflake >>> TIMESTAMP_OFFSET) + DISCORD_EPOCH;
+        return (snowflake >>> TIMESTAMP_OFFSET) + DISCORD_EPOCH / 1000;
     }
 }

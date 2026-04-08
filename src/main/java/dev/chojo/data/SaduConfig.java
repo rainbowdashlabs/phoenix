@@ -18,9 +18,10 @@ import dev.chojo.configuration.elements.sub.Database;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
-import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.SQLException;
+
+import javax.sql.DataSource;
 
 import static org.slf4j.LoggerFactory.getLogger;
 

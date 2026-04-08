@@ -7,8 +7,8 @@ package dev.chojo.commands.message;
 
 import dev.chojo.data.snapshot.MessageSnapshot;
 import dev.chojo.data.snapshot.UserProfile;
-import dev.chojo.data.snapshot.message.contect.GuildRestorationContext;
-import dev.chojo.data.snapshot.message.contect.MessageRestorationContext;
+import dev.chojo.data.snapshot.message.context.GuildRestorationContext;
+import dev.chojo.data.snapshot.message.context.MessageRestorationContext;
 import io.github.kaktushose.jdac.annotations.interactions.Command;
 import io.github.kaktushose.jdac.annotations.interactions.Interaction;
 import io.github.kaktushose.jdac.dispatching.events.interactions.CommandEvent;
@@ -23,10 +23,17 @@ public class Replicate {
 
     @Command(value = "replicate", type = Type.MESSAGE)
     public void replicate(CommandEvent event, Message target) {
+        event.deferReply();
         Optional<MessageSnapshot> messageSnapshot = MessageSnapshot.create(target);
-        if (messageSnapshot.isEmpty()) return;
-        GuildRestorationContext guildRestorationContext =
-                new GuildRestorationContext(i -> i, i -> i, i -> UserProfile.create(target.getAuthor()));
+        if (messageSnapshot.isEmpty()) {
+            event.reply("This message cannot be replicated");
+            return;
+        }
+        GuildRestorationContext guildRestorationContext = new GuildRestorationContext(
+                i -> i,
+                i -> i,
+                (name, id) -> event.getGuild().getEmojiById(id),
+                i -> UserProfile.create(target.getAuthor()));
         MessageRestorationContext messageRestorationContext = new MessageRestorationContext(
                 guildRestorationContext,
                 target.getIdLong(),

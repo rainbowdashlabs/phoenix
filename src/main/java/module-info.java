@@ -33,6 +33,13 @@ module dev.chojo.elpis {
     exports dev.chojo.data;
     exports dev.chojo.scan;
     exports dev.chojo.crypto;
+    exports dev.chojo.crypto.policy;
+    exports dev.chojo.crypto.serialization;
+    exports dev.chojo.crypto.processing;
+    exports dev.chojo.crypto.processing.wrapper;
+    exports dev.chojo.crypto.exceptions;
+    exports dev.chojo.crypto.processing.model;
+    exports dev.chojo.commands.message;
 
     opens dev.chojo.core;
     opens dev.chojo.configuration;

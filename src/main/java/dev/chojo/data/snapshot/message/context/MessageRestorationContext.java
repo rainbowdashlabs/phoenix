@@ -3,9 +3,12 @@
  *
  *     Copyright (C) RainbowDashLabs and Contributor
  */
-package dev.chojo.data.snapshot.message.contect;
+package dev.chojo.data.snapshot.message.context;
 
 import dev.chojo.data.snapshot.UserProfile;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+
+import java.util.Optional;
 
 public class MessageRestorationContext {
     private final GuildRestorationContext context;
@@ -50,5 +53,9 @@ public class MessageRestorationContext {
 
     public UserProfile userProfile(Long userId) {
         return context.userProfile(userId);
+    }
+
+    public Optional<Emoji> newEmoji(String oldId) {
+        return context.newEmoji(oldId);
     }
 }
