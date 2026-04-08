@@ -5,10 +5,13 @@
  */
 package dev.chojo.data.snapshot.message.content;
 
+import dev.chojo.data.snapshot.UserProfile;
 import dev.chojo.data.snapshot.message.Reply;
 import dev.chojo.data.snapshot.message.contect.MessageRestorationContext;
 import dev.chojo.data.snapshot.message.content.meta.Meta;
 import dev.chojo.data.snapshot.message.content.meta.poll.PollMeta;
+import dev.chojo.util.Links;
+import dev.chojo.util.SnowflakeUtil;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.tree.MessageComponentTree;
 import net.dv8tion.jda.api.components.utils.ComponentDeserializer;
@@ -130,17 +133,17 @@ public record MessageContentSnapshot(
         List<Map<String, Object>> embeds =
                 message.getEmbeds().stream().map(m -> m.toData().toMap()).toList();
         List<String> attachmentURLs = message.getAttachments().stream()
-                .map(Message.Attachment::getUrl)
-                .toList();
+                                             .map(Message.Attachment::getUrl)
+                                             .toList();
         List<String> components = null;
         if (message.isUsingComponentsV2()) {
             // TODO Probably find a way to serialize components? Or just dont care?
             // We do not care about v1 components
             components = message.getComponents().stream()
-                    .map(serializer::serialize)
-                    .map(DataObject::toJson)
-                    .map(e -> Base64.getEncoder().encodeToString(e))
-                    .toList();
+                                .map(serializer::serialize)
+                                .map(DataObject::toJson)
+                                .map(e -> Base64.getEncoder().encodeToString(e))
+                                .toList();
         }
         Meta meta = null;
         switch (message.getType()) {
@@ -163,17 +166,21 @@ public record MessageContentSnapshot(
             case THREAD_CREATED -> {
                 // Save from which message the thread was created.
             }
-            case THREAD_STARTER_MESSAGE -> {}
+            case THREAD_STARTER_MESSAGE -> {
+            }
             case SLASH_COMMAND, CONTEXT_COMMAND -> {
                 User executingUser = message.getInteractionMetadata().getUser();
                 // A regular slash command
-                if (message.getInteractionMetadata().getType() == InteractionType.COMMAND) {}
+                if (message.getInteractionMetadata().getType() == InteractionType.COMMAND) {
+                }
 
                 // If this is a context command on a message
-                if (message.getMessageReference() != null) {}
+                if (message.getMessageReference() != null) {
+                }
 
                 // If this is a context command on a user
-                if (message.getInteractionMetadata().getTargetUser() != null) {}
+                if (message.getInteractionMetadata().getTargetUser() != null) {
+                }
             }
         }
         boolean pinned = message.isPinned();
@@ -186,12 +193,12 @@ public record MessageContentSnapshot(
         builder.setContent(rawContent);
         if (components != null) {
             List<DataObject> components = this.components.stream()
-                    .map(e -> Base64.getDecoder().decode(e))
-                    .map(DataObject::fromJson)
-                    .toList();
+                                                         .map(e -> Base64.getDecoder().decode(e))
+                                                         .map(DataObject::fromJson)
+                                                         .toList();
             List<MessageTopLevelComponent> iComponentUnions = deserializer.deserializeAll(components).stream()
-                    .map(MessageTopLevelComponent.class::cast)
-                    .toList();
+                                                                          .map(MessageTopLevelComponent.class::cast)
+                                                                          .toList();
             MessageComponentTree messageComponentTree = MessageComponentTree.of(iComponentUnions);
             MessageComponentTree disabled = messageComponentTree.asDisabled();
             builder.addComponents(disabled);
@@ -200,6 +207,10 @@ public record MessageContentSnapshot(
         if (meta != null) {
             meta.apply(builder, context);
         }
+
+        UserProfile userProfile = context.userProfile(userId);
+
+        builder.addContent("\n<t:%s> by [%s](%s)".formatted(SnowflakeUtil.snowflakeToTimestamp(context.messageId()), userProfile.username(), Links.user(userId)));
         return builder.build();
     }
 }

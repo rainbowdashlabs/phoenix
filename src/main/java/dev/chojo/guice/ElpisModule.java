@@ -17,6 +17,5 @@ public class ElpisModule extends AbstractModule {
         bind(Configuration.class).toInstance(new Configuration());
         bind(CryptoService.class);
         bind(SaduConfig.class);
-        bind(Replicate.class);
     }
 }

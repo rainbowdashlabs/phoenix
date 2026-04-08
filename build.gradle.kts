@@ -1,5 +1,6 @@
 import org.jetbrains.gradle.ext.runConfigurations
 import org.jetbrains.gradle.ext.settings
+import org.jetbrains.gradle.ext.ShortenCommandLine
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -150,12 +151,14 @@ idea {
                     mainClass = "dev.chojo.Bootstrapper"
                     jvmArgs = shared.joinToString(" ")
                     moduleName = "elpis.main"
+                    shortenCommandLine = ShortenCommandLine.MANIFEST
                 }
                 register<org.jetbrains.gradle.ext.Application>("App-Testing - All SKUs") {
                     mainClass = "dev.chojo.Bootstrapper"
                     jvmArgs =
                         (shared + "-Dbot.grantallsku=true" + "-Dcjda.premium.skipEntitledCheck=true").joinToString(" ")
                     moduleName = "elpis.main"
+                    shortenCommandLine = ShortenCommandLine.MANIFEST
                 }
             }
         }

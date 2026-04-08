@@ -28,6 +28,14 @@ public class MessageRestorationContext {
         return newMessageId(messageId);
     }
 
+    public long messageId() {
+        return messageId;
+    }
+
+    public long channelId() {
+        return channelId;
+    }
+
     public Long newChannelId(Long oldId) {
         return context.newChannelId(oldId);
     }
@@ -40,7 +48,7 @@ public class MessageRestorationContext {
         return context.newMessageId(oldId);
     }
 
-    public UserProfile userProfile(Long oldId) {
-        return context.userProfile(oldId);
+    public UserProfile userProfile(Long userId) {
+        return context.userProfile(userId);
     }
 }
