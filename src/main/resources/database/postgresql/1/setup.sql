@@ -120,13 +120,14 @@ CREATE INDEX IF NOT EXISTS guild_message_key_id_index
 
 -- Table for storing the encrypted message keys.
 CREATE TABLE IF NOT EXISTS elpis_schema.guild_message_key (
-    guild_id      BIGINT    NOT NULL
+    guild_id      BIGINT                  NOT NULL
         CONSTRAINT guild_message_key_guild_id_fk
             REFERENCES elpis_schema.guild
             ON DELETE CASCADE,
-    id            BIGSERIAL NOT NULL,
-    encrypted_key TEXT      NOT NULL,
-    cipher        TEXT      NOT NULL,
+    id            BIGSERIAL               NOT NULL,
+    encrypted_key TEXT                    NOT NULL,
+    cipher        TEXT                    NOT NULL,
+    created       TIMESTAMP DEFAULT now() NOT NULL,
     CONSTRAINT guild_message_key_pk
         PRIMARY KEY (guild_id, encrypted_key, cipher)
 );

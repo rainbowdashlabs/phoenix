@@ -38,7 +38,7 @@ public class Crypto implements GuildHolder {
                 VALUES
                     (?, ?, ?)
                 ON CONFLICT(guild_id) DO UPDATE SET
-                    public_key = excluded.public_key""")
+                    public_key = excluded.public_key, cipher = excluded.cipher""")
                 .single(call().bind(guildId()).bind(wrapper.key()).bind(wrapper.cipher()))
                 .insert()
                 .ifChanged(_ -> {
@@ -65,7 +65,7 @@ public class Crypto implements GuildHolder {
                         cipher
                     FROM
                         guild_crypto
-                    WHERE guild_id = ?""")
+                    WHERE guild_id = ? AND public_key IS NOT NULL AND cipher IS NOT NULL""")
                     .single(call().bind(guildId()))
                     .map(row -> new PlainRSAAlgorithmWrapper(row.getString("public_key"), row.getString("cipher")))
                     .first()

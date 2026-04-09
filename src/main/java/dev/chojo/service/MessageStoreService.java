@@ -20,6 +20,7 @@ import dev.chojo.crypto.processing.wrapper.RSAAlgorithmWrapper;
 import dev.chojo.data.dao.GuildSettings;
 import dev.chojo.data.repository.GuildSettingsRepository;
 import dev.chojo.data.repository.MessageRepository;
+import dev.chojo.data.repository.UserProfileRepository;
 import dev.chojo.data.snapshot.EncryptedMessage;
 import dev.chojo.data.snapshot.MessageSnapshot;
 import net.dv8tion.jda.api.entities.channel.Channel;
@@ -47,6 +48,7 @@ public class MessageStoreService {
     private final CryptoService cryptoService;
     private final GuildSettingsRepository guildSettingsRepository;
     private final MessageRepository messageRepository;
+    private final UserProfileRepository userProfileRepository;
 
     // TODO probably should be a thread pool at some point
     private final ScheduledExecutorService runner = Executors.newSingleThreadScheduledExecutor();
@@ -56,11 +58,13 @@ public class MessageStoreService {
             Configuration configuration,
             CryptoService cryptoService,
             GuildSettingsRepository guildSettingsRepository,
-            MessageRepository messageRepository) {
+            MessageRepository messageRepository,
+            UserProfileRepository userProfileRepository) {
         this.cryptoService = cryptoService;
         this.guildSettingsRepository = guildSettingsRepository;
         this.configuration = configuration;
         this.messageRepository = messageRepository;
+        this.userProfileRepository = userProfileRepository;
         runner.execute(this::processLoop);
     }
 
@@ -90,6 +94,7 @@ public class MessageStoreService {
         String content = jsonMapper.writeValueAsString(snapshot.content());
         EncryptedContent encrypted = getEncryptor(snapshot.guildId()).encrypt(content);
         EncryptedMessage encryptedMessage = EncryptedMessage.create(encrypted, snapshot);
+        userProfileRepository.storeGuildUser(snapshot.guildId(), snapshot.author());
         messageRepository.storeMessage(encryptedMessage);
     }
 

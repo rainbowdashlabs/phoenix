@@ -76,7 +76,8 @@ public class Bot extends AbstractModule {
     }
 
     private void jdaCommands(ShardManager manager, Injector injector) {
-        Fluava fluava = Fluava.builder().fallback(Locale.UK).bundleRoot("locale").build();
+        Fluava fluava =
+                Fluava.builder().fallback(Locale.UK).bundleRoot("locale").build();
         JDACBuilder builder = JDACommands.builder(manager)
                 .packages("dev.chojo")
                 .extensionData(new GuiceExtensionData(injector))

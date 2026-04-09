@@ -9,9 +9,9 @@ import com.google.inject.Inject;
 import dev.chojo.configuration.Configuration;
 import dev.chojo.configuration.elements.sub.Crypto;
 import dev.chojo.crypto.CryptoService;
+import dev.chojo.crypto.exceptions.CryptoException;
 import dev.chojo.crypto.processing.wrapper.RSAAlgorithmWrapper;
 import dev.chojo.crypto.serialization.PlainRSAAlgorithmWrapper;
-import dev.chojo.crypto.exceptions.CryptoException;
 import dev.chojo.data.dao.GuildSettings;
 import dev.chojo.data.repository.GuildSettingsRepository;
 import io.github.kaktushose.jdac.annotations.interactions.Command;
@@ -33,7 +33,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
-import java.util.Map;
 
 @Interaction("setup")
 public class Setup {
@@ -59,29 +58,38 @@ public class Setup {
         event.deferReply();
         Crypto crypto = configuration.main().crypto();
         KeyPair keyPair = cryptoService.generateRSAKeyPair();
-        RSAAlgorithmWrapper rsaAlgorithmWrapper = new RSAAlgorithmWrapper(keyPair.getPrivate(), crypto.asymmetricCipher());
-        RSAAlgorithmWrapper rsaAlgorithmWrapperPublic = new RSAAlgorithmWrapper(keyPair.getPublic(), crypto.asymmetricCipher());
+        RSAAlgorithmWrapper rsaAlgorithmWrapper =
+                new RSAAlgorithmWrapper(keyPair.getPrivate(), crypto.asymmetricCipher());
+        RSAAlgorithmWrapper rsaAlgorithmWrapperPublic =
+                new RSAAlgorithmWrapper(keyPair.getPublic(), crypto.asymmetricCipher());
         guildSettings.crypto().setPublicKey(PlainRSAAlgorithmWrapper.wrap(rsaAlgorithmWrapperPublic));
         event.reply("commands-slash-setup-encryption-new-message-success");
-        MessageCreateData build = new MessageCreateBuilder().setContent("commands-slash-setup-encryption-new-message-success")
-                                                            .addFiles(FileUpload.fromData(PlainRSAAlgorithmWrapper.wrap(rsaAlgorithmWrapper).key().getBytes(StandardCharsets.UTF_8), "key.pem"))
-                                                            .build();
+        MessageCreateData build = new MessageCreateBuilder()
+                .setContent("commands-slash-setup-encryption-new-message-success")
+                .addFiles(FileUpload.fromData(
+                        PlainRSAAlgorithmWrapper.wrap(rsaAlgorithmWrapper).key().getBytes(StandardCharsets.UTF_8),
+                        "key.pem"))
+                .build();
         event.reply(build);
     }
 
     @Command(value = "encryption upload", desc = "Setup encryption for the guild")
     public void onEncryptionUpload(CommandEvent event) {
         GuildSettings guildSettings = settingsRepository.get(event.getGuild());
-        String label = "Upload your own RSA public key. This key must have a key length of ".formatted(configuration.main().crypto().asymmetricKeySize());
-        event.replyModal("onPublicKeyModal", List.of(TextDisplay.of(label),
-                Label.of("Upload your public key here", TextInput.of("pubkey", TextInputStyle.PARAGRAPH))));
+        String label = "Upload your own RSA public key. This key must have a key length of %d"
+                .formatted(configuration.main().crypto().asymmetricKeySize());
+        event.replyModal(
+                "onPublicKeyModal",
+                List.of(
+                        TextDisplay.of(label),
+                        Label.of("Upload your public key here", TextInput.of("pubkey", TextInputStyle.PARAGRAPH))));
     }
 
     @Modal("Upload public key")
     public void onPublicKeyModal(ModalEvent event) {
         event.deferReply();
         ModalMapping pubkey = event.value("pubkey");
-        if (pubkey == null || pubkey.getAsString() == null || pubkey.getAsString().isEmpty()) {
+        if (pubkey.getAsString().isEmpty()) {
             event.reply("commands-slash-setup-encryption-upload-message-error-nokey");
             return;
         }
@@ -92,7 +100,8 @@ public class Setup {
             return;
         }
 
-        PlainRSAAlgorithmWrapper plainWrapper = new PlainRSAAlgorithmWrapper(pubkey.getAsString(), configuration.main().crypto().asymmetricCipher());
+        PlainRSAAlgorithmWrapper plainWrapper = new PlainRSAAlgorithmWrapper(
+                pubkey.getAsString(), configuration.main().crypto().asymmetricCipher());
         RSAAlgorithmWrapper unwrap;
         try {
             unwrap = plainWrapper.unwrap();
@@ -109,8 +118,10 @@ public class Setup {
         int expectedKeySize = configuration.main().crypto().asymmetricKeySize();
         int actualKeySize = publicKey.getModulus().bitLength();
         if (actualKeySize != expectedKeySize) {
-            event.reply("commands-slash-setup-encryption-upload-message-error-keysize",
-                    Entry.entry("expected", expectedKeySize), Entry.entry("actual", actualKeySize));
+            event.reply(
+                    "commands-slash-setup-encryption-upload-message-error-keysize",
+                    Entry.entry("expected", expectedKeySize),
+                    Entry.entry("actual", actualKeySize));
             return;
         }
 
