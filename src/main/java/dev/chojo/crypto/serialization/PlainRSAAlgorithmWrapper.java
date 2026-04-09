@@ -31,11 +31,19 @@ public record PlainRSAAlgorithmWrapper(String key, String cipher) {
     /// @throws CryptoException if the key type is unsupported
     public static PlainRSAAlgorithmWrapper wrap(RSAAlgorithmWrapper wrapper) {
         String encoded = Base64.getEncoder().encodeToString(wrapper.key().getEncoded());
+        StringBuilder wrapped = new StringBuilder();
+        for (int i = 0; i < encoded.length(); i++) {
+            if (i > 0 && i % 60 == 0) {
+                wrapped.append("\n");
+            }
+            wrapped.append(encoded.charAt(i));
+        }
+
         String key;
         if (wrapper.key() instanceof PublicKey) {
-            key = "-----BEGIN PUBLIC KEY-----\n" + encoded + "\n-----END PUBLIC KEY-----";
+            key = "-----BEGIN PUBLIC KEY-----\n" + wrapped + "\n-----END PUBLIC KEY-----";
         } else if (wrapper.key() instanceof PrivateKey) {
-            key = "-----BEGIN PRIVATE KEY-----\n" + encoded + "\n-----END PRIVATE KEY-----";
+            key = "-----BEGIN PRIVATE KEY-----\n" + wrapped + "\n-----END PRIVATE KEY-----";
         } else {
             throw new CryptoException(
                     "Unsupported key type: " + wrapper.key().getClass().getName(), null);

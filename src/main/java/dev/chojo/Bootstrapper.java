@@ -7,8 +7,10 @@ package dev.chojo;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import dev.chojo.configuration.Configuration;
 import dev.chojo.core.Bot;
 import dev.chojo.data.SaduConfig;
+import dev.chojo.guice.ElpisModule;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -16,7 +18,8 @@ import java.sql.SQLException;
 public class Bootstrapper {
 
     void main() throws InterruptedException, SQLException, IOException {
-        Injector injector = Guice.createInjector();
+        Configuration configuration = new Configuration();
+        Injector injector = Guice.createInjector(new Bot(configuration), new ElpisModule(configuration));
 
         SaduConfig sadu = injector.getInstance(SaduConfig.class);
         sadu.init();

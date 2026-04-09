@@ -10,12 +10,13 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 import dev.chojo.configuration.Configuration;
-import dev.chojo.service.MessageStoreService;
+import dev.goldmensch.fluava.Fluava;
 import io.github.kaktushose.jdac.JDACBuilder;
 import io.github.kaktushose.jdac.JDACommands;
 import io.github.kaktushose.jdac.annotations.interactions.CommandScope;
 import io.github.kaktushose.jdac.definitions.interactions.command.CommandDefinition;
 import io.github.kaktushose.jdac.guice.GuiceExtensionData;
+import io.github.kaktushose.jdac.message.i18n.FluavaLocalizer;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -26,7 +27,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.Executors;
 
@@ -44,19 +45,21 @@ public class Bot extends AbstractModule {
     }
 
     @Provides
-    public ShardManager shardManager() {
-        Objects.requireNonNull(shardManager, "ShardManager not initialized!");
+    public ShardManager shardManager(Configuration configuration) throws InterruptedException {
+        if (shardManager == null) {
+            shardManager(configuration.main().general().token());
+        }
         return shardManager;
     }
 
     public void start(Injector injector) throws InterruptedException {
-        ShardManager manager = shardManager(configuration.main().general().token());
-        jdaCommands(manager, injector);
+        shardManager(configuration.main().general().token());
+        jdaCommands(shardManager, injector);
 
         Thread.setDefaultUncaughtExceptionHandler((_, e) -> log.error("An uncaught exception has occurred!", e));
-        Runtime.getRuntime().addShutdownHook(new Thread(manager::shutdown));
+        Runtime.getRuntime().addShutdownHook(new Thread(shardManager::shutdown));
 
-        manager.setPresence(OnlineStatus.ONLINE, Activity.customStatus("Vibing"));
+        shardManager.setPresence(OnlineStatus.ONLINE, Activity.customStatus("Vibing"));
     }
 
     private ShardManager shardManager(String token) throws InterruptedException {
@@ -73,8 +76,11 @@ public class Bot extends AbstractModule {
     }
 
     private void jdaCommands(ShardManager manager, Injector injector) {
-        JDACBuilder builder =
-                JDACommands.builder(manager).packages("dev.chojo").extensionData(new GuiceExtensionData(injector));
+        Fluava fluava = Fluava.builder().fallback(Locale.UK).bundleRoot("locale").build();
+        JDACBuilder builder = JDACommands.builder(manager)
+                .packages("dev.chojo")
+                .extensionData(new GuiceExtensionData(injector))
+                .localizer(FluavaLocalizer.create(fluava));
 
         // @Nora set dev mode here, either from configuration or env, idk what you like
         if (configuration.main().general().testmode()) {

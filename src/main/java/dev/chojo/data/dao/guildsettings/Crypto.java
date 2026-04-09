@@ -28,10 +28,10 @@ public class Crypto implements GuildHolder {
         this.guildSettings = guildSettings;
     }
 
-    public synchronized void setPublicKey(PlainRSAAlgorithmWrapper wrapper) {
+    public synchronized boolean setPublicKey(PlainRSAAlgorithmWrapper wrapper) {
         Objects.requireNonNull(wrapper, "Wrapper cannot be null");
-        if (this.wrapper != null) throw new IllegalStateException("Wrapper already set");
-        query("""
+        if (this.wrapper != null) return false;
+        return query("""
                 INSERT
                 INTO
                     guild_crypto(guild_id, public_key, cipher)
