@@ -61,6 +61,7 @@ public class MessageStoreService {
         this.guildSettingsRepository = guildSettingsRepository;
         this.configuration = configuration;
         this.messageRepository = messageRepository;
+        runner.execute(this::processLoop);
     }
 
     public void processLoop() {
@@ -82,6 +83,10 @@ public class MessageStoreService {
     }
 
     private void process(MessageSnapshot snapshot) {
+        if (!guildSettingsRepository.get(snapshot.guildId()).crypto().hasPublicKey()) {
+            // Do not store messages without a public key for encryption
+            return;
+        }
         String content = jsonMapper.writeValueAsString(snapshot.content());
         EncryptedContent encrypted = getEncryptor(snapshot.guildId()).encrypt(content);
         EncryptedMessage encryptedMessage = EncryptedMessage.create(encrypted, snapshot);
@@ -92,16 +97,12 @@ public class MessageStoreService {
         try {
             return encryptors.get(guildId, () -> createEncryptor(guildId));
         } catch (ExecutionException e) {
-            // TODO: Properly handle case when guild has no key generated yet.
             throw new RuntimeException(e);
         }
     }
 
     private StringEncryptor createEncryptor(long guildId) {
         GuildSettings guildSettings = guildSettingsRepository.get(guildId);
-        if (!guildSettings.crypto().hasPublicKey()) {
-            throw new IllegalStateException("Guild settings do not have a public key");
-        }
         RSAAlgorithmWrapper rsaAlgorithmWrapper = guildSettings.crypto().publicKey();
         Encryptor<BytesProcessInput, BytesProcessResult> rsaEncryptor = new Encryptor<>(rsaAlgorithmWrapper);
         KeyRotationPolicy keyRotationPolicy = new KeyRotationPolicy(

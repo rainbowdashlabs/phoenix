@@ -39,7 +39,7 @@ public class Bot extends AbstractModule {
     private ShardManager shardManager;
 
     @Inject
-    public Bot(Configuration configuration, MessageStoreService messageStoreService) {
+    public Bot(Configuration configuration) {
         this.configuration = configuration;
     }
 

@@ -38,14 +38,22 @@ public class Crypto implements GuildHolder {
                 VALUES
                     (?, ?, ?)
                 ON CONFLICT(guild_id) DO UPDATE SET
-                    public_key = excluded.public_key""").single(call().bind(guildId()).bind(wrapper.key()).bind(wrapper.cipher()));
-        this.wrapper = wrapper.unwrap();
-        this.initialized = true;
+                    public_key = excluded.public_key""")
+                .single(call().bind(guildId()).bind(wrapper.key()).bind(wrapper.cipher()))
+                .insert()
+                .ifChanged(_ -> {
+                    this.wrapper = wrapper.unwrap();
+                    this.initialized = true;
+                });
     }
 
     public synchronized void clearPublicKey() {
-        this.wrapper = null;
-        this.initialized = false;
+        query("""
+                UPDATE guild_crypto SET public_key = NULL, cipher = NULL
+                WHERE guild_id = ?""").single(call().bind(guildId())).update().ifChanged(_ -> {
+            this.initialized = false;
+            this.wrapper = null;
+        });
     }
 
     public @Nullable RSAAlgorithmWrapper publicKey() {
