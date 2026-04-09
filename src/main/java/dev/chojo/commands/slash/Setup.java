@@ -76,6 +76,10 @@ public class Setup {
     @Command(value = "encryption upload", desc = "Setup encryption for the guild")
     public void onEncryptionUpload(CommandEvent event) {
         GuildSettings guildSettings = settingsRepository.get(event.getGuild());
+        if (guildSettings.crypto().hasPublicKey()) {
+            event.reply("commands-slash-setup-encryption-upload-message-error-keyexists");
+            return;
+        }
         String label = "Upload your own RSA public key. This key must have a key length of %d"
                 .formatted(configuration.main().crypto().asymmetricKeySize());
         event.replyModal(
