@@ -141,9 +141,9 @@ public record MessageContentSnapshot(
         long userId = message.getAuthor().getIdLong();
         String rawContent = message.getContentRaw();
         List<String> embeds = message.getEmbeds().stream()
-                                     .map(m -> m.toData().toJson())
-                                     .map(e -> Base64.getEncoder().encodeToString(e))
-                                     .toList();
+                .map(m -> m.toData().toJson())
+                .map(e -> Base64.getEncoder().encodeToString(e))
+                .toList();
         List<Attachment> attachmentURLs =
                 message.getAttachments().stream().map(Attachment::create).toList();
         List<String> components = null;
@@ -151,10 +151,10 @@ public record MessageContentSnapshot(
             // TODO Probably find a way to serialize components? Or just dont care?
             // We do not care about v1 components
             components = message.getComponents().stream()
-                                .map(serializer::serialize)
-                                .map(DataObject::toJson)
-                                .map(e -> Base64.getEncoder().encodeToString(e))
-                                .toList();
+                    .map(serializer::serialize)
+                    .map(DataObject::toJson)
+                    .map(e -> Base64.getEncoder().encodeToString(e))
+                    .toList();
         }
         Meta meta = null;
         switch (message.getType()) {
@@ -196,27 +196,26 @@ public record MessageContentSnapshot(
     }
 
     public MessageCreateData create(MessageRestorationContext context) {
-        MessageCreateBuilder builder = new MessageCreateBuilder()
-                .setContent(rawContent)
-                .setAllowedMentions(Collections.emptyList());
+        MessageCreateBuilder builder =
+                new MessageCreateBuilder().setContent(rawContent).setAllowedMentions(Collections.emptyList());
         if (components != null) {
             List<DataObject> components = this.components.stream()
-                                                         .map(e -> Base64.getDecoder().decode(e))
-                                                         .map(DataObject::fromJson)
-                                                         .toList();
+                    .map(e -> Base64.getDecoder().decode(e))
+                    .map(DataObject::fromJson)
+                    .toList();
             List<MessageTopLevelComponent> iComponentUnions = deserializer.deserializeAll(components).stream()
-                                                                          .map(MessageTopLevelComponent.class::cast)
-                                                                          .toList();
+                    .map(MessageTopLevelComponent.class::cast)
+                    .toList();
             MessageComponentTree messageComponentTree = MessageComponentTree.of(iComponentUnions);
             MessageComponentTree disabled = messageComponentTree.asDisabled();
             builder.useComponentsV2().addComponents(disabled);
         } else if (embeds != null) {
             List<MessageEmbed> deserialized = embeds.stream()
-                                                    .map(e -> Base64.getDecoder().decode(e))
-                                                    .map(DataObject::fromJson)
-                                                    .map(EmbedBuilder::fromData)
-                                                    .map(EmbedBuilder::build)
-                                                    .toList();
+                    .map(e -> Base64.getDecoder().decode(e))
+                    .map(DataObject::fromJson)
+                    .map(EmbedBuilder::fromData)
+                    .map(EmbedBuilder::build)
+                    .toList();
             builder.addEmbeds(deserialized);
         }
 

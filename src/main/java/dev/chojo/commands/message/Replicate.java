@@ -54,14 +54,16 @@ public class Replicate {
                 target.getChannel().getIdLong(),
                 target.getGuild().getIdLong());
         MessageCreateData replicate = messageSnapshot.get().replicate(messageRestorationContext);
-        Optional<Webhook> restore = target.getChannel().asTextChannel().retrieveWebhooks().complete().stream().filter(i -> i.getName().equals("restore")).findFirst();
-        Webhook webhook = restore.orElseGet(() -> target.getChannel().asTextChannel().createWebhook("restore").complete());
+        Optional<Webhook> restore = target.getChannel().asTextChannel().retrieveWebhooks().complete().stream()
+                .filter(i -> i.getName().equals("restore"))
+                .findFirst();
+        Webhook webhook = restore.orElseGet(() ->
+                target.getChannel().asTextChannel().createWebhook("restore").complete());
         event.reply("Message replicated successfully");
         WebhookClient.createClient(target.getJDA(), webhook.getUrl())
-                     .sendMessage(replicate)
-                     .setUsername(messageSnapshot.get().author().username())
-                     .setAvatarUrl(messageSnapshot.get().author().profilePicture()).queue();
-        target.getChannel().asTextChannel().createWebhook("Restore")
-              .complete();
+                .sendMessage(replicate)
+                .setUsername(messageSnapshot.get().author().username())
+                .setAvatarUrl(messageSnapshot.get().author().profilePicture())
+                .queue();
     }
 }
