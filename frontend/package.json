@@ -29,7 +29,7 @@
     "jiti": "^2.6.1",
     "npm-run-all2": "^8.0.4",
     "oxlint": "~1.57.0",
-    "typescript": "~5.9.3",
+    "typescript": "~6.0.0",
     "vite": "^8.0.0",
     "vite-plugin-vue-devtools": "^8.0.7",
     "vue-tsc": "^3.2.5"
