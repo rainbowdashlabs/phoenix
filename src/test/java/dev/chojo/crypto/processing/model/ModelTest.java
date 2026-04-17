@@ -14,7 +14,7 @@ class ModelTest {
     void testAESProcessResult() {
         byte[] bytes = new byte[16];
         byte[] iv = new byte[12];
-        AESProcessResult result = new AESProcessResult(bytes, iv);
+        SymProcessResult result = new SymProcessResult(bytes, iv);
         assertArrayEquals(bytes, result.bytes());
         assertArrayEquals(iv, result.iv());
     }
@@ -37,7 +37,7 @@ class ModelTest {
     void testAESProcessInput() {
         byte[] bytes = new byte[16];
         byte[] iv = new byte[12];
-        AESProcessInput input = new AESProcessInput(bytes, iv);
+        SymProcessInput input = new SymProcessInput(bytes, iv);
         assertArrayEquals(bytes, input.bytes());
         assertArrayEquals(iv, input.iv());
     }

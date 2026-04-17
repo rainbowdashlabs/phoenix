@@ -10,8 +10,8 @@ import dev.chojo.configuration.elements.Root;
 import dev.chojo.crypto.CryptoService;
 import dev.chojo.crypto.processing.Decryptor;
 import dev.chojo.crypto.processing.Encryptor;
-import dev.chojo.crypto.processing.model.AESProcessInput;
-import dev.chojo.crypto.processing.model.AESProcessResult;
+import dev.chojo.crypto.processing.model.SymProcessInput;
+import dev.chojo.crypto.processing.model.SymProcessResult;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class AESAlgorithmWrapperTest {
+class SymAlgorithmWrapperTest {
     static CryptoService cryptoService;
 
     @BeforeAll
@@ -44,7 +44,7 @@ class AESAlgorithmWrapperTest {
     void testDestroy()
             throws InvalidKeySpecException, InvalidAlgorithmParameterException, NoSuchPaddingException,
                     NoSuchAlgorithmException, InvalidKeyException, javax.security.auth.DestroyFailedException {
-        AESAlgorithmWrapper wrapper = cryptoService.randomAESKey();
+        SymAlgorithmWrapper wrapper = cryptoService.randomAESKey();
         try {
             wrapper.destroy();
             assertTrue(wrapper.key().isDestroyed());
@@ -57,11 +57,11 @@ class AESAlgorithmWrapperTest {
     void testDecryptionWithoutIV()
             throws InvalidKeySpecException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
                     InvalidAlgorithmParameterException {
-        AESAlgorithmWrapper decryptWrapper = new AESAlgorithmWrapper(
+        SymAlgorithmWrapper decryptWrapper = new SymAlgorithmWrapper(
                 cryptoService.randomAESKey().key(), cryptoService.symmetricCipher(), Cipher.DECRYPT_MODE);
-        Decryptor<AESProcessInput, AESProcessResult> decryptor = new Decryptor<>(decryptWrapper);
+        Decryptor<SymProcessInput, SymProcessResult> decryptor = new Decryptor<>(decryptWrapper);
 
-        AESProcessInput input = new AESProcessInput(new byte[16], null);
+        SymProcessInput input = new SymProcessInput(new byte[16], null);
         assertThrows(NullPointerException.class, () -> decryptor.process(input), "IV must be provided for decryption");
     }
 
@@ -69,13 +69,13 @@ class AESAlgorithmWrapperTest {
     void testProcessedBytes()
             throws InvalidKeySpecException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
                     InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
-        AESAlgorithmWrapper encryptWrapper = new AESAlgorithmWrapper(
+        SymAlgorithmWrapper encryptWrapper = new SymAlgorithmWrapper(
                 cryptoService.randomAESKey().key(), cryptoService.symmetricCipher(), Cipher.ENCRYPT_MODE);
-        Encryptor<AESProcessInput, AESProcessResult> encryptor = new Encryptor<>(encryptWrapper);
+        Encryptor<SymProcessInput, SymProcessResult> encryptor = new Encryptor<>(encryptWrapper);
 
         assertEquals(0, encryptWrapper.processedBytes());
         String message = "Hello, World!";
-        encryptor.process(new AESProcessInput(message.getBytes(), null));
+        encryptor.process(new SymProcessInput(message.getBytes(), null));
         assertEquals(message.getBytes().length, encryptWrapper.processedBytes());
     }
 
@@ -83,12 +83,12 @@ class AESAlgorithmWrapperTest {
     void testEqualsAndHashCode()
             throws InvalidKeySpecException, InvalidAlgorithmParameterException, NoSuchPaddingException,
                     NoSuchAlgorithmException, InvalidKeyException {
-        AESAlgorithmWrapper wrapper1 = cryptoService.randomAESKey();
-        AESAlgorithmWrapper wrapper2 =
-                new AESAlgorithmWrapper(wrapper1.key(), wrapper1.cipherName(), wrapper1.opMode());
-        AESAlgorithmWrapper wrapper3 = cryptoService.randomAESKey();
-        AESAlgorithmWrapper wrapper4 =
-                new AESAlgorithmWrapper(wrapper1.key(), "AES/CBC/PKCS5Padding", wrapper1.opMode());
+        SymAlgorithmWrapper wrapper1 = cryptoService.randomAESKey();
+        SymAlgorithmWrapper wrapper2 =
+                new SymAlgorithmWrapper(wrapper1.key(), wrapper1.cipherName(), wrapper1.opMode());
+        SymAlgorithmWrapper wrapper3 = cryptoService.randomAESKey();
+        SymAlgorithmWrapper wrapper4 =
+                new SymAlgorithmWrapper(wrapper1.key(), "AES/CBC/PKCS5Padding", wrapper1.opMode());
 
         assertEquals(wrapper1, wrapper2);
         assertEquals(wrapper1.hashCode(), wrapper2.hashCode());
@@ -102,7 +102,7 @@ class AESAlgorithmWrapperTest {
     void testGetters()
             throws InvalidKeySpecException, InvalidAlgorithmParameterException, NoSuchPaddingException,
                     NoSuchAlgorithmException, InvalidKeyException {
-        AESAlgorithmWrapper wrapper = cryptoService.randomAESKey();
+        SymAlgorithmWrapper wrapper = cryptoService.randomAESKey();
         assertNotNull(wrapper.key());
         assertEquals("AES/GCM/NoPadding", wrapper.cipherName());
         assertEquals(Cipher.ENCRYPT_MODE, wrapper.opMode());
@@ -110,17 +110,17 @@ class AESAlgorithmWrapperTest {
 
     @Test
     void testLazyCipherLockInit() throws Exception {
-        AESAlgorithmWrapper wrapper = cryptoService.randomAESKey();
+        SymAlgorithmWrapper wrapper = cryptoService.randomAESKey();
         // Cipher should not be created until first use
         // But it's private, so we can't easily check it without reflection or by calling a method that uses it.
         // Let's call a method that uses it and check it doesn't fail.
         String message = "test";
-        AESProcessResult result = wrapper.process(new AESProcessInput(message.getBytes(), null));
+        SymProcessResult result = wrapper.process(new SymProcessInput(message.getBytes(), null));
         assertNotNull(result);
 
         // Calling it again should use the same cipher object (internal state might change but it's the same
         // ConcurrentCipher)
-        AESProcessResult result2 = wrapper.process(new AESProcessInput(message.getBytes(), null));
+        SymProcessResult result2 = wrapper.process(new SymProcessInput(message.getBytes(), null));
         assertNotNull(result2);
     }
 
@@ -128,13 +128,13 @@ class AESAlgorithmWrapperTest {
     void testNonDeterministicEncryption()
             throws InvalidKeySpecException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
                     InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
-        AESAlgorithmWrapper encryptWrapper = new AESAlgorithmWrapper(
+        SymAlgorithmWrapper encryptWrapper = new SymAlgorithmWrapper(
                 cryptoService.randomAESKey().key(), cryptoService.symmetricCipher(), Cipher.ENCRYPT_MODE);
-        Encryptor<AESProcessInput, AESProcessResult> encryptor = new Encryptor<>(encryptWrapper);
+        Encryptor<SymProcessInput, SymProcessResult> encryptor = new Encryptor<>(encryptWrapper);
 
         String message = "Hello, World!";
-        AESProcessResult result1 = encryptor.process(new AESProcessInput(message.getBytes(), null));
-        AESProcessResult result2 = encryptor.process(new AESProcessInput(message.getBytes(), null));
+        SymProcessResult result1 = encryptor.process(new SymProcessInput(message.getBytes(), null));
+        SymProcessResult result2 = encryptor.process(new SymProcessInput(message.getBytes(), null));
 
         assertNotEquals(
                 Arrays.toString(result1.bytes()),
@@ -143,12 +143,12 @@ class AESAlgorithmWrapperTest {
         assertNotNull(result1.iv());
         assertNotNull(result2.iv());
 
-        AESAlgorithmWrapper decryptWrapper =
-                new AESAlgorithmWrapper(encryptWrapper.key(), cryptoService.symmetricCipher(), Cipher.DECRYPT_MODE);
-        Decryptor<AESProcessInput, AESProcessResult> decryptor = new Decryptor<>(decryptWrapper);
+        SymAlgorithmWrapper decryptWrapper =
+                new SymAlgorithmWrapper(encryptWrapper.key(), cryptoService.symmetricCipher(), Cipher.DECRYPT_MODE);
+        Decryptor<SymProcessInput, SymProcessResult> decryptor = new Decryptor<>(decryptWrapper);
 
-        AESProcessResult decrypted1 = decryptor.process(new AESProcessInput(result1.bytes(), result1.iv()));
-        AESProcessResult decrypted2 = decryptor.process(new AESProcessInput(result2.bytes(), result2.iv()));
+        SymProcessResult decrypted1 = decryptor.process(new SymProcessInput(result1.bytes(), result1.iv()));
+        SymProcessResult decrypted2 = decryptor.process(new SymProcessInput(result2.bytes(), result2.iv()));
 
         assertEquals(message, new String(decrypted1.bytes()), "Decryption of first message failed");
         assertEquals(message, new String(decrypted2.bytes()), "Decryption of second message failed");

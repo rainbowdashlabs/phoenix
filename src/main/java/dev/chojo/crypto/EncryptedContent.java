@@ -5,7 +5,7 @@
  */
 package dev.chojo.crypto;
 
-import dev.chojo.crypto.serialization.EncryptedAESAlgorithmWrapper;
+import dev.chojo.crypto.serialization.EncryptedSymAlgorithmWrapper;
 import org.jspecify.annotations.Nullable;
 
 /// A record representing encrypted content along with its key and optional IV.
@@ -15,5 +15,5 @@ import org.jspecify.annotations.Nullable;
 /// @param iv      the optional initialization vector
 public record EncryptedContent(
         String content,
-        EncryptedAESAlgorithmWrapper key,
+        EncryptedSymAlgorithmWrapper key,
         @Nullable String iv) {}

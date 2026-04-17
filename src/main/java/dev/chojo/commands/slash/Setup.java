@@ -10,8 +10,8 @@ import dev.chojo.configuration.Configuration;
 import dev.chojo.configuration.elements.sub.Crypto;
 import dev.chojo.crypto.CryptoService;
 import dev.chojo.crypto.exceptions.CryptoException;
-import dev.chojo.crypto.processing.wrapper.RSAAlgorithmWrapper;
-import dev.chojo.crypto.serialization.PlainRSAAlgorithmWrapper;
+import dev.chojo.crypto.processing.wrapper.AsymAlgorithmWrapper;
+import dev.chojo.crypto.serialization.PlainAsymAlgorithmWrapper;
 import dev.chojo.data.dao.GuildSettings;
 import dev.chojo.data.repository.GuildSettingsRepository;
 import io.github.kaktushose.jdac.annotations.interactions.Command;
@@ -58,16 +58,16 @@ public class Setup {
         event.deferReply();
         Crypto crypto = configuration.main().crypto();
         KeyPair keyPair = cryptoService.generateRSAKeyPair();
-        RSAAlgorithmWrapper rsaAlgorithmWrapper =
-                new RSAAlgorithmWrapper(keyPair.getPrivate(), crypto.asymmetricCipher());
-        RSAAlgorithmWrapper rsaAlgorithmWrapperPublic =
-                new RSAAlgorithmWrapper(keyPair.getPublic(), crypto.asymmetricCipher());
-        guildSettings.crypto().setPublicKey(PlainRSAAlgorithmWrapper.wrap(rsaAlgorithmWrapperPublic));
+        AsymAlgorithmWrapper asymAlgorithmWrapper =
+                new AsymAlgorithmWrapper(keyPair.getPrivate(), crypto.asymmetricCipher());
+        AsymAlgorithmWrapper asymAlgorithmWrapperPublic =
+                new AsymAlgorithmWrapper(keyPair.getPublic(), crypto.asymmetricCipher());
+        guildSettings.crypto().setPublicKey(PlainAsymAlgorithmWrapper.wrap(asymAlgorithmWrapperPublic));
         event.reply("commands-slash-setup-encryption-new-message-success");
         MessageCreateData build = new MessageCreateBuilder()
                 .setContent("commands-slash-setup-encryption-new-message-success")
                 .addFiles(FileUpload.fromData(
-                        PlainRSAAlgorithmWrapper.wrap(rsaAlgorithmWrapper).key().getBytes(StandardCharsets.UTF_8),
+                        PlainAsymAlgorithmWrapper.wrap(asymAlgorithmWrapper).key().getBytes(StandardCharsets.UTF_8),
                         "key.pem"))
                 .build();
         event.reply(build);
@@ -104,9 +104,9 @@ public class Setup {
             return;
         }
 
-        PlainRSAAlgorithmWrapper plainWrapper = new PlainRSAAlgorithmWrapper(
+        PlainAsymAlgorithmWrapper plainWrapper = new PlainAsymAlgorithmWrapper(
                 pubkey.getAsString(), configuration.main().crypto().asymmetricCipher());
-        RSAAlgorithmWrapper unwrap;
+        AsymAlgorithmWrapper unwrap;
         try {
             unwrap = plainWrapper.unwrap();
         } catch (CryptoException e) {

@@ -8,7 +8,7 @@ package dev.chojo.data.repository;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import dev.chojo.crypto.EncryptedContent;
-import dev.chojo.crypto.serialization.EncryptedAESAlgorithmWrapper;
+import dev.chojo.crypto.serialization.EncryptedSymAlgorithmWrapper;
 import dev.chojo.data.snapshot.EncryptedMessage;
 
 import java.util.concurrent.ExecutionException;
@@ -18,7 +18,7 @@ import static de.chojo.sadu.queries.api.query.Query.query;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class MessageRepository {
-    private final Cache<EncryptedAESAlgorithmWrapper, Long> storedKeys =
+    private final Cache<EncryptedSymAlgorithmWrapper, Long> storedKeys =
             CacheBuilder.newBuilder().expireAfterWrite(10, MINUTES).build();
 
     public void storeMessage(EncryptedMessage encryptedMessage) {
@@ -59,7 +59,7 @@ public class MessageRepository {
                 .insert();
     }
 
-    public long storeAndGetKey(EncryptedAESAlgorithmWrapper key, long guildId) {
+    public long storeAndGetKey(EncryptedSymAlgorithmWrapper key, long guildId) {
         try {
             return storedKeys.get(key, () -> storeKey(key, guildId));
         } catch (ExecutionException e) {
@@ -68,7 +68,7 @@ public class MessageRepository {
         }
     }
 
-    private long storeKey(EncryptedAESAlgorithmWrapper key, long guildId) {
+    private long storeKey(EncryptedSymAlgorithmWrapper key, long guildId) {
         return query("""
                         WITH new_key_id AS (
                             INSERT INTO guild_message_key (guild_id, encrypted_key, cipher)

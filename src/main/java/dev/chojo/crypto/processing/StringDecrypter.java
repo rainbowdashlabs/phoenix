@@ -6,11 +6,11 @@
 package dev.chojo.crypto.processing;
 
 import dev.chojo.crypto.EncryptedContent;
-import dev.chojo.crypto.processing.model.AESProcessInput;
-import dev.chojo.crypto.processing.model.AESProcessResult;
+import dev.chojo.crypto.processing.model.SymProcessInput;
+import dev.chojo.crypto.processing.model.SymProcessResult;
 import dev.chojo.crypto.processing.model.BytesProcessInput;
 import dev.chojo.crypto.processing.model.BytesProcessResult;
-import dev.chojo.crypto.serialization.EncryptedAESAlgorithmWrapper;
+import dev.chojo.crypto.serialization.EncryptedSymAlgorithmWrapper;
 
 import java.util.Base64;
 import java.util.HashMap;
@@ -25,7 +25,7 @@ public class StringDecrypter {
     /// In this case, it has to be the private key and not the public key.
     private final Decryptor<BytesProcessInput, BytesProcessResult> rsa;
 
-    private final Map<EncryptedAESAlgorithmWrapper, Decryptor<AESProcessInput, AESProcessResult>> aesDecoder =
+    private final Map<EncryptedSymAlgorithmWrapper, Decryptor<SymProcessInput, SymProcessResult>> aesDecoder =
             new HashMap<>();
 
     /// Creates a new string decrypter with the given RSA decryptor.
@@ -44,10 +44,10 @@ public class StringDecrypter {
         byte[] data = Base64.getDecoder().decode(content.content());
         byte[] iv = content.iv() != null ? Base64.getDecoder().decode(content.iv()) : null;
 
-        return new String(decryptor.process(new AESProcessInput(data, iv)).bytes());
+        return new String(decryptor.process(new SymProcessInput(data, iv)).bytes());
     }
 
-    private Decryptor<AESProcessInput, AESProcessResult> decodeKey(EncryptedAESAlgorithmWrapper key) {
+    private Decryptor<SymProcessInput, SymProcessResult> decodeKey(EncryptedSymAlgorithmWrapper key) {
         return new Decryptor<>(key.decrypt(rsa));
     }
 }

@@ -5,8 +5,8 @@
  */
 package dev.chojo.data.dao.guildsettings;
 
-import dev.chojo.crypto.processing.wrapper.RSAAlgorithmWrapper;
-import dev.chojo.crypto.serialization.PlainRSAAlgorithmWrapper;
+import dev.chojo.crypto.processing.wrapper.AsymAlgorithmWrapper;
+import dev.chojo.crypto.serialization.PlainAsymAlgorithmWrapper;
 import dev.chojo.data.base.GuildHolder;
 import dev.chojo.data.dao.GuildSettings;
 import org.jspecify.annotations.Nullable;
@@ -20,7 +20,7 @@ public class Crypto implements GuildHolder {
     private final GuildSettings guildSettings;
 
     @Nullable
-    private RSAAlgorithmWrapper wrapper;
+    private AsymAlgorithmWrapper wrapper;
 
     private boolean initialized = false;
 
@@ -28,7 +28,7 @@ public class Crypto implements GuildHolder {
         this.guildSettings = guildSettings;
     }
 
-    public synchronized boolean setPublicKey(PlainRSAAlgorithmWrapper wrapper) {
+    public synchronized boolean setPublicKey(PlainAsymAlgorithmWrapper wrapper) {
         Objects.requireNonNull(wrapper, "Wrapper cannot be null");
         if (this.wrapper != null) return false;
         return query("""
@@ -56,7 +56,7 @@ public class Crypto implements GuildHolder {
         });
     }
 
-    public @Nullable RSAAlgorithmWrapper publicKey() {
+    public @Nullable AsymAlgorithmWrapper publicKey() {
         if (wrapper == null && !initialized) {
             query("""
                     SELECT
@@ -67,9 +67,9 @@ public class Crypto implements GuildHolder {
                         guild_crypto
                     WHERE guild_id = ? AND public_key IS NOT NULL AND cipher IS NOT NULL""")
                     .single(call().bind(guildId()))
-                    .map(row -> new PlainRSAAlgorithmWrapper(row.getString("public_key"), row.getString("cipher")))
+                    .map(row -> new PlainAsymAlgorithmWrapper(row.getString("public_key"), row.getString("cipher")))
                     .first()
-                    .map(PlainRSAAlgorithmWrapper::unwrap)
+                    .map(PlainAsymAlgorithmWrapper::unwrap)
                     .ifPresent(wrapper -> this.wrapper = wrapper);
             initialized = true;
         }

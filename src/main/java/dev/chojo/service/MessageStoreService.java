@@ -16,7 +16,7 @@ import dev.chojo.crypto.processing.Encryptor;
 import dev.chojo.crypto.processing.StringEncryptor;
 import dev.chojo.crypto.processing.model.BytesProcessInput;
 import dev.chojo.crypto.processing.model.BytesProcessResult;
-import dev.chojo.crypto.processing.wrapper.RSAAlgorithmWrapper;
+import dev.chojo.crypto.processing.wrapper.AsymAlgorithmWrapper;
 import dev.chojo.data.dao.GuildSettings;
 import dev.chojo.data.repository.GuildSettingsRepository;
 import dev.chojo.data.repository.MessageRepository;
@@ -108,8 +108,8 @@ public class MessageStoreService {
 
     private StringEncryptor createEncryptor(long guildId) {
         GuildSettings guildSettings = guildSettingsRepository.get(guildId);
-        RSAAlgorithmWrapper rsaAlgorithmWrapper = guildSettings.crypto().publicKey();
-        Encryptor<BytesProcessInput, BytesProcessResult> rsaEncryptor = new Encryptor<>(rsaAlgorithmWrapper);
+        AsymAlgorithmWrapper asymAlgorithmWrapper = guildSettings.crypto().publicKey();
+        Encryptor<BytesProcessInput, BytesProcessResult> rsaEncryptor = new Encryptor<>(asymAlgorithmWrapper);
         KeyRotationPolicy keyRotationPolicy = new KeyRotationPolicy(
                 configuration.main().crypto().rotationInterval(), () -> new Encryptor<>(cryptoService.randomAESKey()));
         return new StringEncryptor(rsaEncryptor, keyRotationPolicy);

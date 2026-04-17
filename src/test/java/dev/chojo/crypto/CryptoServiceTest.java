@@ -7,7 +7,7 @@ package dev.chojo.crypto;
 
 import dev.chojo.configuration.Configuration;
 import dev.chojo.configuration.elements.Root;
-import dev.chojo.crypto.processing.wrapper.AESAlgorithmWrapper;
+import dev.chojo.crypto.processing.wrapper.SymAlgorithmWrapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +40,7 @@ class CryptoServiceTest {
 
     @Test
     void randomAESKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
-        AESAlgorithmWrapper wrapper = cryptoService.randomAESKey();
+        SymAlgorithmWrapper wrapper = cryptoService.randomAESKey();
         assertNotNull(wrapper);
         assertNotNull(wrapper.key());
     }

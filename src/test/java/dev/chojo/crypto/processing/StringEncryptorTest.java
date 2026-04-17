@@ -12,7 +12,7 @@ import dev.chojo.crypto.EncryptedContent;
 import dev.chojo.crypto.policy.KeyRotationPolicy;
 import dev.chojo.crypto.processing.model.BytesProcessInput;
 import dev.chojo.crypto.processing.model.BytesProcessResult;
-import dev.chojo.crypto.processing.wrapper.RSAAlgorithmWrapper;
+import dev.chojo.crypto.processing.wrapper.AsymAlgorithmWrapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -38,9 +38,9 @@ class StringEncryptorTest {
     @Test
     void testEncrypt() throws InvalidKeySpecException {
         KeyPair keyPair = cryptoService.generateRSAKeyPair();
-        RSAAlgorithmWrapper rsaAlgorithmWrapper =
-                new RSAAlgorithmWrapper(keyPair.getPublic(), "RSA/ECB/PKCS1Padding", javax.crypto.Cipher.ENCRYPT_MODE);
-        Encryptor<BytesProcessInput, BytesProcessResult> rsa = new Encryptor<>(rsaAlgorithmWrapper);
+        AsymAlgorithmWrapper asymAlgorithmWrapper =
+                new AsymAlgorithmWrapper(keyPair.getPublic(), "RSA/ECB/PKCS1Padding", javax.crypto.Cipher.ENCRYPT_MODE);
+        Encryptor<BytesProcessInput, BytesProcessResult> rsa = new Encryptor<>(asymAlgorithmWrapper);
 
         String generatedString = "testContent";
 
@@ -55,15 +55,15 @@ class StringEncryptorTest {
     @Test
     void testEncryptWithoutIV() throws Exception {
         KeyPair keyPair = cryptoService.generateRSAKeyPair();
-        RSAAlgorithmWrapper rsaAlgorithmWrapper =
-                new RSAAlgorithmWrapper(keyPair.getPublic(), "RSA/ECB/PKCS1Padding", javax.crypto.Cipher.ENCRYPT_MODE);
-        Encryptor<BytesProcessInput, BytesProcessResult> rsa = new Encryptor<>(rsaAlgorithmWrapper);
+        AsymAlgorithmWrapper asymAlgorithmWrapper =
+                new AsymAlgorithmWrapper(keyPair.getPublic(), "RSA/ECB/PKCS1Padding", javax.crypto.Cipher.ENCRYPT_MODE);
+        Encryptor<BytesProcessInput, BytesProcessResult> rsa = new Encryptor<>(asymAlgorithmWrapper);
 
         // Mocking rotation supplier to return a non-AES wrapper (which wouldn't have an IV)
         // Although the current implementation casts to AESAlgorithmWrapper, so this might fail.
         // Let's test what happens if it's NOT an AESProcessResult.
 
-        Encryptor<BytesProcessInput, BytesProcessResult> rsaEnc = new Encryptor<>(rsaAlgorithmWrapper);
+        Encryptor<BytesProcessInput, BytesProcessResult> rsaEnc = new Encryptor<>(asymAlgorithmWrapper);
         KeyRotationPolicy policy = new KeyRotationPolicy(1000, () -> (Encryptor) rsaEnc);
 
         StringEncryptor encoder = new StringEncryptor(rsa, policy);

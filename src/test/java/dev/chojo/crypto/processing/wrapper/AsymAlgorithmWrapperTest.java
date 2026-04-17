@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class RSAAlgorithmWrapperTest {
+class AsymAlgorithmWrapperTest {
     static CryptoService cryptoService;
 
     @BeforeAll
@@ -35,10 +35,10 @@ class RSAAlgorithmWrapperTest {
         KeyPair keyPair = cryptoService.generateRSAKeyPair();
         String cipher = "RSA/ECB/PKCS1Padding";
 
-        RSAAlgorithmWrapper encryptWrapper =
-                new RSAAlgorithmWrapper(keyPair.getPublic(), cipher, javax.crypto.Cipher.ENCRYPT_MODE);
-        RSAAlgorithmWrapper decryptWrapper =
-                new RSAAlgorithmWrapper(keyPair.getPrivate(), cipher, javax.crypto.Cipher.DECRYPT_MODE);
+        AsymAlgorithmWrapper encryptWrapper =
+                new AsymAlgorithmWrapper(keyPair.getPublic(), cipher, javax.crypto.Cipher.ENCRYPT_MODE);
+        AsymAlgorithmWrapper decryptWrapper =
+                new AsymAlgorithmWrapper(keyPair.getPrivate(), cipher, javax.crypto.Cipher.DECRYPT_MODE);
 
         byte[] data = "Hello RSA".getBytes();
         BytesProcessResult encrypted = encryptWrapper.process(new BytesProcessInput(data));
@@ -54,16 +54,16 @@ class RSAAlgorithmWrapperTest {
         String cipher1 = "RSA/ECB/PKCS1Padding";
         String cipher2 = "RSA/ECB/OAEPWithSHA-1AndMGF1Padding";
 
-        RSAAlgorithmWrapper wrapper1 =
-                new RSAAlgorithmWrapper(keyPair1.getPublic(), cipher1, javax.crypto.Cipher.ENCRYPT_MODE);
-        RSAAlgorithmWrapper wrapper2 =
-                new RSAAlgorithmWrapper(keyPair1.getPublic(), cipher1, javax.crypto.Cipher.ENCRYPT_MODE);
-        RSAAlgorithmWrapper wrapper3 =
-                new RSAAlgorithmWrapper(keyPair2.getPublic(), cipher1, javax.crypto.Cipher.ENCRYPT_MODE);
-        RSAAlgorithmWrapper wrapper4 =
-                new RSAAlgorithmWrapper(keyPair1.getPublic(), cipher2, javax.crypto.Cipher.ENCRYPT_MODE);
-        RSAAlgorithmWrapper wrapper5 =
-                new RSAAlgorithmWrapper(keyPair1.getPublic(), cipher1, javax.crypto.Cipher.DECRYPT_MODE);
+        AsymAlgorithmWrapper wrapper1 =
+                new AsymAlgorithmWrapper(keyPair1.getPublic(), cipher1, javax.crypto.Cipher.ENCRYPT_MODE);
+        AsymAlgorithmWrapper wrapper2 =
+                new AsymAlgorithmWrapper(keyPair1.getPublic(), cipher1, javax.crypto.Cipher.ENCRYPT_MODE);
+        AsymAlgorithmWrapper wrapper3 =
+                new AsymAlgorithmWrapper(keyPair2.getPublic(), cipher1, javax.crypto.Cipher.ENCRYPT_MODE);
+        AsymAlgorithmWrapper wrapper4 =
+                new AsymAlgorithmWrapper(keyPair1.getPublic(), cipher2, javax.crypto.Cipher.ENCRYPT_MODE);
+        AsymAlgorithmWrapper wrapper5 =
+                new AsymAlgorithmWrapper(keyPair1.getPublic(), cipher1, javax.crypto.Cipher.DECRYPT_MODE);
 
         assertEquals(wrapper1, wrapper2);
         assertEquals(wrapper1.hashCode(), wrapper2.hashCode());
@@ -78,8 +78,8 @@ class RSAAlgorithmWrapperTest {
     @Test
     void testProcess() throws Exception {
         KeyPair keyPair = cryptoService.generateRSAKeyPair();
-        RSAAlgorithmWrapper wrapper =
-                new RSAAlgorithmWrapper(keyPair.getPublic(), "RSA/ECB/PKCS1Padding", javax.crypto.Cipher.ENCRYPT_MODE);
+        AsymAlgorithmWrapper wrapper =
+                new AsymAlgorithmWrapper(keyPair.getPublic(), "RSA/ECB/PKCS1Padding", javax.crypto.Cipher.ENCRYPT_MODE);
         byte[] data = "test".getBytes();
         BytesProcessResult result = wrapper.process(new BytesProcessInput(data));
         byte[] encrypted = result.bytes();
@@ -90,8 +90,8 @@ class RSAAlgorithmWrapperTest {
     @Test
     void testGetters() {
         KeyPair keyPair = cryptoService.generateRSAKeyPair();
-        RSAAlgorithmWrapper wrapper =
-                new RSAAlgorithmWrapper(keyPair.getPublic(), "RSA/ECB/PKCS1Padding", javax.crypto.Cipher.ENCRYPT_MODE);
+        AsymAlgorithmWrapper wrapper =
+                new AsymAlgorithmWrapper(keyPair.getPublic(), "RSA/ECB/PKCS1Padding", javax.crypto.Cipher.ENCRYPT_MODE);
         assertEquals(keyPair.getPublic(), wrapper.key());
         assertEquals("RSA/ECB/PKCS1Padding", wrapper.cipherName());
         assertEquals(javax.crypto.Cipher.ENCRYPT_MODE, wrapper.opMode());
