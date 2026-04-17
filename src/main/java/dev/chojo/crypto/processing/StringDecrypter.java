@@ -6,10 +6,10 @@
 package dev.chojo.crypto.processing;
 
 import dev.chojo.crypto.EncryptedContent;
-import dev.chojo.crypto.processing.model.SymProcessInput;
-import dev.chojo.crypto.processing.model.SymProcessResult;
 import dev.chojo.crypto.processing.model.BytesProcessInput;
 import dev.chojo.crypto.processing.model.BytesProcessResult;
+import dev.chojo.crypto.processing.model.SymProcessInput;
+import dev.chojo.crypto.processing.model.SymProcessResult;
 import dev.chojo.crypto.serialization.EncryptedSymAlgorithmWrapper;
 
 import java.util.Base64;

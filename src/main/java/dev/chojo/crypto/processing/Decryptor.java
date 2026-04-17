@@ -8,8 +8,8 @@ package dev.chojo.crypto.processing;
 import dev.chojo.crypto.processing.model.BytesProcessInput;
 import dev.chojo.crypto.processing.model.ProcessInput;
 import dev.chojo.crypto.processing.model.ProcessResult;
-import dev.chojo.crypto.processing.wrapper.SymAlgorithmWrapper;
 import dev.chojo.crypto.processing.wrapper.AlgorithmWrapper;
+import dev.chojo.crypto.processing.wrapper.SymAlgorithmWrapper;
 
 import javax.crypto.Cipher;
 

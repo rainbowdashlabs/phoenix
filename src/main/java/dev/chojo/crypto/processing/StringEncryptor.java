@@ -7,11 +7,11 @@ package dev.chojo.crypto.processing;
 
 import dev.chojo.crypto.EncryptedContent;
 import dev.chojo.crypto.policy.KeyRotationPolicy;
-import dev.chojo.crypto.processing.model.SymProcessResult;
 import dev.chojo.crypto.processing.model.BytesProcessInput;
 import dev.chojo.crypto.processing.model.BytesProcessResult;
 import dev.chojo.crypto.processing.model.ProcessInput;
 import dev.chojo.crypto.processing.model.ProcessResult;
+import dev.chojo.crypto.processing.model.SymProcessResult;
 import dev.chojo.crypto.processing.wrapper.SymAlgorithmWrapper;
 import dev.chojo.crypto.serialization.EncryptedSymAlgorithmWrapper;
 import org.jspecify.annotations.Nullable;

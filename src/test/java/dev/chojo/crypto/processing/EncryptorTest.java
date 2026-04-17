@@ -8,12 +8,12 @@ package dev.chojo.crypto.processing;
 import dev.chojo.configuration.Configuration;
 import dev.chojo.configuration.elements.Root;
 import dev.chojo.crypto.CryptoService;
-import dev.chojo.crypto.processing.model.SymProcessInput;
-import dev.chojo.crypto.processing.model.SymProcessResult;
 import dev.chojo.crypto.processing.model.BytesProcessInput;
 import dev.chojo.crypto.processing.model.BytesProcessResult;
-import dev.chojo.crypto.processing.wrapper.SymAlgorithmWrapper;
+import dev.chojo.crypto.processing.model.SymProcessInput;
+import dev.chojo.crypto.processing.model.SymProcessResult;
 import dev.chojo.crypto.processing.wrapper.AsymAlgorithmWrapper;
+import dev.chojo.crypto.processing.wrapper.SymAlgorithmWrapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

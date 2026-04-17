@@ -67,7 +67,9 @@ public class Setup {
         MessageCreateData build = new MessageCreateBuilder()
                 .setContent("commands-slash-setup-encryption-new-message-success")
                 .addFiles(FileUpload.fromData(
-                        PlainAsymAlgorithmWrapper.wrap(asymAlgorithmWrapper).key().getBytes(StandardCharsets.UTF_8),
+                        PlainAsymAlgorithmWrapper.wrap(asymAlgorithmWrapper)
+                                .key()
+                                .getBytes(StandardCharsets.UTF_8),
                         "key.pem"))
                 .build();
         event.reply(build);
