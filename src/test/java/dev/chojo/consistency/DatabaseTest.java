@@ -37,7 +37,7 @@ public class DatabaseTest {
                     .build();
             try (dataSource) {
                 SqlUpdater.builder(dataSource, PostgreSql.get())
-                        .setSchemas("repbot_schema")
+                        .setSchemas("elpis_schema")
                         .execute();
             }
         }

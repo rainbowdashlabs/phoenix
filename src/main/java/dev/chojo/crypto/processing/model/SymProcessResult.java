@@ -7,8 +7,8 @@ package dev.chojo.crypto.processing.model;
 
 import org.jspecify.annotations.Nullable;
 
-/// Represents the input for an AES cryptographic process, including an optional IV.
+/// Represents the result of an AES cryptographic process, including an optional IV.
 ///
-/// @param bytes the bytes to process
+/// @param bytes the processed bytes
 /// @param iv    the optional initialization vector
-public record AESProcessInput(byte[] bytes, byte @Nullable [] iv) implements ProcessInput {}
+public record SymProcessResult(byte[] bytes, byte @Nullable [] iv) implements ProcessResult {}

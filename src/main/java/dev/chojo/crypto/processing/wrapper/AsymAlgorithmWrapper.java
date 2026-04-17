@@ -19,17 +19,17 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.security.auth.DestroyFailedException;
 
-public class RSAAlgorithmWrapper extends AlgorithmWrapper<BytesProcessInput, BytesProcessResult> {
+public class AsymAlgorithmWrapper extends AlgorithmWrapper<BytesProcessInput, BytesProcessResult> {
     /// The AES key.
     private final Key key;
 
     private final int opMode;
 
-    public RSAAlgorithmWrapper(Key key, String cipher) {
+    public AsymAlgorithmWrapper(Key key, String cipher) {
         this(key, cipher, 0);
     }
 
-    public RSAAlgorithmWrapper(Key key, String cipher, int opMode) {
+    public AsymAlgorithmWrapper(Key key, String cipher, int opMode) {
         super(cipher, opMode);
         this.key = key;
         this.opMode = opMode;
@@ -53,7 +53,7 @@ public class RSAAlgorithmWrapper extends AlgorithmWrapper<BytesProcessInput, Byt
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        RSAAlgorithmWrapper that = (RSAAlgorithmWrapper) o;
+        AsymAlgorithmWrapper that = (AsymAlgorithmWrapper) o;
         return java.util.Objects.equals(key, that.key) && java.util.Objects.equals(cipherName, that.cipherName);
     }
 

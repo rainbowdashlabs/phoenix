@@ -5,8 +5,8 @@
  */
 package dev.chojo.crypto.processing.wrapper;
 
-import dev.chojo.crypto.processing.model.AESProcessInput;
-import dev.chojo.crypto.processing.model.AESProcessResult;
+import dev.chojo.crypto.processing.model.SymProcessInput;
+import dev.chojo.crypto.processing.model.SymProcessResult;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -22,18 +22,18 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.security.auth.DestroyFailedException;
 
-public class AESAlgorithmWrapper extends AlgorithmWrapper<AESProcessInput, AESProcessResult> {
+public class SymAlgorithmWrapper extends AlgorithmWrapper<SymProcessInput, SymProcessResult> {
     private static final SecureRandom secureRandom = new SecureRandom();
     /// The AES key.
     private final SecretKey key;
 
     private int processedBytes = 0;
 
-    public AESAlgorithmWrapper(SecretKey key, String cipher) {
+    public SymAlgorithmWrapper(SecretKey key, String cipher) {
         this(key, cipher, 0);
     }
 
-    public AESAlgorithmWrapper(SecretKey key, String cipher, int opMode) {
+    public SymAlgorithmWrapper(SecretKey key, String cipher, int opMode) {
         super(cipher, opMode);
         this.key = key;
     }
@@ -54,7 +54,7 @@ public class AESAlgorithmWrapper extends AlgorithmWrapper<AESProcessInput, AESPr
     }
 
     @Override
-    public AESProcessResult process(AESProcessInput input)
+    public SymProcessResult process(SymProcessInput input)
             throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
                     InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
         try (var lock = cipherLock()) {
@@ -64,13 +64,13 @@ public class AESAlgorithmWrapper extends AlgorithmWrapper<AESProcessInput, AESPr
                 cipher.init(opMode, key, nonce);
                 processedBytes += input.bytes().length;
                 byte[] encrypted = cipher.doFinal(input.bytes());
-                return new AESProcessResult(encrypted, nonce.getIV());
+                return new SymProcessResult(encrypted, nonce.getIV());
             } else {
                 byte[] usedIv = input.iv();
                 Objects.requireNonNull(usedIv, "IV must be provided for decryption");
                 cipher.init(opMode, key, nonce(usedIv));
                 byte[] decrypted = cipher.doFinal(input.bytes());
-                return new AESProcessResult(decrypted, null);
+                return new SymProcessResult(decrypted, null);
             }
         }
     }
@@ -82,7 +82,7 @@ public class AESAlgorithmWrapper extends AlgorithmWrapper<AESProcessInput, AESPr
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        AESAlgorithmWrapper that = (AESAlgorithmWrapper) o;
+        SymAlgorithmWrapper that = (SymAlgorithmWrapper) o;
         return Objects.equals(key, that.key) && Objects.equals(cipherName, that.cipherName);
     }
 

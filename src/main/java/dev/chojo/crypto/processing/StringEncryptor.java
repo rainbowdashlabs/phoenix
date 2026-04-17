@@ -7,13 +7,13 @@ package dev.chojo.crypto.processing;
 
 import dev.chojo.crypto.EncryptedContent;
 import dev.chojo.crypto.policy.KeyRotationPolicy;
-import dev.chojo.crypto.processing.model.AESProcessResult;
 import dev.chojo.crypto.processing.model.BytesProcessInput;
 import dev.chojo.crypto.processing.model.BytesProcessResult;
 import dev.chojo.crypto.processing.model.ProcessInput;
 import dev.chojo.crypto.processing.model.ProcessResult;
-import dev.chojo.crypto.processing.wrapper.AESAlgorithmWrapper;
-import dev.chojo.crypto.serialization.EncryptedAESAlgorithmWrapper;
+import dev.chojo.crypto.processing.model.SymProcessResult;
+import dev.chojo.crypto.processing.wrapper.SymAlgorithmWrapper;
+import dev.chojo.crypto.serialization.EncryptedSymAlgorithmWrapper;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Base64;
@@ -30,7 +30,7 @@ public class StringEncryptor {
     private Encryptor<? extends ProcessInput, ? extends ProcessResult> aes;
     /// The RSA encrypted AES key that was used to encrypt the content.
     @Nullable
-    private EncryptedAESAlgorithmWrapper key;
+    private EncryptedSymAlgorithmWrapper key;
     /// The RSA encoder that is used to encrypt the AES key.
     private final Encryptor<BytesProcessInput, BytesProcessResult> rsa;
     /// The policy that determines when to rotate the AES key.
@@ -50,11 +50,11 @@ public class StringEncryptor {
     ///
     /// @param content the content to encode
     /// @return the encrypted content
-    public EncryptedContent encode(String content) {
+    public EncryptedContent encrypt(String content) {
         ProcessResult result = aes().process(content.getBytes());
         String encrypted = Base64.getEncoder().encodeToString(result.bytes());
         String iv = null;
-        if (result instanceof AESProcessResult aesResult && aesResult.iv() != null) {
+        if (result instanceof SymProcessResult aesResult && aesResult.iv() != null) {
             iv = Base64.getEncoder().encodeToString(aesResult.iv());
         }
         return new EncryptedContent(encrypted, key, iv);
@@ -68,7 +68,7 @@ public class StringEncryptor {
                 // Ignore. If it fails, we can't do anything about it.
             }
             aes = keyRotationPolicy.rotationSupplier().get();
-            key = EncryptedAESAlgorithmWrapper.encrypt((AESAlgorithmWrapper) aes.wrapper, rsa);
+            key = EncryptedSymAlgorithmWrapper.encrypt((SymAlgorithmWrapper) aes.wrapper, rsa);
         }
         return aes;
     }

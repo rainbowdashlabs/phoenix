@@ -8,12 +8,12 @@ package dev.chojo.crypto.processing;
 import dev.chojo.configuration.Configuration;
 import dev.chojo.configuration.elements.Root;
 import dev.chojo.crypto.CryptoService;
-import dev.chojo.crypto.processing.model.AESProcessInput;
-import dev.chojo.crypto.processing.model.AESProcessResult;
 import dev.chojo.crypto.processing.model.BytesProcessInput;
 import dev.chojo.crypto.processing.model.BytesProcessResult;
-import dev.chojo.crypto.processing.wrapper.AESAlgorithmWrapper;
-import dev.chojo.crypto.processing.wrapper.RSAAlgorithmWrapper;
+import dev.chojo.crypto.processing.model.SymProcessInput;
+import dev.chojo.crypto.processing.model.SymProcessResult;
+import dev.chojo.crypto.processing.wrapper.AsymAlgorithmWrapper;
+import dev.chojo.crypto.processing.wrapper.SymAlgorithmWrapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -41,14 +41,14 @@ class EncryptorTest {
     @Test
     public void testEncode() throws InvalidKeySpecException {
         var aes = cryptoService.randomAESKey();
-        Encryptor<AESProcessInput, AESProcessResult> encryptor = new Encryptor<>(aes);
+        Encryptor<SymProcessInput, SymProcessResult> encryptor = new Encryptor<>(aes);
         assertNotNull(encryptor.process("Hello".getBytes()));
     }
 
     @Test
     public void testProcessToString() throws InvalidKeySpecException {
         var aes = cryptoService.randomAESKey();
-        Encryptor<AESProcessInput, AESProcessResult> encryptor = new Encryptor<>(aes);
+        Encryptor<SymProcessInput, SymProcessResult> encryptor = new Encryptor<>(aes);
         String encrypted = encryptor.processToString("Hello");
         assertNotNull(encrypted);
         assertFalse(encrypted.isEmpty());
@@ -61,7 +61,7 @@ class EncryptorTest {
     @Test
     public void testWrapper() throws InvalidKeySpecException {
         var aes = cryptoService.randomAESKey();
-        Encryptor<AESProcessInput, AESProcessResult> encryptor = new Encryptor<>(aes);
+        Encryptor<SymProcessInput, SymProcessResult> encryptor = new Encryptor<>(aes);
         assertEquals(aes, encryptor.wrapper());
     }
 
@@ -76,10 +76,10 @@ class EncryptorTest {
 
     @Test
     void testConstructorThrowsOnWrongMode() throws InvalidKeySpecException {
-        AESAlgorithmWrapper aes = cryptoService.randomAESKey();
+        SymAlgorithmWrapper aes = cryptoService.randomAESKey();
         // randomAESKey returns wrapper in ENCRYPT_MODE usually.
         // Let's create one with DECRYPT_MODE explicitly.
-        AESAlgorithmWrapper aesDecrypt = new AESAlgorithmWrapper(aes.key(), aes.cipherName(), Cipher.DECRYPT_MODE);
+        SymAlgorithmWrapper aesDecrypt = new SymAlgorithmWrapper(aes.key(), aes.cipherName(), Cipher.DECRYPT_MODE);
         assertThrows(IllegalArgumentException.class, () -> new Encryptor<>(aesDecrypt));
     }
 
@@ -87,7 +87,7 @@ class EncryptorTest {
     void testProcessRSA() throws Exception {
         KeyPair keyPair = cryptoService.generateRSAKeyPair();
         String rsaCipher = "RSA/ECB/PKCS1Padding";
-        RSAAlgorithmWrapper rsaWrapper = new RSAAlgorithmWrapper(keyPair.getPublic(), rsaCipher, Cipher.ENCRYPT_MODE);
+        AsymAlgorithmWrapper rsaWrapper = new AsymAlgorithmWrapper(keyPair.getPublic(), rsaCipher, Cipher.ENCRYPT_MODE);
         Encryptor<BytesProcessInput, BytesProcessResult> encryptor = new Encryptor<>(rsaWrapper);
         byte[] result = encryptor.process("test".getBytes()).bytes();
         assertNotNull(result);

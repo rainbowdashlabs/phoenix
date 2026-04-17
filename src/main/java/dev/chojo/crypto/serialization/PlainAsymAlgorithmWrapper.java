@@ -6,7 +6,7 @@
 package dev.chojo.crypto.serialization;
 
 import dev.chojo.crypto.exceptions.CryptoException;
-import dev.chojo.crypto.processing.wrapper.RSAAlgorithmWrapper;
+import dev.chojo.crypto.processing.wrapper.AsymAlgorithmWrapper;
 
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -23,33 +23,41 @@ import javax.crypto.Cipher;
 ///
 /// @param key    the PEM encoded RSA key
 /// @param cipher the RSA cipher name
-public record PlainRSAAlgorithmWrapper(String key, String cipher) {
-    /// Wraps an [RSAAlgorithmWrapper] into a [PlainRSAAlgorithmWrapper].
+public record PlainAsymAlgorithmWrapper(String key, String cipher) {
+    /// Wraps an [AsymAlgorithmWrapper] into a [PlainAsymAlgorithmWrapper].
     ///
     /// @param wrapper the RSA algorithm wrapper to wrap
     /// @return the wrapped RSA algorithm wrapper
     /// @throws CryptoException if the key type is unsupported
-    public static PlainRSAAlgorithmWrapper wrap(RSAAlgorithmWrapper wrapper) {
+    public static PlainAsymAlgorithmWrapper wrap(AsymAlgorithmWrapper wrapper) {
         String encoded = Base64.getEncoder().encodeToString(wrapper.key().getEncoded());
+        StringBuilder wrapped = new StringBuilder();
+        for (int i = 0; i < encoded.length(); i++) {
+            if (i > 0 && i % 60 == 0) {
+                wrapped.append("\n");
+            }
+            wrapped.append(encoded.charAt(i));
+        }
+
         String key;
         if (wrapper.key() instanceof PublicKey) {
-            key = "-----BEGIN PUBLIC KEY-----\n" + encoded + "\n-----END PUBLIC KEY-----";
+            key = "-----BEGIN PUBLIC KEY-----\n" + wrapped + "\n-----END PUBLIC KEY-----";
         } else if (wrapper.key() instanceof PrivateKey) {
-            key = "-----BEGIN PRIVATE KEY-----\n" + encoded + "\n-----END PRIVATE KEY-----";
+            key = "-----BEGIN PRIVATE KEY-----\n" + wrapped + "\n-----END PRIVATE KEY-----";
         } else {
             throw new CryptoException(
                     "Unsupported key type: " + wrapper.key().getClass().getName(), null);
         }
-        return new PlainRSAAlgorithmWrapper(key, wrapper.cipherName());
+        return new PlainAsymAlgorithmWrapper(key, wrapper.cipherName());
     }
 
-    /// Unwraps the [PlainRSAAlgorithmWrapper] back into an [RSAAlgorithmWrapper].
+    /// Unwraps the [PlainAsymAlgorithmWrapper] back into an [AsymAlgorithmWrapper].
     ///
     /// @return the unwrapped RSA algorithm wrapper
     /// @throws CryptoException if the RSA key format is invalid or decryption fails
-    public RSAAlgorithmWrapper unwrap() {
+    public AsymAlgorithmWrapper unwrap() {
         try {
-            KeyFactory rsaFactory = KeyFactory.getInstance("RSA");
+            KeyFactory rsaFactory = KeyFactory.getInstance(algorithm());
             if (this.key.contains("-----BEGIN PUBLIC KEY-----")) {
                 String keyStr = this.key
                         .replace("\n", "")
@@ -58,7 +66,7 @@ public record PlainRSAAlgorithmWrapper(String key, String cipher) {
                         .trim();
                 byte[] decoded = decode(keyStr);
                 PublicKey publicKey = rsaFactory.generatePublic(new X509EncodedKeySpec(decoded));
-                return new RSAAlgorithmWrapper(publicKey, this.cipher, Cipher.ENCRYPT_MODE);
+                return new AsymAlgorithmWrapper(publicKey, this.cipher, Cipher.ENCRYPT_MODE);
             } else if (this.key.contains("-----BEGIN PRIVATE KEY-----")) {
                 String keyStr = this.key
                         .replace("\n", "")
@@ -67,13 +75,17 @@ public record PlainRSAAlgorithmWrapper(String key, String cipher) {
                         .trim();
                 byte[] decoded = decode(keyStr);
                 PrivateKey privateKey = rsaFactory.generatePrivate(new PKCS8EncodedKeySpec(decoded));
-                return new RSAAlgorithmWrapper(privateKey, this.cipher, Cipher.DECRYPT_MODE);
+                return new AsymAlgorithmWrapper(privateKey, this.cipher, Cipher.DECRYPT_MODE);
             } else {
                 throw new CryptoException("Invalid RSA key format", null);
             }
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new CryptoException("Could not decrypt RSA wrapper", e);
         }
+    }
+
+    public String algorithm() {
+        return cipher.split("/")[0];
     }
 
     private byte[] decode(String keyStr) {

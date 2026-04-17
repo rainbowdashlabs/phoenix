@@ -196,8 +196,8 @@ public record MessageContentSnapshot(
     }
 
     public MessageCreateData create(MessageRestorationContext context) {
-        MessageCreateBuilder builder = new MessageCreateBuilder();
-        builder.setContent(rawContent);
+        MessageCreateBuilder builder =
+                new MessageCreateBuilder().setContent(rawContent).setAllowedMentions(Collections.emptyList());
         if (components != null) {
             List<DataObject> components = this.components.stream()
                     .map(e -> Base64.getDecoder().decode(e))

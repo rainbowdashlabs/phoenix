@@ -9,7 +9,7 @@ import dev.chojo.configuration.Configuration;
 import dev.chojo.configuration.elements.Root;
 import dev.chojo.crypto.CryptoService;
 import dev.chojo.crypto.exceptions.CryptoException;
-import dev.chojo.crypto.processing.wrapper.RSAAlgorithmWrapper;
+import dev.chojo.crypto.processing.wrapper.AsymAlgorithmWrapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class PlainRSAAlgorithmWrapperTest {
+class PlainAsymAlgorithmWrapperTest {
     static CryptoService cryptoService;
 
     @BeforeAll
@@ -34,12 +34,12 @@ class PlainRSAAlgorithmWrapperTest {
     void testWrapUnwrapPublic() {
         KeyPair keyPair = cryptoService.generateRSAKeyPair();
         String cipher = "RSA/ECB/PKCS1Padding";
-        RSAAlgorithmWrapper rsaWrapper = new RSAAlgorithmWrapper(keyPair.getPublic(), cipher);
+        AsymAlgorithmWrapper rsaWrapper = new AsymAlgorithmWrapper(keyPair.getPublic(), cipher);
 
-        PlainRSAAlgorithmWrapper encrypted = PlainRSAAlgorithmWrapper.wrap(rsaWrapper);
+        PlainAsymAlgorithmWrapper encrypted = PlainAsymAlgorithmWrapper.wrap(rsaWrapper);
         assertTrue(encrypted.key().contains("-----BEGIN PUBLIC KEY-----"));
 
-        RSAAlgorithmWrapper decrypted = encrypted.unwrap();
+        AsymAlgorithmWrapper decrypted = encrypted.unwrap();
         assertEquals(rsaWrapper, decrypted);
     }
 
@@ -47,12 +47,12 @@ class PlainRSAAlgorithmWrapperTest {
     void testWrapUnwrapPrivate() {
         KeyPair keyPair = cryptoService.generateRSAKeyPair();
         String cipher = "RSA/ECB/PKCS1Padding";
-        RSAAlgorithmWrapper rsaWrapper = new RSAAlgorithmWrapper(keyPair.getPrivate(), cipher);
+        AsymAlgorithmWrapper rsaWrapper = new AsymAlgorithmWrapper(keyPair.getPrivate(), cipher);
 
-        PlainRSAAlgorithmWrapper encrypted = PlainRSAAlgorithmWrapper.wrap(rsaWrapper);
+        PlainAsymAlgorithmWrapper encrypted = PlainAsymAlgorithmWrapper.wrap(rsaWrapper);
         assertTrue(encrypted.key().contains("-----BEGIN PRIVATE KEY-----"));
 
-        RSAAlgorithmWrapper decrypted = encrypted.unwrap();
+        AsymAlgorithmWrapper decrypted = encrypted.unwrap();
         assertEquals(rsaWrapper, decrypted);
     }
 
@@ -60,21 +60,21 @@ class PlainRSAAlgorithmWrapperTest {
     void testUnsupportedKey() {
         java.security.Key key = mock(java.security.Key.class);
         when(key.getEncoded()).thenReturn(new byte[0]);
-        RSAAlgorithmWrapper rsaWrapper = new RSAAlgorithmWrapper(key, "RSA/ECB/PKCS1Padding");
-        assertThrows(CryptoException.class, () -> PlainRSAAlgorithmWrapper.wrap(rsaWrapper));
+        AsymAlgorithmWrapper rsaWrapper = new AsymAlgorithmWrapper(key, "RSA/ECB/PKCS1Padding");
+        assertThrows(CryptoException.class, () -> PlainAsymAlgorithmWrapper.wrap(rsaWrapper));
     }
 
     @Test
     void testInvalidFormat() {
-        PlainRSAAlgorithmWrapper wrapper =
-                new PlainRSAAlgorithmWrapper("-----BEGIN UNKNOWN-----", "RSA/ECB/PKCS1Padding");
+        PlainAsymAlgorithmWrapper wrapper =
+                new PlainAsymAlgorithmWrapper("-----BEGIN UNKNOWN-----", "RSA/ECB/PKCS1Padding");
         CryptoException exception = assertThrows(CryptoException.class, wrapper::unwrap);
         assertEquals("Invalid RSA key format", exception.getMessage());
     }
 
     @Test
     void testInvalidBase64() {
-        PlainRSAAlgorithmWrapper wrapper = new PlainRSAAlgorithmWrapper(
+        PlainAsymAlgorithmWrapper wrapper = new PlainAsymAlgorithmWrapper(
                 "-----BEGIN PUBLIC KEY-----\n!@#$\n-----END PUBLIC KEY-----", "RSA/ECB/PKCS1Padding");
         CryptoException exception = assertThrows(CryptoException.class, wrapper::unwrap);
         assertEquals("Invalid base64 in RSA key", exception.getMessage());
@@ -83,7 +83,7 @@ class PlainRSAAlgorithmWrapperTest {
     @Test
     void testDecryptFailure() {
         // Correct base64 but not a valid RSA key
-        PlainRSAAlgorithmWrapper wrapper = new PlainRSAAlgorithmWrapper(
+        PlainAsymAlgorithmWrapper wrapper = new PlainAsymAlgorithmWrapper(
                 "-----BEGIN PUBLIC KEY-----\nSGVsbG8gd29ybGQ=\n-----END PUBLIC KEY-----", "RSA/ECB/PKCS1Padding");
         CryptoException exception = assertThrows(CryptoException.class, wrapper::unwrap);
         assertTrue(exception.getMessage().contains("Could not decrypt RSA wrapper"));

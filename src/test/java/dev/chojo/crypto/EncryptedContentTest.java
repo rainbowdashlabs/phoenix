@@ -5,7 +5,7 @@
  */
 package dev.chojo.crypto;
 
-import dev.chojo.crypto.serialization.EncryptedAESAlgorithmWrapper;
+import dev.chojo.crypto.serialization.EncryptedSymAlgorithmWrapper;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class EncryptedContentTest {
     @Test
     void testEncryptedContent() {
-        EncryptedAESAlgorithmWrapper key = new EncryptedAESAlgorithmWrapper("key", "cipher");
+        EncryptedSymAlgorithmWrapper key = new EncryptedSymAlgorithmWrapper("key", "cipher");
         EncryptedContent content = new EncryptedContent("content", key, "iv");
         assertEquals("content", content.content());
         assertEquals(key, content.key());

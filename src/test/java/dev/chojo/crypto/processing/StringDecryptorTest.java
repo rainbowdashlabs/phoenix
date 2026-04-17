@@ -12,8 +12,8 @@ import dev.chojo.crypto.EncryptedContent;
 import dev.chojo.crypto.policy.KeyRotationPolicy;
 import dev.chojo.crypto.processing.model.BytesProcessInput;
 import dev.chojo.crypto.processing.model.BytesProcessResult;
-import dev.chojo.crypto.processing.wrapper.AESAlgorithmWrapper;
-import dev.chojo.crypto.processing.wrapper.RSAAlgorithmWrapper;
+import dev.chojo.crypto.processing.wrapper.AsymAlgorithmWrapper;
+import dev.chojo.crypto.processing.wrapper.SymAlgorithmWrapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -40,11 +40,11 @@ class StringDecryptorTest {
     void testDecode() throws InvalidKeySpecException {
         KeyPair keyPair = cryptoService.generateRSAKeyPair();
         String rsaCipher = "RSA/ECB/PKCS1Padding";
-        RSAAlgorithmWrapper publicRSA =
-                new RSAAlgorithmWrapper(keyPair.getPublic(), rsaCipher, javax.crypto.Cipher.ENCRYPT_MODE);
-        RSAAlgorithmWrapper privateRSA =
-                new RSAAlgorithmWrapper(keyPair.getPrivate(), rsaCipher, javax.crypto.Cipher.DECRYPT_MODE);
-        AESAlgorithmWrapper aesAlgorithmWrapper = cryptoService.randomAESKey();
+        AsymAlgorithmWrapper publicRSA =
+                new AsymAlgorithmWrapper(keyPair.getPublic(), rsaCipher, javax.crypto.Cipher.ENCRYPT_MODE);
+        AsymAlgorithmWrapper privateRSA =
+                new AsymAlgorithmWrapper(keyPair.getPrivate(), rsaCipher, javax.crypto.Cipher.DECRYPT_MODE);
+        SymAlgorithmWrapper symAlgorithmWrapper = cryptoService.randomAESKey();
         Encryptor<BytesProcessInput, BytesProcessResult> rsa = new Encryptor<>(publicRSA);
         String generatedString = new Random()
                 .ints('0', 'z' + 1)
@@ -54,7 +54,7 @@ class StringDecryptorTest {
                 .toString();
         KeyRotationPolicy keyRotationPolicy =
                 new KeyRotationPolicy(10000, () -> new Encryptor<>(cryptoService.randomAESKey()));
-        EncryptedContent encrypted = new StringEncryptor(rsa, keyRotationPolicy).encode(generatedString);
+        EncryptedContent encrypted = new StringEncryptor(rsa, keyRotationPolicy).encrypt(generatedString);
         String decode = new StringDecrypter(new Decryptor<>(privateRSA)).decode(encrypted);
         assertEquals(generatedString, decode);
     }

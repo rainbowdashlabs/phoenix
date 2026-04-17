@@ -13,9 +13,9 @@ import dev.chojo.crypto.processing.Decryptor;
 import dev.chojo.crypto.processing.Encryptor;
 import dev.chojo.crypto.processing.model.BytesProcessInput;
 import dev.chojo.crypto.processing.model.BytesProcessResult;
-import dev.chojo.crypto.processing.wrapper.AESAlgorithmWrapper;
 import dev.chojo.crypto.processing.wrapper.AlgorithmWrapper;
-import dev.chojo.crypto.processing.wrapper.RSAAlgorithmWrapper;
+import dev.chojo.crypto.processing.wrapper.AsymAlgorithmWrapper;
+import dev.chojo.crypto.processing.wrapper.SymAlgorithmWrapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class EncryptedAESAlgorithmWrapperTest {
+class EncryptedSymAlgorithmWrapperTest {
     static CryptoService cryptoService;
 
     @BeforeAll
@@ -43,11 +43,11 @@ class EncryptedAESAlgorithmWrapperTest {
     @Test
     void encrypt() throws InvalidKeySpecException {
         KeyPair rsa = cryptoService.generateRSAKeyPair();
-        RSAAlgorithmWrapper rsaWrapper =
-                new RSAAlgorithmWrapper(rsa.getPublic(), "RSA/ECB/PKCS1Padding", Cipher.ENCRYPT_MODE);
-        AESAlgorithmWrapper aesWrapper = cryptoService.randomAESKey();
+        AsymAlgorithmWrapper rsaWrapper =
+                new AsymAlgorithmWrapper(rsa.getPublic(), "RSA/ECB/PKCS1Padding", Cipher.ENCRYPT_MODE);
+        SymAlgorithmWrapper aesWrapper = cryptoService.randomAESKey();
         Encryptor<BytesProcessInput, BytesProcessResult> encryptor = new Encryptor<>(rsaWrapper);
-        EncryptedAESAlgorithmWrapper wrapper = EncryptedAESAlgorithmWrapper.encrypt(aesWrapper, encryptor);
+        EncryptedSymAlgorithmWrapper wrapper = EncryptedSymAlgorithmWrapper.encrypt(aesWrapper, encryptor);
         System.out.printf("Encrypted: %s%n", wrapper);
     }
 
@@ -55,13 +55,13 @@ class EncryptedAESAlgorithmWrapperTest {
     void decrypt() throws InvalidKeySpecException {
         KeyPair rsa = cryptoService.generateRSAKeyPair();
         String rsaCipher = "RSA/ECB/PKCS1Padding";
-        RSAAlgorithmWrapper rsaPublic = new RSAAlgorithmWrapper(rsa.getPublic(), rsaCipher, Cipher.ENCRYPT_MODE);
-        RSAAlgorithmWrapper rsaPrivate = new RSAAlgorithmWrapper(rsa.getPrivate(), rsaCipher, Cipher.DECRYPT_MODE);
-        AESAlgorithmWrapper aesWrapper = cryptoService.randomAESKey();
+        AsymAlgorithmWrapper rsaPublic = new AsymAlgorithmWrapper(rsa.getPublic(), rsaCipher, Cipher.ENCRYPT_MODE);
+        AsymAlgorithmWrapper rsaPrivate = new AsymAlgorithmWrapper(rsa.getPrivate(), rsaCipher, Cipher.DECRYPT_MODE);
+        SymAlgorithmWrapper aesWrapper = cryptoService.randomAESKey();
         Encryptor<BytesProcessInput, BytesProcessResult> encryptor = new Encryptor<>(rsaPublic);
         Decryptor<BytesProcessInput, BytesProcessResult> decryptor = new Decryptor<>(rsaPrivate);
-        EncryptedAESAlgorithmWrapper wrapper = EncryptedAESAlgorithmWrapper.encrypt(aesWrapper, encryptor);
-        AESAlgorithmWrapper decrypted = wrapper.decrypt(decryptor);
+        EncryptedSymAlgorithmWrapper wrapper = EncryptedSymAlgorithmWrapper.encrypt(aesWrapper, encryptor);
+        SymAlgorithmWrapper decrypted = wrapper.decrypt(decryptor);
         assertEquals(aesWrapper, decrypted);
     }
 

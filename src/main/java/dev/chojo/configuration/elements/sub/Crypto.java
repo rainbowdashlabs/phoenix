@@ -16,6 +16,7 @@ public class Crypto {
     private String symmetricAlgorithm = "AES";
     private String symmetricCipher = "AES/GCM/NoPadding";
     private int symmetricKeySize = 256;
+    private int rotationInterval = 8000;
 
     public String asymmetricAlgorithm() {
         return asymmetricAlgorithm;
@@ -39,5 +40,9 @@ public class Crypto {
 
     public String symmetricAlgorithm() {
         return symmetricAlgorithm;
+    }
+
+    public long rotationInterval() {
+        return rotationInterval;
     }
 }

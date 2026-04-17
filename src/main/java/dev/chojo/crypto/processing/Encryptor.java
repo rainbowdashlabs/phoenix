@@ -5,12 +5,12 @@
  */
 package dev.chojo.crypto.processing;
 
-import dev.chojo.crypto.processing.model.AESProcessInput;
 import dev.chojo.crypto.processing.model.BytesProcessInput;
 import dev.chojo.crypto.processing.model.ProcessInput;
 import dev.chojo.crypto.processing.model.ProcessResult;
-import dev.chojo.crypto.processing.wrapper.AESAlgorithmWrapper;
+import dev.chojo.crypto.processing.model.SymProcessInput;
 import dev.chojo.crypto.processing.wrapper.AlgorithmWrapper;
+import dev.chojo.crypto.processing.wrapper.SymAlgorithmWrapper;
 
 import javax.crypto.Cipher;
 
@@ -38,8 +38,8 @@ public class Encryptor<I extends ProcessInput, R extends ProcessResult> extends 
     @Override
     @SuppressWarnings("unchecked")
     public R process(byte[] data) {
-        if (wrapper instanceof AESAlgorithmWrapper) {
-            return process((I) new AESProcessInput(data, null));
+        if (wrapper instanceof SymAlgorithmWrapper) {
+            return process((I) new SymProcessInput(data, null));
         }
         return process((I) new BytesProcessInput(data));
     }

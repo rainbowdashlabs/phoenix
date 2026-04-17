@@ -15,6 +15,6 @@ public class SnowflakeUtil {
      * @return epoch timestamp in seconds
      */
     public static long snowflakeToTimestamp(long snowflake) {
-        return (snowflake >>> TIMESTAMP_OFFSET) + DISCORD_EPOCH / 1000;
+        return ((snowflake >>> TIMESTAMP_OFFSET) + DISCORD_EPOCH) / 1000L;
     }
 }

@@ -8,7 +8,7 @@ package dev.chojo.crypto;
 import com.google.inject.Inject;
 import dev.chojo.configuration.Configuration;
 import dev.chojo.configuration.elements.sub.Crypto;
-import dev.chojo.crypto.processing.wrapper.AESAlgorithmWrapper;
+import dev.chojo.crypto.processing.wrapper.SymAlgorithmWrapper;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -46,10 +46,10 @@ public class CryptoService {
         return rsaGenerator.generateKeyPair();
     }
 
-    /// Generates a random AES key in encrypt mode.
+    /// Generates a random AES key in encryption mode.
     ///
     /// @return the generated AES algorithm wrapper
-    public AESAlgorithmWrapper randomAESKey() {
+    public SymAlgorithmWrapper randomAESKey() {
         return randomAESKey(Cipher.ENCRYPT_MODE);
     }
 
@@ -57,9 +57,9 @@ public class CryptoService {
     ///
     /// @param opMode the operation mode (e.g., [Cipher#ENCRYPT_MODE])
     /// @return the generated AES algorithm wrapper
-    public AESAlgorithmWrapper randomAESKey(int opMode) {
+    public SymAlgorithmWrapper randomAESKey(int opMode) {
         SecretKey secretKey = aesGenerator.generateKey();
-        return new AESAlgorithmWrapper(secretKey, symmetricCipher(), opMode);
+        return new SymAlgorithmWrapper(secretKey, symmetricCipher(), opMode);
     }
 
     public String asymmetricCipher() {
