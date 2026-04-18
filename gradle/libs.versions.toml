@@ -14,7 +14,7 @@ pitest = { id = "info.solidsoft.pitest", version = "1.19.0" }
 [libraries]
 # Core
 jda = { group = "net.dv8tion", name = "JDA", version = "6.4.1" }
-jdacommands = { group = "io.github.kaktushose", name = "jda-commands", version = "5.0.0-SNAPSHOT" }
+jdacommands = { group = "io.github.kaktushose", name = "jda-commands", version = "5.0.0" }
 
 # Database
 hikari = { group = "com.zaxxer", name = "HikariCP", version = "7.0.2" }
