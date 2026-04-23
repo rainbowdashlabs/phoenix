@@ -29,6 +29,17 @@ module dev.chojo.elpis {
     requires jdk.jshell;
     requires org.eclipse.jetty.util;
     requires com.google.common;
+    requires java.net.http;
+    requires io.javalin;
+    requires javalin.openapi.plugin;
+    requires javalin.swagger.plugin;
+    requires dev.chojo.aether.supporter;
+    requires dev.chojo.aether.discordoauth;
+    requires dev.chojo.aether.kofi;
+    requires dev.chojo.aether.mailing;
+    requires dev.chojo.aether.serialization;
+    requires dev.chojo.aether.commonweb;
+    requires dev.chojo.aether.common;
 
     exports dev.chojo.configuration;
     exports dev.chojo.core;
@@ -54,4 +65,9 @@ module dev.chojo.elpis {
     opens dev.chojo.configuration;
     opens dev.chojo.configuration.elements;
     opens dev.chojo.configuration.elements.sub;
+    opens dev.chojo.configuration.elements.sub.supporter;
+    opens dev.chojo.data;
+    opens dev.chojo.data.snapshot;
+    opens dev.chojo.data.dao;
+    opens dev.chojo.data.dao.user;
 }

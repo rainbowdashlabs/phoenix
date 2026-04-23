@@ -10,6 +10,9 @@ import dev.chojo.ocular.override.Overwrite;
 import dev.chojo.ocular.override.OverwritePrefix;
 import dev.chojo.ocular.override.Prop;
 
+import java.util.Collections;
+import java.util.List;
+
 @OverwritePrefix("bot")
 public class General {
     @Overwrite(env = @Env("TOKEN"), prop = @Prop("token"))
@@ -21,6 +24,8 @@ public class General {
     @Overwrite(env = @Env, prop = @Prop)
     private long botguild = 0L;
 
+    private List<Long> botOwner = Collections.emptyList();
+
     public String token() {
         return token;
     }
@@ -31,5 +36,13 @@ public class General {
 
     public long botguild() {
         return botguild;
+    }
+
+    public List<Long> botOwner() {
+        return botOwner;
+    }
+
+    public boolean isOwner(long id) {
+        return botOwner.contains(id);
     }
 }

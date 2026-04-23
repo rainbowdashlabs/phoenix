@@ -216,4 +216,4 @@ gradle-app.setting
 # Project specific
 .env
 
-config
+/config

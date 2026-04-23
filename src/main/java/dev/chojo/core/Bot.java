@@ -9,6 +9,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
+import dev.chojo.aether.supporter.service.SupporterMiddleware;
 import dev.chojo.configuration.Configuration;
 import dev.goldmensch.fluava.Fluava;
 import io.github.kaktushose.jdac.JDACBuilder;
@@ -81,7 +82,8 @@ public class Bot extends AbstractModule {
         JDACBuilder builder = JDACommands.builder(manager)
                 .packages("dev.chojo")
                 .extensionData(new GuiceExtensionData(injector))
-                .localizer(FluavaLocalizer.create(fluava));
+                .localizer(FluavaLocalizer.create(fluava))
+                .middleware(new SupporterMiddleware<>());
 
         // @Nora set dev mode here, either from configuration or env, idk what you like
         if (configuration.main().general().testmode()) {
