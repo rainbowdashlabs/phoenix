@@ -38,7 +38,7 @@ javalin-openapi-swagger = { group = "io.javalin.community.openapi", name = "java
 javalin-openapi-openapi = { group = "io.javalin.community.openapi", name = "javalin-openapi-plugin", version.ref = "javalin" }
 
 # Configuration
-ocular = { group = "dev.chojo", name = "ocular", version = "2.1.4" }
+ocular = { group = "dev.chojo", name = "ocular", version = "2.2.0" }
 jackson-yaml = { group = "tools.jackson.dataformat", name = "jackson-dataformat-yaml", version.ref = "jackson" }
 jackson-toml = { group = "tools.jackson.dataformat", name = "jackson-dataformat-toml", version.ref = "jackson" }
 jackson-core = { group = "tools.jackson.core", name = "jackson-core", version.ref = "jackson" }
