@@ -3,7 +3,7 @@
  *
  *     Copyright (C) RainbowDashLabs and Contributor
  */
-package dev.chojo.data.dao.user.sub;
+package dev.chojo.data.dao.user.sub.token;
 
 import org.jspecify.annotations.Nullable;
 
@@ -48,21 +48,35 @@ public class UserTokens {
         return Optional.ofNullable(tokens().get(token));
     }
 
-    public void addToken(UserToken token) {
-        query("""
-                INSERT INTO user_token (user_id, access_token, refresh_token, expiry, token) VALUES (?, ?, ?, ?, ?) ON CONFLICT(token) DO NOTHING;
-                """)
+    public UserToken addToken(UserToken token) {
+        return query("""
+                INSERT
+                INTO
+                    user_token
+                    (user_id, access_token, refresh_token, expiry, token)
+                VALUES
+                    (?, ?, ?, ?, ?)
+                ON CONFLICT(token)
+                    DO UPDATE
+                    SET last_used = now()
+                RETURNING user_id, access_token, refresh_token, expiry, token;""")
                 .single(call().bind(userId)
-                              .bind(token.accessToken())
-                              .bind(token.refreshToken())
-                              .bind(token.expiry(), INSTANT_TIMESTAMP)
-                              .bind(token.token()))
-                .insert().ifChanged(e -> tokens().put(token.token(), token));
+                        .bind(token.accessToken())
+                        .bind(token.refreshToken())
+                        .bind(token.expiry(), INSTANT_TIMESTAMP)
+                        .bind(token.token()))
+                .map(UserToken::new)
+                .first()
+                .filter(e -> e.userId() == token.userId())
+                .map(e -> {
+                    tokens().put(e.token(), e);
+                    return e;
+                })
+                .orElseThrow();
     }
 
     public void removeToken(String token) {
-
-        tokens().remove(token);
+        tokens().remove(token).delete();
     }
 
     public void updateToken(UserToken token) {
@@ -70,9 +84,9 @@ public class UserTokens {
                 UPDATE user_token SET access_token = ?, refresh_token = ?, expiry = ? WHERE token = ?;
                 """)
                 .single(call().bind(token.accessToken())
-                              .bind(token.refreshToken())
-                              .bind(token.expiry(), INSTANT_TIMESTAMP)
-                              .bind(token.token()))
+                        .bind(token.refreshToken())
+                        .bind(token.expiry(), INSTANT_TIMESTAMP)
+                        .bind(token.token()))
                 .update()
                 .ifChanged(e -> tokens().put(token.token(), token));
     }

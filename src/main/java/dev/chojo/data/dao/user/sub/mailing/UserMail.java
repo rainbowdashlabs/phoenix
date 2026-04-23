@@ -3,9 +3,8 @@
  *
  *     Copyright (C) RainbowDashLabs and Contributor
  */
-package dev.chojo.data.dao.user.sub;
+package dev.chojo.data.dao.user.sub.mailing;
 
-import ch.qos.logback.core.pattern.color.GreenCompositeConverter;
 import de.chojo.sadu.mapper.annotation.MappingProvider;
 import de.chojo.sadu.mapper.wrapper.Row;
 import dev.chojo.aether.mailing.entities.AMailEntry;
@@ -23,7 +22,7 @@ import static de.chojo.sadu.queries.converter.StandardValueConverter.INSTANT_TIM
 /**
  * Represents a mail entry tied to a user.
  */
-public class MailEntry extends AMailEntry {
+public class UserMail extends AMailEntry {
 
     @MappingProvider({
         "user_id",
@@ -34,8 +33,9 @@ public class MailEntry extends AMailEntry {
         "verification_requested",
         "verification_code"
     })
-    public MailEntry(Row row) throws SQLException {
-        this(                row.getLong("user_id"),
+    public UserMail(Row row) throws SQLException {
+        this(
+                row.getLong("user_id"),
                 row.get("source", AetherConverter.MAIL_SOURCE),
                 row.getString("mail_hash"),
                 row.getString("mail_short"),
@@ -44,7 +44,7 @@ public class MailEntry extends AMailEntry {
                 row.getString("verification_code"));
     }
 
-    public MailEntry(
+    public UserMail(
             long userId,
             MailSource source,
             String hash,

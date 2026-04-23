@@ -5,38 +5,47 @@
  */
 package dev.chojo.service;
 
+import com.google.inject.Inject;
 import dev.chojo.aether.common.provider.IUserProvider;
 import dev.chojo.aether.kofi.configuration.Kofi;
 import dev.chojo.aether.kofi.pojo.Type;
 import dev.chojo.aether.kofi.service.AKofiService;
 import dev.chojo.aether.mailing.service.AMailService;
-import dev.chojo.aether.supporter.access.Subscriptions;
+import dev.chojo.aether.supporter.access.ISubscriptions;
 import dev.chojo.aether.supporter.configuration.SupporterConfiguration;
 import dev.chojo.data.dao.user.sub.purchases.KofiPurchase;
+import dev.chojo.data.repository.SupporterRepository;
 
 import java.time.Instant;
 import java.util.List;
 
 public class KofiService extends AKofiService<KofiPurchase> {
+    private final SupporterRepository supporterRepository;
+
+    @Inject
     public KofiService(
             Kofi configuration,
             IUserProvider IUserProvider,
             AMailService mailService,
-            SupporterConfiguration<?, ?, ?> supporterConfiguration) {
+            SupporterConfiguration<?, ?, ?> supporterConfiguration,
+            SupporterRepository supporterRepository) {
         super(configuration, IUserProvider, mailService, supporterConfiguration);
+        this.supporterRepository = supporterRepository;
     }
 
     @Override
-    protected void registerPurchase(KofiPurchase purchase) {}
+    protected void registerPurchase(KofiPurchase purchase) {
+        supporterRepository.registerPurchase(purchase);
+    }
 
     @Override
     protected List<KofiPurchase> expiredPurchases() {
-        return List.of();
+        return supporterRepository.getExpiredKofiPurchased();
     }
 
     @Override
-    protected Subscriptions guildSubscriptions(long guildId) {
-        return null;
+    protected ISubscriptions guildSubscriptions(long guildId) {
+        return supporterRepository.guild(guildId);
     }
 
     @Override

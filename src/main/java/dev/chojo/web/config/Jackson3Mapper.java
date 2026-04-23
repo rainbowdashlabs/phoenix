@@ -55,14 +55,19 @@ public class Jackson3Mapper implements JsonMapper {
         if (Objects.requireNonNull(obj) instanceof String s) {
             return new ByteArrayInputStream(s.getBytes());
         }
-        return executor.getInputStream(out -> mapper.tokenStreamFactory()
-                .createGenerator(out, JsonEncoding.UTF8)
-                .writePOJO(obj));
+        try {
+            return new ByteArrayInputStream(mapper.writeValueAsBytes(obj));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void writeToOutputStream(Stream<?> stream, OutputStream outputStream) {
-        SequenceWriter sequenceWriter = mapper.writer().writeValuesAsArray(outputStream);
-        stream.forEach(sequenceWriter::write);
+        try (SequenceWriter sequenceWriter = mapper.writer().writeValuesAsArray(outputStream)) {
+            stream.forEach(sequenceWriter::write);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

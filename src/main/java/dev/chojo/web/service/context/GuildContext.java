@@ -5,102 +5,19 @@
  */
 package dev.chojo.web.service.context;
 
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.sharding.ShardManager;
-import org.jetbrains.annotations.NotNull;
+import dev.chojo.aether.discordoauth.pojo.DiscordGuild;
+import dev.chojo.web.config.GuildRole;
+import io.javalin.security.RouteRole;
 
-public class GuildContext {
-    private final dev.chojo.configuration.Configuration configuration;
-    private final ShardManager shardManager;
-    private final long guildId;
-    private final long userId;
-    private PremiumValidator premiumValidator;
-    private GuildValidator guildValidator;
-    private volatile boolean dirty = true;
-    private GuildPOJO cachedGuild;
+import java.util.Set;
 
-    public GuildContext(
-            dev.chojo.configuration.Configuration configuration, ShardManager shardManager, long guildId, long userId) {
-        this.configuration = configuration;
-        this.shardManager = shardManager;
-        this.guildRepository = guildRepository;
-        this.settingsAuditLogRepository = settingsAuditLogRepository;
-        this.guildId = guildId;
-        this.userId = userId;
-    }
-
-    public Guild guild() {
-        return shardManager.getGuildById(guildId);
-    }
-
-    public RepGuild repGuild() {
-        return guildRepository.guild(guild());
-    }
-
-    @NotNull
-    public GuildPOJO guildPOJO() {
-        if (dirty || cachedGuild == null) {
-            cachedGuild = GuildPOJO.generate(guild());
-            dirty = false;
+public record GuildContext(Set<GuildRole> roles, DiscordGuild guild) {
+    public boolean hasAccess(Set<RouteRole> required) {
+        for (GuildRole role : roles) {
+            if (required.contains(role)) {
+                return true;
+            }
         }
-        return cachedGuild;
-    }
-
-    public void markDirty() {
-        this.dirty = true;
-    }
-
-    public ShardManager shardManager() {
-        return shardManager;
-    }
-
-    public PremiumValidator premiumValidator() {
-        if (premiumValidator == null) {
-            premiumValidator = new PremiumValidator(repGuild(), shardManager);
-        }
-        return premiumValidator;
-    }
-
-    public GuildValidator guildValidator() {
-        if (guildValidator == null) {
-            guildValidator = new GuildValidator(this);
-        }
-        return guildValidator;
-    }
-
-    public GuildRepository guildRepository() {
-        return guildRepository;
-    }
-
-    public long guildId() {
-        return guildId;
-    }
-
-    public long userId() {
-        return userId;
-    }
-
-    public Configuration configuration() {
-        return configuration;
-    }
-
-    /**
-     * Records a change of a guild setting.
-     *
-     * @param settingsKey A unique key identifying the setting.
-     * @param oldValue    the old value of the setting before the change.
-     * @param newValue    the new value of the setting after the change.
-     */
-    public void recordChange(String settingsKey, Object oldValue, Object newValue) {
-        settingsAuditLogRepository.recordChange(guildId, userId, settingsKey, oldValue, newValue);
-    }
-
-    /**
-     * @deprecated Used to validate if the member is still in the guild and has permissions.
-     * This is now handled during session creation and request interception.
-     */
-    @Deprecated
-    public void validate() {
-        // No-op for now, as validation is moved to handleAccess
+        return false;
     }
 }

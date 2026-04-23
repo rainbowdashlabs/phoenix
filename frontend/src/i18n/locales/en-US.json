@@ -1,0 +1,32 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "login": "Login"
+  },
+  "home": {
+    "hero": {
+      "title": "Welcome to Elpis",
+      "subtitle": "A simple and modern solution for your needs.",
+      "getStarted": "Get Started",
+      "learnMore": "Learn More"
+    },
+    "features": {
+      "fast": {
+        "title": "Fast",
+        "description": "Built with performance in mind using the latest technologies."
+      },
+      "reliable": {
+        "title": "Reliable",
+        "description": "Designed to be stable and consistent across all environments."
+      },
+      "secure": {
+        "title": "Secure",
+        "description": "Security is our top priority, ensuring your data is always safe."
+      }
+    }
+  },
+  "footer": {
+    "copyright": "© 2026 RainbowDashLabs and Contributor. All rights reserved."
+  }
+}

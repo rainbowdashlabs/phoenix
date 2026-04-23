@@ -16,7 +16,7 @@ pitest = { id = "info.solidsoft.pitest", version = "1.19.0" }
 jda = { group = "net.dv8tion", name = "JDA", version = "6.4.1" }
 jdacommands = { group = "io.github.kaktushose", name = "jda-commands", version = "5.0.0" }
 
-aether = { group = "dev.chojo.aether", name = "aether", version = "1.2.6" }
+aether = { group = "dev.chojo.aether", name = "aether", version = "1.2.12" }
 
 # Database
 hikari = { group = "com.zaxxer", name = "HikariCP", version = "7.0.2" }

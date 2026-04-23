@@ -62,9 +62,9 @@ public class SaduConfig {
         Database db = configuration.main().database();
         dataSource = DataSourceCreator.create(PostgreSql.get())
                 .configure(config ->
-                        config.allowMultiQueries(true).applicationName("Elpis").currentSchema(db.schema()))
+                        config.allowMultiQueries(true).applicationName("Phoenix").currentSchema(db.schema()))
                 .create()
-                .withPoolName("Elpis")
+                .withPoolName("Phoenix")
                 .usingUsername(db.user())
                 .usingPassword(db.password())
                 .withMaximumPoolSize(db.poolSize())
@@ -85,7 +85,7 @@ public class SaduConfig {
     private void update() throws SQLException, IOException {
         Database db = configuration.main().database();
         SqlUpdater.builder(dataSource, PostgreSql.get())
-                .setReplacements(new QueryReplacement("elpis_schema.", db.schema() + "."))
+                .setReplacements(new QueryReplacement("phoenix_schema.", db.schema() + "."))
                 .setSchemas(db.schema())
                 .execute();
     }

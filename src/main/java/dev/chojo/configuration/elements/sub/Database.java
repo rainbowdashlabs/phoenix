@@ -22,7 +22,7 @@ public class Database {
     private String database = "postgres";
 
     @Overwrite(env = @Env, prop = @Prop)
-    private String schema = "elpis_schema";
+    private String schema = "phoenix_schema";
 
     @Overwrite(env = @Env, prop = @Prop)
     private String user = "postgres";

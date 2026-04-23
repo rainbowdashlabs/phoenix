@@ -7,12 +7,13 @@ package dev.chojo.web;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.google.inject.Inject;
 import dev.chojo.aether.commonweb.error.ApiException;
 import dev.chojo.aether.commonweb.error.ErrorResponseWrapper;
-import dev.chojo.aether.discordoauth.service.DiscordOAuthService;
 import dev.chojo.aether.serialization.jackson.DiscordSerializationModule;
 import dev.chojo.configuration.Configuration;
-import dev.chojo.configuration.elements.sub.Api;
+import dev.chojo.service.DiscordOAuthService;
+import dev.chojo.web.api.Api;
 import dev.chojo.web.config.Jackson3Mapper;
 import dev.chojo.web.service.SessionService;
 import dev.chojo.web.service.context.UserContext;
@@ -48,10 +49,15 @@ public class WebService {
     private final Configuration configuration;
     private Javalin javalin;
     private final SessionService sessionService;
+    private final DiscordOAuthService discordOAuthService;
 
-    public WebService(Configuration configuration, SessionService sessionService) {
+    @Inject
+    public WebService(
+            Configuration configuration, SessionService sessionService, DiscordOAuthService discordOAuthService) {
         this.configuration = configuration;
         this.sessionService = sessionService;
+        this.discordOAuthService = discordOAuthService;
+        initApi();
     }
 
     public static io.javalin.json.JsonMapper jacksonMapper() {
@@ -101,26 +107,7 @@ public class WebService {
 
                     setupExceptionHandler(config.routes);
 
-                    config.routes.apiBuilder(() -> new Api(
-                                    sessionService,
-                                    data.metrics(),
-                                    bot.hub(),
-                                    bot.localization(),
-                                    autopostService,
-                                    bot.roleAssigner(),
-                                    bot.shardManager(),
-                                    configuration,
-                                    data.settingsAuditLogRepository(),
-                                    memberCache,
-                                    data.guildRepository(),
-                                    data.userRepository(),
-                                    new DiscordOAuthService(configuration),
-                                    data.voteRepository(),
-                                    bot.tokenPurchaseService(),
-                                    kofiService,
-                                    mailService,
-                                    scanService)
-                            .init());
+                    config.routes.apiBuilder(() -> new Api(sessionService, configuration, discordOAuthService).init());
                     config.routes.beforeMatched(this::handleAccess);
                     config.jsonMapper(jacksonMapper());
                     // Serve frontend SPA
@@ -147,11 +134,6 @@ public class WebService {
         Set<RouteRole> routeRoles = ctx.routeRoles();
     }
 
-    private UserContext userSession(Context ctx) {
-        return sessionService.getUserSession(ctx);
-        ctx.sessionAttribute("Authorization");
-    }
-
     private void addGuildSession(Context ctx, UserContext userContext) {
         ctx.sessionAttribute("X-Guild-Id");
     }
@@ -162,10 +144,10 @@ public class WebService {
 
     private void setupExceptionHandler(RoutesConfig routes) {
         // Handle specific PremiumFeatureException with detailed JSON
-        routes.exception(PremiumFeatureException.class, (err, ctx) -> {
-            var response = new ErrorResponseWrapper("Supporter Required", err.getMessage(), err.details());
-            ctx.json(response).status(err.status());
-        });
+        //        routes.exception(PremiumFeatureException.class, (err, ctx) -> {
+        //            var response = new ErrorResponseWrapper("Supporter Required", err.getMessage(), err.details());
+        //            ctx.json(response).status(err.status());
+        //        });
 
         routes.exception(JsonMappingException.class, (err, ctx) -> {
             log.error("Invalid JSON on route {}", ctx.path(), err);
@@ -203,15 +185,15 @@ public class WebService {
     private void configureOpenApi(OpenApiPluginConfiguration config) {
         config.withDocumentationPath("/docs").withDefinitionConfiguration((version, definition) -> {
             definition.info(info -> {
-                info.title("Reputation Bot API");
+                info.title("Phoenix API");
                 info.version("1.0");
-                info.description("Documentation for the Reputation Bot API");
+                info.description("Documentation for the Phoenix API");
                 info.license(
                         "GNU Affero General Public License v3.0",
-                        "https://github.com/RainbowDashLabs/reputation-bot/blob/master/LICENSE.md");
+                        "https://github.com/RainbowDashLabs/phoenix/blob/master/LICENSE.md");
             });
             definition.server(openApiServer -> {
-                openApiServer.url("https://repbot.rainbowdashlabs.de");
+                openApiServer.url("https://phoenix.chojo.dev");
                 openApiServer.description("Main server");
             });
         });

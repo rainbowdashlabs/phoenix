@@ -5,9 +5,9 @@
  */
 package dev.chojo.data.dao.guildsupporter;
 
+import dev.chojo.aether.supporter.access.ISubscriptions;
 import dev.chojo.aether.supporter.access.SkuTarget;
 import dev.chojo.aether.supporter.access.Subscription;
-import dev.chojo.aether.supporter.access.Subscriptions;
 import dev.chojo.aether.supporter.configuration.modules.subscriptions.platform.Platform;
 import dev.chojo.aether.supporter.registry.SupporterRegistry;
 import net.dv8tion.jda.api.entities.Entitlement.EntitlementType;
@@ -19,7 +19,7 @@ import static de.chojo.sadu.queries.api.call.Call.call;
 import static de.chojo.sadu.queries.api.query.Query.query;
 import static de.chojo.sadu.queries.converter.StandardValueConverter.INSTANT_TIMESTAMP;
 
-public class GuildSubscriptions implements Subscriptions {
+public class GuildSubscriptions implements ISubscriptions {
     private final long guildId;
 
     @Nullable
@@ -36,7 +36,7 @@ public class GuildSubscriptions implements Subscriptions {
                 SELECT
                     target_id,
                     subscription_id,
-                    platform,
+                    source,
                     target,
                     purchase_type,
                     ends_at,
@@ -68,14 +68,13 @@ public class GuildSubscriptions implements Subscriptions {
                 """).single(call().bind(subscription.subscriptionId()).bind(subscription.targetId()));
     }
 
-
     @Override
     public boolean addSubscription(Subscription subscription) {
         query("""
                 INSERT
                 INTO
                     subscriptions
-                    (subscription_id, target_id, platform, target, purchase_type, ends_at, persistent)
+                    (subscription_id, target_id, source, target, purchase_type, ends_at, persistent)
                 VALUES
                     (?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(target_id, target, subscription_id)
@@ -99,7 +98,7 @@ public class GuildSubscriptions implements Subscriptions {
     @Override
     public void clear(Platform source) {
         query("""
-                DELETE FROM subscriptions WHERE target_id = ? AND platform = ?;
+                DELETE FROM subscriptions WHERE target_id = ? AND source = ?;
                 """).single(call().bind(guildId).bind(source.name())).delete();
     }
 }

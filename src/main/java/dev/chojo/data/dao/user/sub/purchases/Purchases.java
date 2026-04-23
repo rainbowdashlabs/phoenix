@@ -3,9 +3,7 @@
  *
  *     Copyright (C) RainbowDashLabs and Contributor
  */
-package dev.chojo.data.dao.user.sub;
-
-import dev.chojo.data.dao.user.sub.purchases.KofiPurchase;
+package dev.chojo.data.dao.user.sub.purchases;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,10 +33,7 @@ public class Purchases {
                     user_mails um
                         LEFT JOIN kofi_purchase kp
                         ON um.mail_hash = kp.mail_hash
-                WHERE user_id = ? AND verified;""")
-                .single(call().bind(user))
-                .mapAs(KofiPurchase.class)
-                .all();
+                WHERE user_id = ? AND verified;""").single(call().bind(user)).mapAs(KofiPurchase.class).all();
     }
 
     public Optional<KofiPurchase> byId(long id) {

@@ -6,9 +6,12 @@
 package dev.chojo.web.service;
 
 import com.google.inject.Inject;
+import dev.chojo.aether.discordoauth.pojo.DiscordGuild;
 import dev.chojo.configuration.Configuration;
 import dev.chojo.web.config.GuildRole;
 import dev.chojo.web.config.SessionAttribute;
+import dev.chojo.web.config.UserRole;
+import dev.chojo.web.service.context.GuildContext;
 import dev.chojo.web.service.context.UserContext;
 import io.javalin.http.Context;
 import io.javalin.http.UnauthorizedResponse;
@@ -38,7 +41,7 @@ public class SecurityService {
         }
 
         Set<RouteRole> routeRoles = ctx.routeRoles();
-        if (routeRoles.contains(GuildRole.ANYONE) || routeRoles.isEmpty()) {
+        if (routeRoles.contains(UserRole.ANYONE) || routeRoles.isEmpty()) {
             return;
         }
 
@@ -49,42 +52,37 @@ public class SecurityService {
 
         ctx.sessionAttribute(SessionAttribute.USER_SESSION, userContext);
 
-        if (routeRoles.contains(GuildRole.MEMBER)) {
-            return;
-        }
-
         String guildIdStr = ctx.header("X-Guild-Id");
         if (guildIdStr != null) {
             ctx.sessionAttribute(SessionAttribute.GUILD_ID, guildIdStr);
             var guildData = userContext.guilds().get(guildIdStr);
-            boolean isBotOwner = configuration.main().general().isOwner(userContext.userId());
+            if (guildData == null && userContext.hasAccess(Set.of(UserRole.OWNER))) {
+                // Create a fake guild
+                guildData =
+                        new GuildContext(Set.of(GuildRole.ADMIN), new DiscordGuild(guildIdStr, null, "", "", "", true));
+            }
 
-            if (guildData != null || isBotOwner) {
-                GuildRole accessLevel = guildData != null ? guildData.accessLevel() : GuildRole.ADMIN;
+            if (guildData != null) {
+                if (!guildData.hasAccess(routeRoles)) {
+                    throw new UnauthorizedResponse("Permission denied. Required roles: " + routeRoles);
+                }
 
-                if (routeRoles.contains(GuildRole.ADMIN) && accessLevel != GuildRole.ADMIN) {
-                    throw new UnauthorizedResponse("You need to be a guild administrator to access this route.");
-                }
-                if (routeRoles.contains(GuildRole.GUILD_USER)
-                        && (accessLevel != GuildRole.GUILD_USER && accessLevel != GuildRole.ADMIN)) {
-                    throw new UnauthorizedResponse("You need to be a guild user to access this route.");
-                }
                 long guildId = Long.parseLong(guildIdStr);
 
-                if (isBotOwner && guildData == null) {
+                if (userContext.hasAccess(Set.of(UserRole.OWNER))
+                        && guildData.guild().name() == null) {
                     // Ensure the guild actually exists and the bot is in it if the owner wants to access it
-                    if (bot.shardManager().getGuildById(guildId) == null) {
+                    if (sessionService.shardManager().getGuildById(guildId) == null) {
                         throw new UnauthorizedResponse(
                                 "The requested guild does not exist or the bot is not a member.");
                     }
                 }
 
-                ctx.sessionAttribute(
-                        SessionAttribute.GUILD_SESSION, sessionService.getGuildSession(userContext.userId(), guildId));
-            } else if (routeRoles.contains(GuildRole.ADMIN) || routeRoles.contains(GuildRole.GUILD_USER)) {
+                ctx.sessionAttribute(SessionAttribute.GUILD_SESSION, sessionService.getGuildSession(guildId));
+            } else {
                 throw new UnauthorizedResponse("You are not a member of the requested guild.");
             }
-        } else if (routeRoles.contains(GuildRole.ADMIN) || routeRoles.contains(GuildRole.GUILD_USER)) {
+        } else if (routeRoles.stream().anyMatch(role -> role instanceof GuildRole)) {
             throw new UnauthorizedResponse("Guild context missing. Please provide X-Guild-Id header.");
         }
     }

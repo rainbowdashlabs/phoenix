@@ -189,7 +189,7 @@ CREATE INDEX user_token_user_id_index
 CREATE TABLE phoenix_schema.subscriptions (
     target_id       BIGINT    NOT NULL,
     subscription_id BIGINT    NOT NULL,
-    platform        TEXT      NOT NULL,
+    source          TEXT      NOT NULL,
     target          TEXT      NOT NULL,
     purchase_type   TEXT      NOT NULL,
     ends_at         TIMESTAMP NOT NULL,
@@ -236,4 +236,28 @@ CREATE INDEX IF NOT EXISTS kofi_purchase_guild_id_index
 
 CREATE INDEX IF NOT EXISTS kofi_purchase_mail_hash_index
     ON phoenix_schema.kofi_purchase (mail_hash);
+
+CREATE TABLE phoenix_schema.discord_purchase (
+    user_id         BIGINT    NOT NULL,
+    sku_id          BIGINT    NOT NULL,
+    type            TEXT      NOT NULL,
+    target          TEXT      NOT NULL,
+    subscription_id BIGINT    NOT NULL,
+    entitlement_id  BIGINT    NOT NULL,
+    expires_at      TIMESTAMP NOT NULL,
+    persistent      BOOL      NOT NULL,
+    guild_id        BIGINT    NOT NULL
+);
+
+CREATE INDEX discord_purchase_expires_at_index
+    ON phoenix_schema.discord_purchase (expires_at);
+
+CREATE INDEX discord_purchase_guild_id_index
+    ON phoenix_schema.discord_purchase (guild_id);
+
+CREATE UNIQUE INDEX discord_purchase_guild_id_subscription_id_uindex
+    ON phoenix_schema.discord_purchase (guild_id, subscription_id);
+
+CREATE INDEX discord_purchase_user_id_index
+    ON phoenix_schema.discord_purchase (user_id);
 

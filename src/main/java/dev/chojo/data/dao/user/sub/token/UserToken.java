@@ -3,12 +3,12 @@
  *
  *     Copyright (C) RainbowDashLabs and Contributor
  */
-package dev.chojo.data.dao.user.sub;
+package dev.chojo.data.dao.user.sub.token;
 
 import de.chojo.sadu.mapper.annotation.MappingProvider;
 import de.chojo.sadu.mapper.wrapper.Row;
+import dev.chojo.aether.discordoauth.access.IOAuthToken;
 import dev.chojo.aether.discordoauth.access.OAuthScope;
-import dev.chojo.aether.discordoauth.access.OAuthToken;
 import dev.chojo.aether.discordoauth.pojo.TokenResponse;
 
 import java.sql.SQLException;
@@ -22,13 +22,14 @@ import static de.chojo.sadu.queries.api.call.Call.call;
 import static de.chojo.sadu.queries.api.query.Query.query;
 import static de.chojo.sadu.queries.converter.StandardValueConverter.INSTANT_TIMESTAMP;
 
-public final class UserToken implements OAuthToken {
+public final class UserToken implements IOAuthToken {
     private final long userId;
     private String accessToken;
     private String refreshToken;
     private Instant expiry;
     private final Set<OAuthScope> scopes;
     private final String token;
+    private Instant lastUsed;
 
     /**
      * Create a new WebToken.
@@ -40,13 +41,20 @@ public final class UserToken implements OAuthToken {
      * @param token        token
      */
     public UserToken(
-            long userId, String accessToken, String refreshToken, Instant expiry, Set<OAuthScope> scope, String token) {
+            long userId,
+            String accessToken,
+            String refreshToken,
+            Instant expiry,
+            Set<OAuthScope> scope,
+            String token,
+            Instant lastUsed) {
         this.userId = userId;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.expiry = expiry;
         this.scopes = scope;
         this.token = token;
+        this.lastUsed = lastUsed;
     }
 
     @MappingProvider({"user_id", "access_token", "refresh_token", "expiry", "token"})
@@ -58,13 +66,25 @@ public final class UserToken implements OAuthToken {
                 row.getString("refresh_token"),
                 row.get("expiry", INSTANT_TIMESTAMP),
                 scopes.stream().map(OAuthScope::valueOf).collect(Collectors.toSet()),
-                row.getString("token"));
+                row.getString("token"),
+                row.get("last_used", INSTANT_TIMESTAMP));
     }
 
     public void delete() {
         query("DELETE FROM user_token WHERE user_id = ?")
                 .single(call().bind(userId))
                 .delete();
+    }
+
+    public Instant lastUsed() {
+        return lastUsed;
+    }
+
+    public void used() {
+        query("UPDATE user_token SET last_used = now() WHERE token = ?")
+                .single(call().bind(token))
+                .update()
+                .ifChanged(e -> lastUsed = Instant.now());
     }
 
     @Override
@@ -75,18 +95,7 @@ public final class UserToken implements OAuthToken {
     @Override
     public void update(TokenResponse response) {
         query("""
-                INSERT
-                INTO
-                    user_token
-                    (user_id, access_token, refresh_token, expiry, token)
-                VALUES
-                    (?, ?, ?, ?, ?)
-                ON CONFLICT (token)
-                    DO UPDATE
-                    SET
-                        access_token  = excluded.access_token,
-                        refresh_token = excluded.refresh_token,
-                        expiry        = excluded.expiry
+                UPDATE user_token SET access_token = ?, refresh_token = ?, expiry = ? WHERE token = ?;
                 """)
                 .single(call().bind(userId)
                         .bind(response.accessToken())

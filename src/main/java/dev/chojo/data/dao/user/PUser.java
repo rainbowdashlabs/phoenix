@@ -5,10 +5,10 @@
  */
 package dev.chojo.data.dao.user;
 
-import dev.chojo.data.dao.user.sub.Purchases;
-import dev.chojo.data.dao.user.sub.UserMails;
 import dev.chojo.data.dao.user.sub.UserSettings;
-import dev.chojo.data.dao.user.sub.UserTokens;
+import dev.chojo.data.dao.user.sub.mailing.UserMails;
+import dev.chojo.data.dao.user.sub.purchases.Purchases;
+import dev.chojo.data.dao.user.sub.token.UserTokens;
 import org.jspecify.annotations.Nullable;
 
 import static de.chojo.sadu.queries.api.call.Call.call;
@@ -16,12 +16,16 @@ import static de.chojo.sadu.queries.api.query.Query.query;
 
 public class PUser {
     private final long userId;
+
     @Nullable
     private UserSettings settings;
+
     @Nullable
-    private UserMails mails;
+    private UserMails userMails;
+
     @Nullable
     private Purchases purchases;
+
     @Nullable
     private UserTokens tokens;
 
@@ -30,7 +34,7 @@ public class PUser {
     }
 
     public UserTokens tokens() {
-        if(tokens == null){
+        if (tokens == null) {
             tokens = new UserTokens(userId);
         }
         return tokens;
@@ -50,10 +54,10 @@ public class PUser {
     }
 
     public UserMails mails() {
-        if (mails == null) {
-            mails = new UserMails(userId);
+        if (userMails == null) {
+            userMails = new UserMails(userId);
         }
-        return mails;
+        return userMails;
     }
 
     public Purchases purchases() {

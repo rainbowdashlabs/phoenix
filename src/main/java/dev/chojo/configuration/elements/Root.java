@@ -8,7 +8,6 @@ package dev.chojo.configuration.elements;
 import dev.chojo.aether.discordoauth.configuration.DiscordOAuth;
 import dev.chojo.aether.kofi.configuration.Kofi;
 import dev.chojo.aether.mailing.configuration.Mailing;
-import dev.chojo.aether.mailing.service.MailServiceConfig;
 import dev.chojo.aether.supporter.configuration.SupporterConfiguration;
 import dev.chojo.configuration.elements.sub.Api;
 import dev.chojo.configuration.elements.sub.Crypto;
