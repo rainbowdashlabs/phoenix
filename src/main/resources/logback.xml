@@ -6,7 +6,12 @@
         </encoder>
     </appender>
 
-    <root level="info">
+    <logger name="org.eclipse.jetty" level="OFF"/>
+    <logger name="io.javalin" level="OFF"/>
+    <logger name="net.dv8tion.jda" level="INFO"/>
+    <logger name="com.zaxxer.hikari" level="INFO"/>
+
+    <root level="trace">
         <appender-ref ref="STDOUT"/>
     </root>
 

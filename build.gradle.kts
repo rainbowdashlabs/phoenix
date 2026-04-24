@@ -21,6 +21,7 @@ group = "dev.chojo"
 version = "1.0.0"
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven("https://central.sonatype.com/repository/maven-snapshots/")
 }
@@ -30,6 +31,7 @@ dependencies {
         exclude(module = "opus-java")
     }
     implementation(libs.jdacommands)
+    implementation(libs.aether)
 
     implementation(libs.hikari)
     implementation(libs.postgres)

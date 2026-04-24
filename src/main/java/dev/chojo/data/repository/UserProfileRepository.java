@@ -7,6 +7,7 @@ package dev.chojo.data.repository;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.inject.Inject;
 import dev.chojo.data.snapshot.UserProfile;
 
 import java.util.concurrent.ExecutionException;
@@ -18,6 +19,9 @@ import static de.chojo.sadu.queries.api.query.Query.query;
 public class UserProfileRepository {
     private final Cache<Long, Cache<Long, UserProfile>> cache =
             CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build();
+
+    @Inject
+    public UserProfileRepository() {}
 
     public UserProfile getGuildUser(long guildId, long userId) {
         try {

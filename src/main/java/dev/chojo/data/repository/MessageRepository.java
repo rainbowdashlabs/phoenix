@@ -7,6 +7,7 @@ package dev.chojo.data.repository;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.inject.Inject;
 import dev.chojo.crypto.EncryptedContent;
 import dev.chojo.crypto.serialization.EncryptedSymAlgorithmWrapper;
 import dev.chojo.data.snapshot.EncryptedMessage;
@@ -20,6 +21,9 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 public class MessageRepository {
     private final Cache<EncryptedSymAlgorithmWrapper, Long> storedKeys =
             CacheBuilder.newBuilder().expireAfterWrite(10, MINUTES).build();
+
+    @Inject
+    public MessageRepository() {}
 
     public void storeMessage(EncryptedMessage encryptedMessage) {
         EncryptedContent content = encryptedMessage.content();

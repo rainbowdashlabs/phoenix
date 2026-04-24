@@ -5,10 +5,12 @@
  */
 package dev.chojo.configuration;
 
+import dev.chojo.aether.supporter.jackson.SupporterModule;
 import dev.chojo.configuration.elements.Root;
 import dev.chojo.ocular.Configurations;
 import dev.chojo.ocular.dataformats.YamlDataFormat;
 import dev.chojo.ocular.key.Key;
+import tools.jackson.databind.JacksonModule;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -19,6 +21,11 @@ public class Configuration extends Configurations<Root> {
 
     public Configuration() {
         super(getBasePath(), ROOT, List.of(new YamlDataFormat()), Configuration.class.getClassLoader(), null);
+    }
+
+    @Override
+    public List<JacksonModule> additionalModules() {
+        return List.of(new SupporterModule());
     }
 
     private static Path getRootPath() {
