@@ -16,7 +16,7 @@ const { state } = useAuth()
   <header class="sticky-header">
     <div class="container">
       <div class="logo">
-        <RouterLink to="/">Elpis</RouterLink>
+        <RouterLink to="/">Phoenix</RouterLink>
       </div>
       <nav>
         <RouterLink to="/">{{ $t('nav.home') }}</RouterLink>
