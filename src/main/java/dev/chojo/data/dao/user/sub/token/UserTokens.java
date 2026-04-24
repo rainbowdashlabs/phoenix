@@ -5,8 +5,11 @@
  */
 package dev.chojo.data.dao.user.sub.token;
 
+import de.chojo.sadu.postgresql.types.PostgreSqlTypes;
+import dev.chojo.aether.discordoauth.access.OAuthScope;
 import org.jspecify.annotations.Nullable;
 
+import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -35,7 +38,8 @@ public class UserTokens {
                         refresh_token,
                         expiry,
                         token,
-                        last_used
+                        last_used,
+                        scopes
                     FROM
                         user_token
                     WHERE user_id = ?
@@ -53,18 +57,19 @@ public class UserTokens {
                 INSERT
                 INTO
                     user_token
-                    (user_id, access_token, refresh_token, expiry, token)
+                    (user_id, access_token, refresh_token, expiry, token, scopes)
                 VALUES
-                    (?, ?, ?, ?, ?)
+                    (?, ?, ?, ?, ?, ?)
                 ON CONFLICT(token)
                     DO UPDATE
                     SET last_used = now()
-                RETURNING user_id, access_token, refresh_token, expiry, token;""")
+                RETURNING user_id, access_token, refresh_token, expiry, token, scopes, last_used;""")
                 .single(call().bind(userId)
                         .bind(token.accessToken())
                         .bind(token.refreshToken())
                         .bind(token.expiry(), INSTANT_TIMESTAMP)
-                        .bind(token.token()))
+                        .bind(token.token())
+                        .bind(token.scopes().stream().map(OAuthScope::name).toList(), PostgreSqlTypes.TEXT))
                 .map(UserToken::new)
                 .first()
                 .filter(e -> e.userId() == token.userId())

@@ -8,9 +8,11 @@ package dev.chojo.data.converter;
 import de.chojo.sadu.mapper.reader.ValueReader;
 import de.chojo.sadu.mapper.wrapper.Row;
 import de.chojo.sadu.queries.api.call.adapter.Adapter;
+import de.chojo.sadu.queries.call.adapter.StandardAdapter;
 import de.chojo.sadu.queries.converter.ValueConverter;
 import dev.chojo.aether.common.registry.Key;
 import dev.chojo.aether.common.registry.Registry;
+import dev.chojo.aether.discordoauth.access.OAuthScope;
 import dev.chojo.aether.mailing.entities.MailSource;
 import dev.chojo.aether.mailing.service.MailSourceRegistry;
 import dev.chojo.aether.supporter.configuration.modules.subscriptions.SubscriptionKey;
@@ -19,6 +21,8 @@ import dev.chojo.aether.supporter.configuration.modules.subscriptions.platform.p
 import dev.chojo.aether.supporter.registry.SupporterRegistry;
 
 import java.sql.Types;
+import java.util.Collection;
+import java.util.List;
 
 public final class AetherConverter {
     public static final ValueConverter<MailSource, String> MAIL_SOURCE =
