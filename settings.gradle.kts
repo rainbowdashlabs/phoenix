@@ -1,1 +1,1 @@
-rootProject.name = "elpis"
+rootProject.name = "phoenix"

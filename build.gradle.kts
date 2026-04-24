@@ -14,7 +14,7 @@ plugins {
 }
 
 application {
-    mainClass = "dev.chojo.Bootstrapper"
+    mainClass = "dev.chojo.phoenix.Bootstrapper"
     applicationDefaultJvmArgs = listOf("--add-reads", "dev.chojo.elpis=ALL-UNNAMED")
 }
 group = "dev.chojo"
