@@ -33,7 +33,7 @@ ENV DOCKER=true
 WORKDIR /app
 
 #COPY --from=frontend /build/dist/ public
-COPY --from=build /home/gradle/build/install/elpis/ .
+COPY --from=build /home/gradle/build/install/phoenix/ .
 
 RUN mkdir config
 RUN echo "{}" > config/config.json
