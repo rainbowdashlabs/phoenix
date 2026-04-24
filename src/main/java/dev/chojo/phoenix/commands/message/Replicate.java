@@ -6,11 +6,11 @@
 package dev.chojo.phoenix.commands.message;
 
 import com.google.inject.Inject;
+import dev.chojo.phoenix.MessageStoreService;
 import dev.chojo.phoenix.data.snapshot.MessageSnapshot;
 import dev.chojo.phoenix.data.snapshot.UserProfile;
 import dev.chojo.phoenix.data.snapshot.message.context.GuildRestorationContext;
 import dev.chojo.phoenix.data.snapshot.message.context.MessageRestorationContext;
-import dev.chojo.phoenix.MessageStoreService;
 import io.github.kaktushose.jdac.annotations.interactions.Command;
 import io.github.kaktushose.jdac.annotations.interactions.Interaction;
 import io.github.kaktushose.jdac.dispatching.events.interactions.CommandEvent;

@@ -9,8 +9,6 @@ import dev.chojo.phoenix.configuration.Configuration;
 import dev.chojo.phoenix.configuration.elements.Root;
 import dev.chojo.phoenix.crypto.CryptoService;
 import dev.chojo.phoenix.crypto.exceptions.CryptoException;
-import dev.chojo.phoenix.crypto.processing.Decryptor;
-import dev.chojo.phoenix.crypto.processing.Encryptor;
 import dev.chojo.phoenix.crypto.processing.model.BytesProcessInput;
 import dev.chojo.phoenix.crypto.processing.model.BytesProcessResult;
 import dev.chojo.phoenix.crypto.processing.model.SymProcessInput;
@@ -98,9 +96,7 @@ class DecryptorTest {
         when(wrapper.process(any(BytesProcessInput.class))).thenReturn(null);
 
         Decryptor<BytesProcessInput, BytesProcessResult> decryptor = new Decryptor<>(wrapper);
-        assertThrows(
-                CryptoException.class,
-                () -> decryptor.process(new BytesProcessInput(new byte[0])));
+        assertThrows(CryptoException.class, () -> decryptor.process(new BytesProcessInput(new byte[0])));
     }
 
     @Test

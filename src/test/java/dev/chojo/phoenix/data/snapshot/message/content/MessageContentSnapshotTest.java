@@ -6,7 +6,6 @@
 package dev.chojo.phoenix.data.snapshot.message.content;
 
 import dev.chojo.phoenix.data.snapshot.UserProfile;
-import dev.chojo.phoenix.data.snapshot.message.content.MessageContentSnapshot;
 import dev.chojo.phoenix.data.snapshot.message.context.GuildRestorationContext;
 import dev.chojo.phoenix.data.snapshot.message.context.MessageRestorationContext;
 import net.dv8tion.jda.api.components.MessageTopLevelComponentUnion;

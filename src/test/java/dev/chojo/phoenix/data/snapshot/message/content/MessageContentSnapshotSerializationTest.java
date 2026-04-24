@@ -7,7 +7,6 @@ package dev.chojo.phoenix.data.snapshot.message.content;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.chojo.phoenix.data.snapshot.message.content.MessageContentSnapshot;
 import dev.chojo.phoenix.data.snapshot.message.content.meta.PollEnd;
 import dev.chojo.phoenix.data.snapshot.message.content.meta.Reference;
 import dev.chojo.phoenix.data.snapshot.message.content.meta.ThreadCreated;

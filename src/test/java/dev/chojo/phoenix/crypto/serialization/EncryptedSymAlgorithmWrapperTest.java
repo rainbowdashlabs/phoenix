@@ -16,7 +16,6 @@ import dev.chojo.phoenix.crypto.processing.model.BytesProcessResult;
 import dev.chojo.phoenix.crypto.processing.wrapper.AlgorithmWrapper;
 import dev.chojo.phoenix.crypto.processing.wrapper.AsymAlgorithmWrapper;
 import dev.chojo.phoenix.crypto.processing.wrapper.SymAlgorithmWrapper;
-import dev.chojo.phoenix.crypto.serialization.EncryptedSymAlgorithmWrapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

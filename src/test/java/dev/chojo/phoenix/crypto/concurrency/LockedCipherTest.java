@@ -5,7 +5,6 @@
  */
 package dev.chojo.phoenix.crypto.concurrency;
 
-import dev.chojo.phoenix.crypto.concurrency.LockedCipher;
 import org.junit.jupiter.api.Test;
 
 import java.security.NoSuchAlgorithmException;

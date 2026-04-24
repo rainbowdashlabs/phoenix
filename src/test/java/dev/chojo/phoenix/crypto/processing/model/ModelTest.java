@@ -5,10 +5,6 @@
  */
 package dev.chojo.phoenix.crypto.processing.model;
 
-import dev.chojo.phoenix.crypto.processing.model.BytesProcessInput;
-import dev.chojo.phoenix.crypto.processing.model.BytesProcessResult;
-import dev.chojo.phoenix.crypto.processing.model.SymProcessInput;
-import dev.chojo.phoenix.crypto.processing.model.SymProcessResult;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -6,10 +6,10 @@
 package dev.chojo.phoenix.configuration;
 
 import dev.chojo.aether.supporter.jackson.SupporterModule;
-import dev.chojo.phoenix.configuration.elements.Root;
 import dev.chojo.ocular.Configurations;
 import dev.chojo.ocular.dataformats.YamlDataFormat;
 import dev.chojo.ocular.key.Key;
+import dev.chojo.phoenix.configuration.elements.Root;
 import tools.jackson.databind.JacksonModule;
 
 import java.nio.file.Path;

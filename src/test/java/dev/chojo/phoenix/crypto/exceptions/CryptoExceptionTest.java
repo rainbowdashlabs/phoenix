@@ -5,7 +5,6 @@
  */
 package dev.chojo.phoenix.crypto.exceptions;
 
-import dev.chojo.phoenix.crypto.exceptions.CryptoException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

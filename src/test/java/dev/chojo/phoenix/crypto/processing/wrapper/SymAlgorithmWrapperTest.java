@@ -12,7 +12,6 @@ import dev.chojo.phoenix.crypto.processing.Decryptor;
 import dev.chojo.phoenix.crypto.processing.Encryptor;
 import dev.chojo.phoenix.crypto.processing.model.SymProcessInput;
 import dev.chojo.phoenix.crypto.processing.model.SymProcessResult;
-import dev.chojo.phoenix.crypto.processing.wrapper.SymAlgorithmWrapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

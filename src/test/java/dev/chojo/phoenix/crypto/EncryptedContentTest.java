@@ -5,7 +5,6 @@
  */
 package dev.chojo.phoenix.crypto;
 
-import dev.chojo.phoenix.crypto.EncryptedContent;
 import dev.chojo.phoenix.crypto.serialization.EncryptedSymAlgorithmWrapper;
 import org.junit.jupiter.api.Test;
 

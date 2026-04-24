@@ -7,7 +7,6 @@ package dev.chojo.phoenix.crypto;
 
 import dev.chojo.phoenix.configuration.Configuration;
 import dev.chojo.phoenix.configuration.elements.Root;
-import dev.chojo.phoenix.crypto.CryptoService;
 import dev.chojo.phoenix.crypto.processing.wrapper.SymAlgorithmWrapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

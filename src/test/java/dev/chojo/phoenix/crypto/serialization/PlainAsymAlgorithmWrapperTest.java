@@ -10,7 +10,6 @@ import dev.chojo.phoenix.configuration.elements.Root;
 import dev.chojo.phoenix.crypto.CryptoService;
 import dev.chojo.phoenix.crypto.exceptions.CryptoException;
 import dev.chojo.phoenix.crypto.processing.wrapper.AsymAlgorithmWrapper;
-import dev.chojo.phoenix.crypto.serialization.PlainAsymAlgorithmWrapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
