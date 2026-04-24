@@ -17,7 +17,6 @@ import dev.chojo.aether.supporter.service.context.ISupporterErrorSupplier;
 import dev.chojo.aether.supporter.service.context.SubcriptionContextProvider;
 import dev.chojo.configuration.Configuration;
 import dev.chojo.data.repository.SupporterRepository;
-import dev.chojo.service.EntitlementService;
 import dev.goldmensch.fluava.Fluava;
 import io.github.kaktushose.jdac.JDACBuilder;
 import io.github.kaktushose.jdac.JDACommands;
@@ -81,7 +80,7 @@ public class Bot extends AbstractModule {
     }
 
     private ShardManager shardManager(String token) throws InterruptedException {
-        if(shardManager != null) return shardManager;
+        if (shardManager != null) return shardManager;
         shardManager = DefaultShardManagerBuilder.createDefault(token)
                 .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)

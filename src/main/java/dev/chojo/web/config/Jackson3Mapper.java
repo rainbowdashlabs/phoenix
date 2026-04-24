@@ -8,7 +8,6 @@ package dev.chojo.web.config;
 import io.javalin.json.JsonMapper;
 import io.javalin.json.PipedStreamExecutor;
 import org.jspecify.annotations.NonNull;
-import tools.jackson.core.JsonEncoding;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SequenceWriter;
 

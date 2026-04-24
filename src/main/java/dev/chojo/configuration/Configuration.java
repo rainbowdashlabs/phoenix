@@ -7,7 +7,6 @@ package dev.chojo.configuration;
 
 import dev.chojo.aether.supporter.jackson.SupporterModule;
 import dev.chojo.configuration.elements.Root;
-import dev.chojo.guice.ElpisModule;
 import dev.chojo.ocular.Configurations;
 import dev.chojo.ocular.dataformats.YamlDataFormat;
 import dev.chojo.ocular.key.Key;

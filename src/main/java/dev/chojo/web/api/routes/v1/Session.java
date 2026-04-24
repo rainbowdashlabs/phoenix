@@ -42,7 +42,8 @@ public class Session implements RoutesBuilder {
                 @OpenApiResponse(status = "401", description = "Not logged in")
             })
     private void user(Context ctx) {
-        UserContext session = sessionService.getUserSession(ctx).orElseThrow(() -> new UnauthorizedResponse("Not logged in"));
+        UserContext session =
+                sessionService.getUserSession(ctx).orElseThrow(() -> new UnauthorizedResponse("Not logged in"));
         ctx.json(session.user());
     }
 }

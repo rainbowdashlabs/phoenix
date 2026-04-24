@@ -61,8 +61,9 @@ public class SaduConfig {
     private void internalConnect() {
         Database db = configuration.main().database();
         dataSource = DataSourceCreator.create(PostgreSql.get())
-                .configure(config ->
-                        config.allowMultiQueries(true).applicationName("Phoenix").currentSchema(db.schema()))
+                .configure(config -> config.allowMultiQueries(true)
+                        .applicationName("Phoenix")
+                        .currentSchema(db.schema()))
                 .create()
                 .withPoolName("Phoenix")
                 .usingUsername(db.user())

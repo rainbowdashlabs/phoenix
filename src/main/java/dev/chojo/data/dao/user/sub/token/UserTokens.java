@@ -9,7 +9,6 @@ import de.chojo.sadu.postgresql.types.PostgreSqlTypes;
 import dev.chojo.aether.discordoauth.access.OAuthScope;
 import org.jspecify.annotations.Nullable;
 
-import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;

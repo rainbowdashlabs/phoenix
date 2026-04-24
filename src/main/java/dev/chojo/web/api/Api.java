@@ -42,8 +42,8 @@ public class Api {
                     ctx.method() + " " + ctx.url(),
                     Objects.requireNonNullElse(ctx.queryString(), ""),
                     ctx.headerMap().entrySet().stream()
-                       .map(h -> "   " + h.getKey() + ": " + h.getValue())
-                       .collect(Collectors.joining("\n")),
+                            .map(h -> "   " + h.getKey() + ": " + h.getValue())
+                            .collect(Collectors.joining("\n")),
                     ctx.body().substring(0, Math.min(ctx.body().length(), 180)));
         });
         after(ctx -> {
@@ -54,18 +54,17 @@ public class Api {
                     Objects.requireNonNullElse(ctx.queryString(), ""),
                     ctx.status(),
                     ctx.res().getHeaderNames().stream()
-                       .map(h -> "   " + h + ": " + ctx.res().getHeader(h))
-                       .collect(Collectors.joining("\n")),
+                            .map(h -> "   " + h + ": " + ctx.res().getHeader(h))
+                            .collect(Collectors.joining("\n")),
                     ContentType.OCTET_STREAM.equals(ctx.contentType())
                             ? "Bytes"
                             : Objects.requireNonNullElse(ctx.result(), "")
-                                     .substring(
-                                             0,
-                                             Math.min(
-                                                     Objects.requireNonNullElse(ctx.result(), "")
+                                    .substring(
+                                            0,
+                                            Math.min(
+                                                    Objects.requireNonNullElse(ctx.result(), "")
                                                             .length(),
-                                                     180)));
-
+                                                    180)));
         });
         new V1(sessionService, configuration, discordOAuthService).buildRoutes();
     }
