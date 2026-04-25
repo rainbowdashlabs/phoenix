@@ -20,6 +20,9 @@ public class Bootstrapper {
 
     void main() throws InterruptedException, SQLException, IOException {
         Configuration configuration = new Configuration();
+        configuration.main();
+        configuration.save();
+
         Injector injector = Guice.createInjector(new PhoenixModule(configuration));
 
         SaduConfig sadu = injector.getInstance(SaduConfig.class);

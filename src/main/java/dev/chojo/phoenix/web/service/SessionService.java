@@ -82,6 +82,7 @@ public class SessionService {
         if (token.isBlank()) return;
         userRepository.byToken(token).ifPresent(user -> user.tokens().removeToken(token));
         userSessions.invalidate(token);
+        // TODO: discordOAuthService.client().invalidate(token);
     }
 
     public GuildSession getGuildSession(long guildId) {
@@ -93,9 +94,9 @@ public class SessionService {
     }
 
     private Optional<UserContext> tryReconstructSession(String token) {
-        return userRepository.byToken(token).map(meta -> {
-            UserToken userToken = meta.tokens().token(token).get();
-            UserContext session = createUserSessionFromToken(meta.id(), token, userToken.lastUsed());
+        return userRepository.byToken(token).map(user -> {
+            UserToken userToken = user.tokens().token(token).get();
+            UserContext session = createUserSessionFromToken(user.id(), token, userToken.lastUsed());
             userSessions.put(token, session);
             userToken.used();
             return session;

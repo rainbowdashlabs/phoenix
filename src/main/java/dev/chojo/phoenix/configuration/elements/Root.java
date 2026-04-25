@@ -13,6 +13,7 @@ import dev.chojo.phoenix.configuration.elements.sub.Api;
 import dev.chojo.phoenix.configuration.elements.sub.Crypto;
 import dev.chojo.phoenix.configuration.elements.sub.Database;
 import dev.chojo.phoenix.configuration.elements.sub.General;
+import dev.chojo.phoenix.configuration.elements.sub.Links;
 import dev.chojo.phoenix.configuration.elements.sub.supporter.FeatureID;
 import dev.chojo.phoenix.configuration.elements.sub.supporter.FeatureMeta;
 import dev.chojo.phoenix.configuration.elements.sub.supporter.FeaturePrice;
@@ -27,6 +28,11 @@ public class Root {
     private Kofi kofi = new Kofi();
     private Mailing mailing = new Mailing();
     private SupporterConfiguration<FeatureID, FeaturePrice, FeatureMeta> supporter = new SupporterConfiguration<>();
+    private Links links = new Links();
+
+    public Links links() {
+        return links;
+    }
 
     public General general() {
         return general;

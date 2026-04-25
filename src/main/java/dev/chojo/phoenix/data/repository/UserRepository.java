@@ -8,6 +8,7 @@ package dev.chojo.phoenix.data.repository;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import de.chojo.sadu.queries.converter.StandardValueConverter;
 import dev.chojo.phoenix.data.dao.user.PUser;
 import dev.chojo.phoenix.data.dao.user.sub.token.UserToken;
@@ -22,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import static de.chojo.sadu.queries.api.call.Call.call;
 import static de.chojo.sadu.queries.api.query.Query.query;
 
+@Singleton
 public class UserRepository {
     private final Cache<Long, PUser> users =
             CacheBuilder.newBuilder().expireAfterAccess(15, TimeUnit.MINUTES).build();

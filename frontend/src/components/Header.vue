@@ -6,24 +6,29 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
 import { useAuth } from '@/stores/auth'
+import { useApplication } from '@/stores/application'
 import LoginButton from './LoginButton.vue'
 import UserProfile from './UserProfile.vue'
 
 const { state } = useAuth()
+const { state: appState } = useApplication()
 </script>
 
 <template>
   <header class="sticky-header">
     <div class="container">
       <div class="logo">
-        <RouterLink to="/">Phoenix</RouterLink>
+        <RouterLink to="/">
+          <img v-if="appState.botInfo" :src="appState.botInfo.profilePictureUrl" :alt="appState.botInfo.displayName" class="logo-avatar" />
+          <span>{{ appState.botInfo ? appState.botInfo.displayName : 'Phoenix' }}</span>
+        </RouterLink>
       </div>
       <nav>
         <RouterLink to="/">{{ $t('nav.home') }}</RouterLink>
         <RouterLink to="/about">{{ $t('nav.about') }}</RouterLink>
         <div v-if="!state.loading" class="auth-section">
-          <LoginButton v-if="!state.user" />
-          <UserProfile v-else :user="state.user" />
+          <LoginButton v-if="!state.userContext" />
+          <UserProfile v-else :user="state.userContext.user" />
         </div>
       </nav>
     </div>
@@ -55,6 +60,15 @@ const { state } = useAuth()
   font-weight: bold;
   color: var(--color-heading);
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
 }
 
 nav {
