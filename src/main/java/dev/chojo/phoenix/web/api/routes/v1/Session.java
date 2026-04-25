@@ -5,7 +5,6 @@
  */
 package dev.chojo.phoenix.web.api.routes.v1;
 
-import dev.chojo.aether.serialization.pojo.guild.MemberPOJO;
 import dev.chojo.phoenix.web.api.RoutesBuilder;
 import dev.chojo.phoenix.web.config.UserRole;
 import dev.chojo.phoenix.web.service.SessionService;
@@ -38,12 +37,14 @@ public class Session implements RoutesBuilder {
             summary = "Get current user session",
             tags = {"Session"},
             responses = {
-                @OpenApiResponse(status = "200", content = @io.javalin.openapi.OpenApiContent(from = MemberPOJO.class)),
+                @OpenApiResponse(
+                        status = "200",
+                        content = @io.javalin.openapi.OpenApiContent(from = UserContext.class)),
                 @OpenApiResponse(status = "401", description = "Not logged in")
             })
     private void user(Context ctx) {
         UserContext session =
                 sessionService.getUserSession(ctx).orElseThrow(() -> new UnauthorizedResponse("Not logged in"));
-        ctx.json(session.user());
+        ctx.json(session);
     }
 }

@@ -27,6 +27,7 @@ import io.javalin.openapi.plugin.swagger.SwaggerConfiguration;
 import io.javalin.openapi.plugin.swagger.SwaggerPlugin;
 import io.javalin.plugin.bundled.CorsPluginConfig;
 import io.javalin.security.RouteRole;
+import net.dv8tion.jda.api.sharding.ShardManager;
 import org.slf4j.Logger;
 import tools.jackson.core.exc.InputCoercionException;
 import tools.jackson.databind.ObjectMapper;
@@ -50,13 +51,18 @@ public class WebService {
     private Javalin javalin;
     private final SessionService sessionService;
     private final DiscordOAuthService discordOAuthService;
+    private final ShardManager shardManager;
 
     @Inject
     public WebService(
-            Configuration configuration, SessionService sessionService, DiscordOAuthService discordOAuthService) {
+            Configuration configuration,
+            SessionService sessionService,
+            DiscordOAuthService discordOAuthService,
+            ShardManager shardManager) {
         this.configuration = configuration;
         this.sessionService = sessionService;
         this.discordOAuthService = discordOAuthService;
+        this.shardManager = shardManager;
         initApi();
     }
 
@@ -107,7 +113,8 @@ public class WebService {
 
                     setupExceptionHandler(config.routes);
 
-                    config.routes.apiBuilder(() -> new Api(sessionService, configuration, discordOAuthService).init());
+                    config.routes.apiBuilder(
+                            () -> new Api(sessionService, configuration, discordOAuthService, shardManager).init());
                     config.routes.beforeMatched(this::handleAccess);
                     config.jsonMapper(jacksonMapper());
                     // Serve frontend SPA

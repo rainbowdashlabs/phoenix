@@ -12,13 +12,15 @@ const apiClient = axios.create({
   }
 })
 
-// Add a request interceptor to include the auth token
+// Add a request interceptor to include the auth token and selected guild
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('auth_token')
     if (token) {
       config.headers.Authorization = token
     }
+    const guildId = localStorage.getItem('selected_guild_id') ?? '0'
+    config.headers['Guild-Id'] = guildId
     return config
   },
   (error) => {

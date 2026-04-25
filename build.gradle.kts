@@ -15,7 +15,7 @@ plugins {
 
 application {
     mainClass = "dev.chojo.phoenix.Bootstrapper"
-    applicationDefaultJvmArgs = listOf("--add-reads", "dev.chojo.elpis=ALL-UNNAMED")
+    applicationDefaultJvmArgs = listOf()
 }
 group = "dev.chojo"
 version = "1.0.0"
@@ -32,6 +32,7 @@ dependencies {
     }
     implementation(libs.jdacommands)
     implementation(libs.aether)
+    annotationProcessor(libs.aether)
 
     implementation(libs.hikari)
     implementation(libs.postgres)
@@ -61,7 +62,7 @@ dependencies {
 tasks {
     compileJava {
         options.isIncremental = true
-        options.compilerArgs.addAll(listOf("--add-reads", "dev.chojo.elpis=ALL-UNNAMED", "-parameters"))
+        options.compilerArgs.addAll(listOf("-parameters"))
     }
 
     processResources {

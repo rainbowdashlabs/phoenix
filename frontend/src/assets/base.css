@@ -1,8 +1,8 @@
 /* color palette from <https://github.com/vuejs/theme> */
 :root {
-  --color-cyan-glow: #22f8ff;
+  --color-cyan-glow: #11a7ac;
   --color-steel-blue: #89a7c4;
-  --color-deep-saffron: #ff9012;
+  --color-deep-saffron: #e18012;
   --color-blaze-orange: #ff5d12;
   --color-bright-gold: #ffdd1b;
   --color-lime-green: #00c507;
@@ -27,7 +27,7 @@
   --color-border-hover: rgba(0, 0, 0, 0.29);
 
   --color-heading: var(--vt-c-indigo);
-  --color-text: #2c3e50;
+  --color-text: var(--color-carbon-black);
 
   --color-primary: var(--color-cyan-glow);
   --color-primary-accent: var(--color-steel-blue);
@@ -38,7 +38,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --color-background: var(--color-carbon-black);
     --color-background-soft: var(--color-carbon-black-accent);
     --color-background-mute: #121212;
@@ -49,6 +49,18 @@
     --color-heading: var(--vt-c-white);
     --color-text: rgba(235, 235, 235, 0.64);
   }
+}
+
+:root[data-theme='dark'] {
+  --color-background: var(--color-carbon-black);
+  --color-background-soft: var(--color-carbon-black-accent);
+  --color-background-mute: #121212;
+
+  --color-border: rgba(255, 255, 255, 0.12);
+  --color-border-hover: rgba(255, 255, 255, 0.29);
+
+  --color-heading: var(--vt-c-white);
+  --color-text: rgba(235, 235, 235, 0.64);
 }
 
 *,

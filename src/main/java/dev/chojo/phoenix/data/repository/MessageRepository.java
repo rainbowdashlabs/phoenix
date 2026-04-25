@@ -8,6 +8,7 @@ package dev.chojo.phoenix.data.repository;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import dev.chojo.phoenix.crypto.EncryptedContent;
 import dev.chojo.phoenix.crypto.serialization.EncryptedSymAlgorithmWrapper;
 import dev.chojo.phoenix.data.snapshot.EncryptedMessage;
@@ -18,6 +19,7 @@ import static de.chojo.sadu.queries.api.call.Call.call;
 import static de.chojo.sadu.queries.api.query.Query.query;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
+@Singleton
 public class MessageRepository {
     private final Cache<EncryptedSymAlgorithmWrapper, Long> storedKeys =
             CacheBuilder.newBuilder().expireAfterWrite(10, MINUTES).build();
