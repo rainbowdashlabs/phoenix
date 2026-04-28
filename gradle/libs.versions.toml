@@ -20,7 +20,7 @@ aether = { group = "dev.chojo.aether", name = "aether", version = "1.2.16" }
 
 # Database
 hikari = { group = "com.zaxxer", name = "HikariCP", version = "7.0.2" }
-postgres = { group = "org.postgresql", name = "postgresql", version = "42.7.10" }
+postgres = { group = "org.postgresql", name = "postgresql", version = "42.7.11" }
 sadu-postgresql = { group = "de.chojo.sadu", name = "sadu-postgresql", version.ref = "sadu" }
 sadu-datasource = { group = "de.chojo.sadu", name = "sadu-datasource", version.ref = "sadu" }
 sadu-queries = { group = "de.chojo.sadu", name = "sadu-queries", version.ref = "sadu" }
