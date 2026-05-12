@@ -29,7 +29,7 @@ sadu-updater = { group = "de.chojo.sadu", name = "sadu-updater", version.ref = "
 sadu-testing = { group = "de.chojo.sadu", name = "sadu-testing", version.ref = "sadu" }
 
 # Logging
-slf4j = { group = "org.slf4j", name = "slf4j-api", version = "2.0.17" }
+slf4j = { group = "org.slf4j", name = "slf4j-api", version = "2.0.18" }
 logback-core = { group = "ch.qos.logback", name = "logback-core", version.ref = "logback" }
 logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
 
