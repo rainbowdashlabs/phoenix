@@ -14,7 +14,7 @@ jobs:
     name: Verify Backend Build
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
@@ -31,7 +31,7 @@ jobs:
     name: Verify Frontend Build
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
@@ -53,7 +53,7 @@ jobs:
     name: Verify Backend License Check
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
@@ -68,7 +68,7 @@ jobs:
     name: Verify Frontend License Check
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
@@ -83,7 +83,7 @@ jobs:
     name: Verify Backend Format Validation
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
@@ -98,7 +98,7 @@ jobs:
     name: Verify Frontend Format Validation
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
@@ -113,7 +113,7 @@ jobs:
     name: Verify Backend Database Validation
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
@@ -128,6 +128,6 @@ jobs:
     name: Verify Docker Build
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Build as Docker image
         run: docker build . -f docker/Dockerfile
