@@ -8,6 +8,7 @@ package dev.chojo.phoenix.data.repository;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import dev.chojo.phoenix.data.snapshot.UserProfile;
 
 import java.util.concurrent.ExecutionException;
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import static de.chojo.sadu.queries.api.call.Call.call;
 import static de.chojo.sadu.queries.api.query.Query.query;
 
+@Singleton
 public class UserProfileRepository {
     private final Cache<Long, Cache<Long, UserProfile>> cache =
             CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build();

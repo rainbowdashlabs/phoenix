@@ -8,6 +8,7 @@ package dev.chojo.phoenix.data.repository;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import dev.chojo.aether.kofi.pojo.Type;
 import dev.chojo.phoenix.data.dao.GuildSupporter;
 import dev.chojo.phoenix.data.dao.user.sub.purchases.DiscordPurchase;
@@ -22,6 +23,7 @@ import static de.chojo.sadu.queries.api.call.Call.call;
 import static de.chojo.sadu.queries.api.query.Query.query;
 import static de.chojo.sadu.queries.converter.StandardValueConverter.INSTANT_TIMESTAMP;
 
+@Singleton
 public class SupporterRepository {
     private final Cache<Long, GuildSupporter> guildSupporters =
             CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).build();

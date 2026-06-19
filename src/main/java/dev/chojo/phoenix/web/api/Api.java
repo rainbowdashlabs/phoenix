@@ -12,6 +12,7 @@ import dev.chojo.phoenix.web.api.routes.V1;
 import dev.chojo.phoenix.web.service.SessionService;
 import io.javalin.http.ContentType;
 import io.javalin.http.HandlerType;
+import net.dv8tion.jda.api.sharding.ShardManager;
 import org.slf4j.Logger;
 
 import java.util.Objects;
@@ -26,12 +27,18 @@ public class Api {
     private final SessionService sessionService;
     private final Configuration configuration;
     private final DiscordOAuthService discordOAuthService;
+    private final ShardManager shardManager;
 
     @Inject
-    public Api(SessionService sessionService, Configuration configuration, DiscordOAuthService discordOAuthService) {
+    public Api(
+            SessionService sessionService,
+            Configuration configuration,
+            DiscordOAuthService discordOAuthService,
+            ShardManager shardManager) {
         this.sessionService = sessionService;
         this.configuration = configuration;
         this.discordOAuthService = discordOAuthService;
+        this.shardManager = shardManager;
     }
 
     public void init() {
@@ -66,6 +73,6 @@ public class Api {
                                                             .length(),
                                                     180)));
         });
-        new V1(sessionService, configuration, discordOAuthService).buildRoutes();
+        new V1(sessionService, configuration, discordOAuthService, shardManager).buildRoutes();
     }
 }

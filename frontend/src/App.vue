@@ -9,8 +9,10 @@ import { RouterView } from 'vue-router'
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
 import { useAuth } from '@/stores/auth'
+import { useApplication } from '@/stores/application'
 
 const { fetchUser } = useAuth()
+const { fetchApplication } = useApplication()
 
 onMounted(() => {
   const urlParams = new URLSearchParams(window.location.search)
@@ -23,6 +25,7 @@ onMounted(() => {
     window.history.replaceState({}, '', url.toString())
   }
   fetchUser()
+  fetchApplication()
 })
 </script>
 

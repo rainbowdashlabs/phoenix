@@ -7,9 +7,10 @@
     </appender>
 
     <logger name="org.eclipse.jetty" level="OFF"/>
-    <logger name="io.javalin" level="OFF"/>
+    <logger name="io.javalin" level="INFO"/>
     <logger name="net.dv8tion.jda" level="INFO"/>
     <logger name="com.zaxxer.hikari" level="INFO"/>
+    <logger name="dev.goldmensch.fluava" level="INFO"/>
 
     <root level="trace">
         <appender-ref ref="STDOUT"/>

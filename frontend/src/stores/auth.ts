@@ -6,20 +6,43 @@
 import { reactive, readonly } from 'vue'
 import apiClient from '@/api/client'
 
-export interface User {
-  name: string
+export interface MemberPOJO {
+  displayName: string
   id: string
   color: string
-  avatar: string
+  profilePictureUrl: string
+}
+
+export interface DiscordGuild {
+  id: string
+  name: string
+  icon: string | null
+  permissions: string
+  permissions_new: string
+  owner: boolean
+}
+
+export interface GuildContext {
+  roles: string[]
+  guild: DiscordGuild
+}
+
+export interface UserContext {
+  userId: number
+  token: string
+  guilds: Record<string, GuildContext>
+  user: MemberPOJO
+  created: string
+  role: string[]
 }
 
 interface AuthState {
-  user: User | null
+  userContext: UserContext | null
   loading: boolean
 }
 
 const state = reactive<AuthState>({
-  user: null,
+  userContext: null,
   loading: true
 })
 
@@ -27,13 +50,13 @@ export function useAuth() {
   const fetchUser = async () => {
     state.loading = true
     try {
-      const response = await apiClient.get<User>('/v1/session/user')
-      state.user = response.data
+      const response = await apiClient.get<UserContext>('/v1/session/user')
+      state.userContext = response.data
     } catch (error: any) {
       if (error.response?.status !== 401) {
         console.error('Failed to fetch user:', error)
       }
-      state.user = null
+      state.userContext = null
     } finally {
       state.loading = false
     }
@@ -44,9 +67,21 @@ export function useAuth() {
     window.location.href = `${baseURL}/v1/auth/login`
   }
 
+  const logout = async () => {
+    try {
+      await apiClient.post('/v1/auth/logout')
+    } catch (error) {
+      console.error('Failed to logout:', error)
+    } finally {
+      localStorage.removeItem('auth_token')
+      state.userContext = null
+    }
+  }
+
   return {
     state: readonly(state),
     fetchUser,
-    login
+    login,
+    logout
   }
 }

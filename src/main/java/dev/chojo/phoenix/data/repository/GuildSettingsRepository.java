@@ -8,6 +8,7 @@ package dev.chojo.phoenix.data.repository;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import dev.chojo.phoenix.data.dao.GuildSettings;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.sharding.ShardManager;
@@ -15,6 +16,7 @@ import net.dv8tion.jda.api.sharding.ShardManager;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+@Singleton
 public class GuildSettingsRepository {
     private final ShardManager shardManager;
     private final Cache<Long, GuildSettings> cache =
