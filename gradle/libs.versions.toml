@@ -13,7 +13,7 @@ pitest = { id = "info.solidsoft.pitest", version = "1.19.0" }
 
 [libraries]
 # Core
-jda = { group = "net.dv8tion", name = "JDA", version = "6.4.2" }
+jda = { group = "net.dv8tion", name = "JDA", version = "6.5.0" }
 jdacommands = { group = "io.github.kaktushose", name = "jda-commands", version = "5.1.1" }
 
 aether = { group = "dev.chojo.aether", name = "aether", version = "1.2.16" }
