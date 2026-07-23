@@ -1,5 +1,5 @@
 [versions]
-logback = "1.5.38"
+logback = "1.6.0"
 sadu = "2.3.9"
 jackson = "3.2.1"
 junit = "6.1.2"
